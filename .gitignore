@@ -1,0 +1,8 @@
+.DS_Store
+.claude/
+.bkit/
+node_modules/
+.next/
+*.tsbuildinfo
+next-env.d.ts
+.env*

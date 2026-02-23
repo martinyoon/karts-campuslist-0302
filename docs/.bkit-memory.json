@@ -1,0 +1,23 @@
+{
+  "sessionCount": 51,
+  "lastSession": {
+    "startedAt": "2026-02-23T04:37:56.186Z",
+    "platform": "claude",
+    "level": "Starter"
+  },
+  "pdca": {
+    "campulist": {
+      "phase": "check",
+      "matchRate": 96,
+      "iterationCount": 6,
+      "archivedAt": "2026-02-20T10:42:00.000Z",
+      "archivedTo": "docs/archive/2026-02/campulist/"
+    },
+    "mock-auth": {
+      "phase": "check",
+      "matchRate": 99,
+      "iterationCount": 1,
+      "startedAt": "2026-02-21T05:00:00.000Z"
+    }
+  }
+}
