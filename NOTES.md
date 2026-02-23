@@ -75,6 +75,8 @@ interface User {
 | `2d214d1` | feat: 캠퍼스리스트 초기 커밋 — 글쓰기 예시 채우기 7가지 기능 개선 |
 | `cf3a159` | feat: 글쓰기 나머지 3기능 추가 (인기태그/하이라이트/미리보기) + NOTES.md |
 | `98e019c` | fix: 예시 채우기 버튼 UX 개선 + interval 메모리 누수 수정 |
+| `d68b578` | docs: NOTES.md 최신 작업 내용으로 업데이트 |
+| `5bdc6ef` | fix: 글 수정 시 제목 내용 사라지는 버그 수정 (React 배칭 타이밍) |
 
 ---
 
@@ -148,10 +150,73 @@ export interface CategoryExampleSet {
 | 톤 라벨 | `톤:` | **문체:** |
 | 스피닝 텍스트 | `뽑는 중...` | **예시 고르는 중...** |
 
-### 4. 버그 수정
+### 4. 버그 수정 — setInterval 메모리 누수 + user assertion
 
 - **setInterval 메모리 누수** — `useRef`로 interval ID 관리 + `useEffect` cleanup 추가
 - **user! non-null assertion** — 스피닝 시작 시점에 `capturedUser`로 안전하게 캡처
+
+### 5. 버그 수정 — 글 수정 시 제목 사라짐 (React 배칭 타이밍)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+게시글 수정 진입 시 원래 제목에서 사용자 입력 부분이 사라지고 접두어(`[대학약칭][회원유형] `)만 남는 버그.
+
+#### 원인
+
+React 상태 배칭(batching) 타이밍 문제. 두 개의 `useEffect`가 같은 렌더 사이클에서 경합:
+
+```
+useEffect #1 (수정 모드 초기화, line 204):
+  setIsEditMode(true)  ← state 배칭, 아직 반영 안됨
+  setTitle(post.title) ← state 배칭, 아직 반영 안됨
+
+useEffect #2 (접두어 삽입, line 312):
+  if (!isEditMode)     ← 아직 false (이전 렌더 클로저)
+  if (!title)          ← 아직 "" (이전 렌더 클로저)
+  → setTitle(접두어)   ← 마지막 setTitle이 승리 → 원래 제목 덮어쓰기
+```
+
+#### 수정
+
+`isEditRef` (useRef) 추가 — ref는 state와 달리 동기적으로 반영되므로 같은 렌더 사이클에서 즉시 확인 가능.
+
+```tsx
+// 1. ref 추가
+const isEditRef = useRef(false);
+
+// 2. 수정 모드 초기화에서 동기적으로 설정
+isEditRef.current = true;
+setIsEditMode(true);
+
+// 3. 접두어 useEffect에서 ref 체크
+if (user && !isEditMode && !draftLoaded && !isEditRef.current) {
+```
+
+### 6. Supabase 연동 가이드 문서 작성
+
+**파일**: `SUPABASE_MIGRATION_GUIDE.md` (프로젝트 루트)
+
+UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단계로 체계적으로 정리.
+
+| 단계 | 내용 |
+|------|------|
+| 1 | 사전 준비 — 패키지 설치, 클라이언트 초기화 |
+| 2 | 테이블 생성 — 12개 테이블 SQL + 시드 데이터 |
+| 3 | 인증 전환 — Mock Auth → Supabase Auth + profiles |
+| 4 | 게시글 CRUD — localStorage → posts 테이블 |
+| 5 | 이미지 업로드 — base64 → Supabase Storage |
+| 6 | 찜/조회수/검색 — post_likes + view_count + Full-text Search |
+| 7 | 캠톡 Realtime — localStorage 채팅 → Supabase Realtime |
+| 8 | 캠노티 알림 — localStorage 알림 → notifications 테이블 |
+| 9 | RLS 보안 — Row Level Security 정책 |
+| 10 | 정리/배포 — Mock 코드 삭제 + Vercel 배포 |
+
+포함 내용:
+- 12개 Supabase 테이블 스키마 (컬럼, 타입, 인덱스, 제약조건)
+- 현재 TypeScript 타입 ↔ Supabase snake_case 매핑표
+- 각 단계별 테스트 체크리스트
+- 삭제할 파일/localStorage 키 vs 유지할 파일 목록
+- RLS 정책 (테이블별 SELECT/INSERT/UPDATE/DELETE 규칙)
 
 ---
 
@@ -164,8 +229,10 @@ export interface CategoryExampleSet {
 [완료] 인기태그 추천 / 필드 하이라이트 / 미리보기 바텀시트
 [완료] 예시 채우기 버튼 UX 개선 (텍스트 + 서브텍스트 + 헤딩)
 [완료] setInterval 메모리 누수 + user assertion 버그 수정
+[완료] 글 수정 시 제목 사라짐 버그 수정 (isEditRef)
+[완료] Supabase 연동 가이드 문서 작성 (SUPABASE_MIGRATION_GUIDE.md)
 [완료] npm run build 성공 (TypeScript 에러 없음)
-[완료] GitHub 푸시 완료 (3개 커밋)
+[완료] GitHub 푸시 완료 (5개 커밋)
 ```
 
 ---
@@ -176,20 +243,24 @@ export interface CategoryExampleSet {
 
 - [ ] 실제 사용 테스트 — `npm run dev`로 글쓰기 페이지에서 전체 기능 직접 확인
 - [ ] 캠퍼스 선택 기능 점검 — 회원가입/프로필 편집에서 정상 작동 확인
+- [ ] UI 전체 점검 — 모든 페이지 기능 확인 후 Supabase 연동 착수
 
-### 우선순위 중간
+### 우선순위 중간 (Supabase 연동 — `SUPABASE_MIGRATION_GUIDE.md` 참조)
 
-- [ ] Supabase 연동 — Mock Auth/Data를 실제 Supabase로 전환
-- [ ] 이미지 업로드 — 현재 base64 로컬 저장 -> Supabase Storage 연동
-- [ ] 채팅(캠톡) 실시간 기능 — 현재 Mock -> Supabase Realtime
-- [ ] 검색 기능 고도화 — 현재 로컬 필터 -> 전문 검색(Full-text search)
-- [ ] 알림(캠노티) 구현 — 현재 UI만 있음
+- [ ] Supabase 프로젝트 생성 + 패키지 설치
+- [ ] DB 테이블 생성 (12개 테이블 + 시드 데이터)
+- [ ] 인증 시스템 전환 (Mock → Supabase Auth)
+- [ ] 게시글 CRUD 전환 (localStorage → Supabase)
+- [ ] 이미지 업로드 전환 (base64 → Supabase Storage)
+- [ ] 찜/조회수/검색 전환
+- [ ] 캠톡 실시간 채팅 (localStorage → Supabase Realtime)
+- [ ] 캠노티 알림 전환
+- [ ] RLS 보안 정책 설정
 
 ### 우선순위 낮음
 
 - [ ] 글쓰기 예시 데이터 검수 — 46개 카테고리 예시 문구 품질 확인/수정
-- [ ] 톤 변형 카테고리 확장 — 현재 10개 -> 전체 46개
-- [ ] 미리보기 바텀시트 애니메이션 — `animate-in` 클래스 작동 확인
+- [ ] 톤 변형 카테고리 확장 — 현재 10개 → 전체 46개
 - [ ] 다크모드 대응 점검
 - [ ] PWA / 모바일 최적화
 - [ ] SEO 메타태그 설정
@@ -204,3 +275,6 @@ export interface CategoryExampleSet {
 - `fillTemplate()`은 `{{prefix}}`, `{{university}}`, `{{department}}`, `{{memberType}}` 플레이스홀더 지원
 - 톤 변형은 `title`과 `body`만 오버라이드, `price`/`tags`/`location`은 기본 예시 유지
 - `spinIntervalRef`로 interval ID 관리, 컴포넌트 언마운트 시 자동 정리
+- `isEditRef`로 수정 모드 동기 플래그 관리, React 배칭 타이밍 문제 방지
+- Supabase 연동 시 snake_case ↔ camelCase 변환 유틸 필요
+- Supabase 연동 상세 지시사항은 `SUPABASE_MIGRATION_GUIDE.md` 참조
