@@ -739,6 +739,7 @@ function WritePageContent() {
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 maxLength={100}
+                className={highlightedFields.includes('제목') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}
               />
               <div className="mt-1 flex items-center justify-between">
                 {errors.title ? <p className="text-xs text-red-500">{errors.title}</p> : <span />}
@@ -761,7 +762,7 @@ function WritePageContent() {
                   placeholder="가격 입력 (없으면 비워두세요)"
                   value={price}
                   onChange={e => setPrice(e.target.value)}
-                  className="flex-1"
+                  className={`flex-1 ${highlightedFields.includes('가격') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
                 />
                 <span className="text-sm text-muted-foreground">원</span>
               </div>
@@ -791,7 +792,7 @@ function WritePageContent() {
                 onChange={e => setBody(e.target.value)}
                 rows={8}
                 maxLength={5000}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className={`w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
               />
               <p className="mt-1 text-right text-xs text-muted-foreground">{body.length}/5,000</p>
               {errors.body && <p className="mt-1 text-xs text-red-500">{errors.body}</p>}
@@ -858,6 +859,24 @@ function WritePageContent() {
                   ))}
                 </div>
               )}
+              {/* 인기 태그 추천 */}
+              {suggestedTags.length > 0 && tags.length < 5 && (
+                <div className="mt-2">
+                  <span className="text-xs text-muted-foreground">인기 태그: </span>
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    {suggestedTags.slice(0, 8).map(tag => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => { if (tags.length < 5 && !tags.includes(tag)) setTags([...tags, tag]); }}
+                        className="rounded-full border border-dashed border-blue-500/40 px-2 py-0.5 text-xs text-blue-500 transition-colors hover:border-blue-500 hover:bg-blue-500/10"
+                      >
+                        +{tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 거래 장소 */}
@@ -867,6 +886,7 @@ function WritePageContent() {
                 placeholder="예: 서울대 정문 GS25 앞"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
+                className={highlightedFields.includes('장소') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}
               />
             </div>
 
@@ -964,6 +984,78 @@ function WritePageContent() {
                 </div>
               </div>
             </div>
+
+            {/* 미리보기 버튼 */}
+            <button
+              type="button"
+              onClick={() => setShowPreview(true)}
+              className="w-full rounded-lg border border-border bg-muted/30 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              👀 미리보기
+            </button>
+
+            {/* 미리보기 바텀시트 */}
+            {showPreview && (
+              <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={() => setShowPreview(false)}>
+                <div
+                  className="w-full max-w-lg animate-in slide-in-from-bottom rounded-t-2xl bg-background p-4 pb-8 shadow-xl"
+                  style={{ maxHeight: '85vh', overflowY: 'auto' }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">다른 사람에게 이렇게 보여요!</span>
+                    <button onClick={() => setShowPreview(false)} className="rounded-full p-1 text-muted-foreground hover:bg-muted">&times;</button>
+                  </div>
+                  <div className="space-y-3">
+                    {/* 이미지 미리보기 */}
+                    {images.length > 0 && (
+                      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                        {images.map((src, i) => (
+                          <img key={i} src={src} alt="" className="h-48 w-48 shrink-0 rounded-lg object-cover" />
+                        ))}
+                      </div>
+                    )}
+                    {/* 제목 */}
+                    <h2 className="text-lg font-bold">{title.trim() || '(제목 없음)'}</h2>
+                    {/* 가격 */}
+                    {price && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl font-bold">{Number(price).toLocaleString()}원</span>
+                        {priceNegotiable && <Badge variant="secondary" className="text-xs">협의가능</Badge>}
+                      </div>
+                    )}
+                    {/* 본문 */}
+                    <div className="whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
+                      {body.trim() || '(내용 없음)'}
+                    </div>
+                    {/* 태그 */}
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {tags.map(tag => (
+                          <Badge key={tag} variant="outline" className="text-xs">#{tag}</Badge>
+                        ))}
+                      </div>
+                    )}
+                    {/* 장소 */}
+                    {location.trim() && (
+                      <p className="text-xs text-muted-foreground">📍 {location}</p>
+                    )}
+                    {/* 작성자 */}
+                    <div className="flex items-center gap-2 border-t border-border pt-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-sm font-bold text-blue-500">
+                        {user?.nickname?.charAt(0) || '?'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{user?.nickname || '사용자'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {universities.find(u => u.id === universityId)?.name} · 방금 전
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 등록 버튼 */}
             <div>
