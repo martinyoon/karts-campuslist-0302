@@ -67,7 +67,14 @@ function MyPageContent() {
     setRecentPosts(getRecentViewedPosts());
   }, [user]);
 
-  if (!user) return null;
+  if (!user) return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <p className="text-sm text-muted-foreground">로딩 중...</p>
+      </div>
+    </div>
+  );
 
   const university = universities.find(u => u.id === user.universityId);
 
@@ -110,7 +117,7 @@ function MyPageContent() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={logout}
+              onClick={() => { if (window.confirm('로그아웃 하시겠습니까?')) logout(); }}
               className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
               로그아웃

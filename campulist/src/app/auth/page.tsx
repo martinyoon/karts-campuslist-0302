@@ -232,9 +232,9 @@ export default function AuthPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
-            {mode === 'login' && (
+            {mode === 'signup' && (
               <p className="mt-1 text-xs text-muted-foreground">
-                기존 테스트 계정: 비밀번호 1234
+                4자리 이상 입력해주세요
               </p>
             )}
           </div>
@@ -246,20 +246,10 @@ export default function AuthPage() {
 
         <Separator className="my-6" />
 
-        {/* 소셜 로그인 */}
-        <div className="space-y-3">
-          <p className="text-center text-xs text-muted-foreground">소셜 계정으로 시작하기</p>
-          <Button variant="outline" className="w-full gap-2 opacity-50" disabled>
-            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z" fill="currentColor" /></svg>
-            Facebook (준비 중)
-          </Button>
-          <Button variant="outline" className="w-full gap-2 bg-[#FEE500]/50 text-[#191919]/50" disabled>
-            카카오 (준비 중)
-          </Button>
-          <Button variant="outline" className="w-full gap-2 bg-[#03C75A]/50 text-white/50" disabled>
-            네이버 (준비 중)
-          </Button>
-        </div>
+        {/* 소셜 로그인 — 추후 Supabase OAuth 연동 시 활성화 */}
+        <p className="text-center text-xs text-muted-foreground">
+          소셜 로그인(카카오, 네이버 등)은 곧 지원 예정입니다.
+        </p>
       </div>
     </div>
   );

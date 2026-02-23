@@ -652,7 +652,7 @@ function WritePageContent() {
             {hasExample && (
               <div className="space-y-2.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
                 {/* 섹션 안내 */}
-                <p className="text-sm font-medium text-foreground">글 작성이 막막하신가요?</p>
+                <p className="text-sm font-medium text-foreground">글 제목·내용을 어떻게 채울지 막막하다면?</p>
 
                 {/* 시즌 배지 */}
                 {seasonHint && seasonLabel && (
@@ -693,16 +693,16 @@ function WritePageContent() {
                   {isSpinning ? (
                     <>
                       <span className="animate-spin">✨</span>
-                      <span ref={spinnerRef} className="truncate max-w-[200px]">예시 고르는 중...</span>
+                      <span ref={spinnerRef} className="truncate max-w-[200px]">샘플 고르는 중...</span>
                     </>
                   ) : (
-                    '✨ 예시로 채우기'
+                    '📝 미리 준비된 샘플 글로 일단 채워보기'
                   )}
                 </button>
 
                 {/* 서브텍스트 */}
                 <p className="text-center text-xs text-muted-foreground">
-                  이미 작성한 항목은 유지돼요{exExamples.length > 1 && ' · 누를 때마다 다른 예시!'}
+                  작성한 내용은 그대로 유지돼요{exExamples.length > 1 && ' · 누를 때마다 새로운 샘플!'}
                 </p>
               </div>
             )}
@@ -864,7 +864,7 @@ function WritePageContent() {
               <label className="mb-1.5 block text-sm font-medium">태그 (최대 5개)</label>
               <div className="flex gap-2">
                 <Input
-                  placeholder="태그 입력 후 추가"
+                  placeholder="태그 입력 후 Enter"
                   value={tagInput}
                   onChange={e => setTagInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTag())}

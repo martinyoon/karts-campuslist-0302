@@ -92,7 +92,7 @@ export default async function SearchPage({ searchParams }: Props) {
             sortBy={sortBy}
             priceMin={priceMin}
             priceMax={priceMax}
-            emptyState={<EmptyState message={`\u201C${query}\u201D에 대한 검색 결과가 없습니다.`} sub="다른 검색어로 시도해보세요." />}
+            emptyState={<EmptyState message={`\u201C${query}\u201D에 대한 검색 결과가 없습니다.`} sub="검색어를 줄이거나 다른 단어로 검색해보세요." />}
           />
         ) : (
           <div className="px-4 py-16 text-center text-muted-foreground">
