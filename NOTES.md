@@ -77,6 +77,11 @@ interface User {
 | `98e019c` | fix: 예시 채우기 버튼 UX 개선 + interval 메모리 누수 수정 |
 | `d68b578` | docs: NOTES.md 최신 작업 내용으로 업데이트 |
 | `5bdc6ef` | fix: 글 수정 시 제목 내용 사라지는 버그 수정 (React 배칭 타이밍) |
+| `68ad6ec` | fix: UI 버그 수정 + UX 개선 6건 |
+| `17362ca` | docs: NOTES.md 업데이트 + Supabase 연동 가이드 추가 |
+| `6cb3ecc` | feat: 게시판 분리 — 캠퍼스 게시판 vs 광고 게시판 |
+| `86b2910` | fix: 글쓰기 권한 버그 수정 — 회원유형별 보드 접근 제한 |
+| (현재) | refactor: 보드 통합 + 오픈 소분류 전환 + 글쓰기 UX 개선 |
 
 ---
 
@@ -192,7 +197,89 @@ setIsEditMode(true);
 if (user && !isEditMode && !draftLoaded && !isEditRef.current) {
 ```
 
-### 6. Supabase 연동 가이드 문서 작성
+### 6. 캠퍼스/광고 보드 통합 — "오픈 소분류" 방식 전환
+
+**Before:** 캠퍼스 게시판 + 광고 게시판 (2개 보드, boardType 분기, 18개+ 파일에 분산)
+**After:** 통합 7개 대분류 + 46개 소분류 (소분류별 `postAccess: 'campus' | 'open'`)
+
+#### 핵심 변경
+
+- `BoardType` 타입 → `PostAccess` 타입으로 교체
+- 광고 카테고리(ID 101+) 전부 삭제, 기존 7개 대분류 유지
+- 소분류별 `postAccess` 필드 추가 (campus 20개 / open 26개)
+- 상인/일반인은 `open` 소분류에만 글쓰기 가능
+- `app/ad/` 라우트 삭제
+
+#### 변경된 파일 (18개)
+
+| 파일 | 변경 내용 |
+|------|----------|
+| `lib/types.ts` | PostAccess 추가, BoardType 제거 |
+| `data/categories.ts` | 광고 카테고리 삭제, postAccess 추가, 헬퍼 정리 |
+| `data/posts.ts` | boardType 필드 제거, 광고 게시글 카테고리 재매핑 |
+| `lib/api.ts` | boardType 필터 전체 제거 |
+| `app/write/page.tsx` | 보드 탭 제거, postAccess 기반 권한 체크 |
+| `app/page.tsx` | 보드 필터 칩 제거, 통합 피드 |
+| `app/[university]/page.tsx` | 보드 필터 칩 제거 |
+| `app/search/page.tsx` | 보드 필터 탭 제거 |
+| `app/ad/page.tsx` | 삭제 |
+| `app/ad/[university]/page.tsx` | 삭제 |
+| `components/post/UniversityTabs.tsx` | boardParam 제거 |
+| `components/post/CategoryGrid.tsx` | boardType 분기 제거 |
+| `components/post/CategoryDirectory.tsx` | boardType 제거 |
+| `components/post/PostCard.tsx` | 배지 로직 변경 |
+| `components/post/PostFeedWithLocal.tsx` | boardType 제거 |
+| `components/write/CategorySummary.tsx` | boardType 색상 제거, 통합 blue |
+| `components/layout/Header.tsx` | 카테고리 통합 |
+| `components/layout/BottomNav.tsx` | /ad 참조 제거 |
+| `lib/writeUrl.ts` | board 파라미터 제거 |
+
+#### PostAccess 분포
+
+| 대분류 | campus | open |
+|--------|--------|------|
+| 중고마켓 | 8 (전부) | 0 |
+| 주거 | 2 (룸메이트, 양도) | 3 (원룸, 하숙, 단기) |
+| 일자리 | 3 (과외, RA, 구직) | 5 (알바, 레슨, 인턴, 프리랜서, 구인) |
+| 커뮤니티 | 7 (전부) | 0 |
+| 서비스 | 0 | 8 (전부) |
+| 캠퍼스라이프 | 0 | 4 (전부) |
+| 긱·의뢰 | 0 | 6 (전부) |
+| **합계** | **20** | **26** |
+
+### 7. 글쓰기 페이지 UX 개선 — "필터 우선" 카테고리 표시
+
+**문제:** 비캠퍼스 회원(인근상인/일반인)이 46개 카테고리를 모두 보고 혼란. 🔒 표시만으로는 직관적이지 않음.
+
+**해결:** 사용자 역할에 따라 카테고리 표시를 분리.
+
+#### 비캠퍼스 회원 (인근상인/일반인)
+
+1. 상단 안내 배너: "🏪 인근상인 회원님, 아래 카테고리에 글을 작성할 수 있어요"
+2. open 카테고리 26개만 5개 대분류 아래에 표시
+3. 하단 접기/펼치기: "🔒 캠퍼스 인증 회원 전용 (20개)"
+4. 펼치면 campus 카테고리가 opacity 50%로 표시
+5. 잠긴 소분류 클릭 시 토스트 안내
+
+#### 캠퍼스 회원
+
+- 변경 없음 (7개 대분류, 46개 소분류 전체)
+
+### 8. campus 카테고리 조기 차단 — 3개 우회 경로 수정
+
+**문제:** 등록하기 클릭 시(handleSubmit)에서만 차단 → 폼 작성 후에야 막힘 → UX 나쁨.
+
+**해결:** 진입 시점에서 차단하도록 3개 경로에 `isCampusBlocked()` 체크 추가.
+
+| 우회 경로 | 차단 동작 |
+|----------|----------|
+| URL 파라미터 `/write?major=market&minor=textbooks` | 토스트 경고 + 카테고리 선택으로 복귀 |
+| 임시저장 복원 (localStorage에 campus 카테고리) | minorId를 null로 초기화 |
+| 수정 모드 `/write?edit=postId` | 토스트 경고 + 원래 게시글로 리다이렉트 |
+
+handleSubmit 방어 코드(501~507행)는 최후 안전장치로 유지.
+
+### 9. Supabase 연동 가이드 문서 작성
 
 **파일**: `SUPABASE_MIGRATION_GUIDE.md` (프로젝트 루트)
 
@@ -231,8 +318,11 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
 [완료] setInterval 메모리 누수 + user assertion 버그 수정
 [완료] 글 수정 시 제목 사라짐 버그 수정 (isEditRef)
 [완료] Supabase 연동 가이드 문서 작성 (SUPABASE_MIGRATION_GUIDE.md)
+[완료] 캠퍼스/광고 보드 통합 → "오픈 소분류" 방식 (18개 파일 수정, app/ad/ 삭제)
+[완료] 글쓰기 UX 개선 — 필터 우선 카테고리 표시 (비캠퍼스: open만, 캠퍼스: 전체)
+[완료] campus 카테고리 조기 차단 (URL 파라미터, 임시저장, 수정 모드 3개 경로)
 [완료] npm run build 성공 (TypeScript 에러 없음)
-[완료] GitHub 푸시 완료 (5개 커밋)
+[완료] GitHub 푸시 완료
 ```
 
 ---
@@ -278,3 +368,8 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
 - `isEditRef`로 수정 모드 동기 플래그 관리, React 배칭 타이밍 문제 방지
 - Supabase 연동 시 snake_case ↔ camelCase 변환 유틸 필요
 - Supabase 연동 상세 지시사항은 `SUPABASE_MIGRATION_GUIDE.md` 참조
+- `PostAccess` = `'campus' | 'open'` — 소분류에만 적용, 대분류에는 undefined
+- `CAMPUS_MEMBER_TYPES` = undergraduate, graduate, professor, staff, alumni — 권한 체크용 유지
+- `isCampusBlocked()` — write/page.tsx useEffect 내 인라인 헬퍼, URL/드래프트/수정 3곳에서 사용
+- `getCategoryGroups()` — 인자 없이 호출 (boardType 파라미터 제거됨)
+- `app/ad/` 라우트는 완전 삭제됨 (리다이렉트 없음, 404 반환)

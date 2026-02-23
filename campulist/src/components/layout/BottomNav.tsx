@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { getMyUnreadTotal } from '@/lib/camtalk';
 import { useAuth } from '@/contexts/AuthContext';
 import { getWriteUrl } from '@/lib/writeUrl';
+import { universities } from '@/data/universities';
 
 const navItems = [
   { href: '/', label: '홈', icon: (active: boolean) => <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg> },
@@ -33,7 +34,9 @@ export default function BottomNav() {
     <nav aria-label="하단 메뉴" className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background md:hidden">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-around">
         {navItems.map(item => {
-          const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+          const isActive = item.href === '/'
+            ? (pathname === '/' || universities.some(u => pathname === `/${u.slug}`))
+            : pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}

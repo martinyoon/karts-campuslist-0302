@@ -12,19 +12,12 @@ export function getWriteUrl(pathname: string, searchParams?: string): string {
   const segments = pathname.split('/').filter(Boolean);
   const writeParams = new URLSearchParams();
 
-  // /ad 프리픽스 감지 — 광고 게시판에서 글쓰기 버튼 누른 경우
-  let offset = 0;
-  if (segments[0] === 'ad') {
-    writeParams.set('board', 'ad');
-    offset = 1;
+  if (segments.length >= 1 && universitySlugs.has(segments[0])) {
+    writeParams.set('uni', segments[0]);
   }
 
-  if (segments.length >= 1 + offset && universitySlugs.has(segments[offset])) {
-    writeParams.set('uni', segments[offset]);
-  }
-
-  if (segments.length >= 2 + offset) {
-    const catSlug = segments[1 + offset];
+  if (segments.length >= 2) {
+    const catSlug = segments[1];
     if (majorSlugs.has(catSlug)) {
       writeParams.set('major', catSlug);
       const sp = new URLSearchParams(searchParams || '');

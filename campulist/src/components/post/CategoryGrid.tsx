@@ -1,19 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { campusMajorCategories, adMajorCategories } from '@/data/categories';
-import type { BoardType } from '@/lib/types';
+import { majorCategories } from '@/data/categories';
 import CategoryDirectory from './CategoryDirectory';
 
 interface CategoryGridProps {
   universitySlug?: string;
-  boardType?: BoardType;
 }
 
-export default function CategoryGrid({ universitySlug, boardType = 'campus' }: CategoryGridProps) {
+export default function CategoryGrid({ universitySlug }: CategoryGridProps) {
   const [open, setOpen] = useState(false);
   const [activeMajorId, setActiveMajorId] = useState<number | null>(null);
-  const cats = boardType === 'ad' ? adMajorCategories : campusMajorCategories;
 
   const handleClick = (majorId: number) => {
     setActiveMajorId(majorId);
@@ -23,7 +20,7 @@ export default function CategoryGrid({ universitySlug, boardType = 'campus' }: C
   return (
     <>
       <div className="grid grid-cols-3 gap-3 px-4 py-4 sm:grid-cols-7">
-        {cats.map(cat => (
+        {majorCategories.map(cat => (
           <button
             key={cat.slug}
             onClick={() => handleClick(cat.id)}
@@ -40,7 +37,6 @@ export default function CategoryGrid({ universitySlug, boardType = 'campus' }: C
         onOpenChange={setOpen}
         activeMajorId={activeMajorId}
         universitySlug={universitySlug}
-        boardType={boardType}
       />
     </>
   );

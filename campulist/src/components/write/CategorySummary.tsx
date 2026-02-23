@@ -17,17 +17,17 @@ export default function CategorySummary({ universityId, majorId, minorId, onChan
   const minor = getMinorCategories(majorId).find(c => c.id === minorId);
 
   return (
-    <div id="field-category" className="flex items-center justify-between rounded-lg bg-amber-500/10 px-3 py-2 dark:bg-amber-500/15">
-      <nav className="flex items-center gap-2 text-lg text-amber-600 dark:text-amber-400">
+    <div id="field-category" className="flex items-center justify-between rounded-lg bg-blue-500/10 px-3 py-2 dark:bg-blue-500/15">
+      <nav className="flex items-center gap-2 text-lg text-blue-600 dark:text-blue-400">
         <span className="font-semibold">{uniShort}</span>
-        <span className="font-normal text-amber-400/50">›</span>
+        <span className="font-normal text-blue-400/50">›</span>
         <span className="font-semibold"><span className="cat-icon">{major?.icon} </span>{major?.name}</span>
-        <span className="font-normal text-amber-400/50">›</span>
+        <span className="font-normal text-blue-400/50">›</span>
         <span className="font-bold">{minor?.name}</span>
       </nav>
       <button
         onClick={onChangeCategory}
-        className="shrink-0 text-xs text-amber-500 hover:underline"
+        className="shrink-0 text-xs text-blue-500 hover:underline"
       >
         변경
       </button>

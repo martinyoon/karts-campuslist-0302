@@ -3,7 +3,7 @@
 // Phase B에서 이 파일만 Supabase 버전으로 교체하면 전환 완료
 // ============================================================
 
-import type { Post, PostListItem, PostDetail, PostFilters, PostStatus, User, BoardType } from './types';
+import type { Post, PostListItem, PostDetail, PostFilters, PostStatus, User } from './types';
 import { mockPosts, toPostListItem, getPostImages, getPostTags } from '@/data/posts';
 import { universities } from '@/data/universities';
 import { categories } from '@/data/categories';
@@ -47,10 +47,6 @@ function getAllPosts(): Post[] {
 
 export async function getPosts(filters?: PostFilters): Promise<PostListItem[]> {
   let posts = getAllPosts().filter(p => p.status === 'active');
-
-  if (filters?.boardType) {
-    posts = posts.filter(p => (p.boardType ?? 'campus') === filters.boardType);
-  }
 
   if (filters?.universitySlug) {
     const uni = universities.find(u => u.slug === filters.universitySlug);
@@ -267,14 +263,13 @@ export function deletePost(postId: string): void {
 }
 
 // 게시글 생성 (localStorage에 저장)
-// TODO: Supabase 연동 시 RLS로 boardType vs memberType 권한 검증 필요
-// - campus 게시판: CAMPUS_MEMBER_TYPES만 작성 가능
-// - ad 게시판: 모든 회원 작성 가능
+// TODO: Supabase 연동 시 RLS로 postAccess 기반 권한 검증
+// - campus 소분류: CAMPUS_MEMBER_TYPES만 작성 가능
+// - open 소분류: 모든 회원 작성 가능
 export function createPost(input: {
   title: string;
   body: string;
   authorId: string;
-  boardType?: BoardType;
   universityId: number;
   categoryMajorId: number;
   categoryMinorId: number;
@@ -297,7 +292,6 @@ export function createPost(input: {
     price: input.price,
     priceNegotiable: input.priceNegotiable,
     isPremium: false,
-    boardType: input.boardType ?? 'campus',
     status: 'active',
     locationDetail: input.locationDetail,
     contactMethods: input.contactMethods,
@@ -392,11 +386,8 @@ export function getFilteredLocalPosts(filters?: {
   authorId?: string;
   priceMin?: number;
   priceMax?: number;
-  boardType?: BoardType;
 }): PostListItem[] {
-  // getAllPosts에서 로컬 게시글 + 오버라이드 적용된 것만 추출
   let posts = getAllPosts().filter(p => p.id.startsWith('local-') && p.status === 'active');
-  if (filters?.boardType) posts = posts.filter(p => (p.boardType ?? 'campus') === filters.boardType);
   if (filters?.universityId) posts = posts.filter(p => p.universityId === filters.universityId);
   if (filters?.categoryMajorId) posts = posts.filter(p => p.categoryMajorId === filters.categoryMajorId);
   if (filters?.categoryMinorId) posts = posts.filter(p => p.categoryMinorId === filters.categoryMinorId);

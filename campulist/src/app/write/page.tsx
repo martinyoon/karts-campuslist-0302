@@ -13,12 +13,12 @@ import AuthGuard from '@/components/auth/AuthGuard';
 import { createPost, getPostForEdit, updatePost, deletePost } from '@/lib/api';
 import { getPostImages } from '@/data/posts';
 import { LIMITS } from '@/lib/constants';
-import type { PostStatus, MemberType, BoardType } from '@/lib/types';
+import type { PostStatus, MemberType } from '@/lib/types';
 import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
 import CategorySummary from '@/components/write/CategorySummary';
 import { categoryExamples, categoryExampleSets } from '@/data/categoryExamples';
 import type { ToneType } from '@/data/categoryExamples';
-import { getCategoryBySlug, getCategoryGroups, getBoardType } from '@/data/categories';
+import { getCategoryBySlug, getCategoryGroups, categories } from '@/data/categories';
 import type { User } from '@/lib/types';
 
 interface WriteDraft {
@@ -124,8 +124,7 @@ function WritePageContent() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [showAdBoard, setShowAdBoard] = useState(false);
-
+  const [showLocked, setShowLocked] = useState(false);
   // 확장 예시 세트
   const exSet = minorId ? categoryExampleSets[minorId] : null;
   const exExamples = exSet?.examples ?? (minorId && categoryExamples[minorId] ? [categoryExamples[minorId]] : []);
@@ -211,11 +210,24 @@ function WritePageContent() {
     const params = new URLSearchParams(window.location.search);
     const editParam = params.get('edit');
 
+    // campus 카테고리 접근 차단 체크 (비캠퍼스 회원)
+    const isCampusBlocked = (mId: number) => {
+      const minor = categories.find(c => c.id === mId);
+      return minor?.postAccess === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType);
+    };
+
     if (editParam) {
       // user 로드 전이면 대기
       if (!user) return;
       const post = getPostForEdit(editParam);
       if (post && post.authorId === user.id) {
+        // campus 카테고리 게시글 수정 차단
+        if (isCampusBlocked(post.categoryMinorId)) {
+          initialized.current = true;
+          toast('이 카테고리는 대학 소속 인증 회원만 이용 가능합니다');
+          router.push(`/post/${editParam}`);
+          return;
+        }
         initialized.current = true;
         isEditRef.current = true;
         setEditId(editParam);
@@ -255,33 +267,24 @@ function WritePageContent() {
       }
     }
 
-    // URL에서 board 파라미터 확인 (광고 게시판에서 진입 시)
-    const boardParam = params.get('board');
-    if (boardParam === 'ad') {
-      setShowAdBoard(true);
-    }
-
     // URL에서 major/minor 카테고리 파라미터 확인 (카테고리 페이지에서 진입 시)
     const majorParam = params.get('major');
     if (majorParam) {
       const majorCat = getCategoryBySlug(majorParam);
       if (majorCat && majorCat.parentId === null) {
-        // 권한 체크: 캠퍼스 카테고리인데 캠퍼스 회원이 아니면 URL 파라미터 무시
-        const catBoardType = getBoardType(majorCat.id);
-        if (catBoardType === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)) {
-          initialized.current = true;
-          setShowAdBoard(false);
-          return; // 광고 카테고리 선택으로 전환
-        }
-
         initialized.current = true;
         setMajorId(majorCat.id);
         const minorParam = params.get('minor');
         if (minorParam) {
           const minorCat = getCategoryBySlug(minorParam);
           if (minorCat && minorCat.parentId === majorCat.id) {
-            setMinorId(minorCat.id);
-            setStep('form');
+            if (isCampusBlocked(minorCat.id)) {
+              toast('이 카테고리는 대학 소속 인증 회원만 이용 가능합니다');
+              setStep('major');
+            } else {
+              setMinorId(minorCat.id);
+              setStep('form');
+            }
           } else {
             setStep('minor');
           }
@@ -310,13 +313,18 @@ function WritePageContent() {
         setPriceNegotiable(draft.priceNegotiable || false);
         setUniversityId(draft.universityId || 1);
         setMajorId(draft.majorId);
-        setMinorId(draft.minorId);
+        // campus 카테고리 드래프트 → minorId 무시
+        if (draft.minorId && isCampusBlocked(draft.minorId)) {
+          setMinorId(null);
+        } else {
+          setMinorId(draft.minorId);
+        }
         setTags(draft.tags || []);
         setLocation(draft.location || '');
         setLastSaved(draft.savedAt);
         setDraftLoaded(true);
         // 드래프트 카테고리 상태에 따라 step 결정
-        if (draft.majorId && draft.minorId) {
+        if (draft.majorId && draft.minorId && !isCampusBlocked(draft.minorId)) {
           setStep('form');
         }
         // majorId만 있으면 대분류부터 시작 (선택값은 유지됨)
@@ -513,11 +521,13 @@ function WritePageContent() {
   const handleSubmit = () => {
     if (submitting) return;
 
-    // 보드 권한 검증: 캠퍼스 게시판은 대학 소속 회원만 이용 가능
-    const targetBoardType = majorId ? getBoardType(majorId) : 'campus';
-    if (targetBoardType === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)) {
-      toast('캠퍼스 게시판은 대학 소속 인증 회원만 이용할 수 있습니다.');
-      return;
+    // postAccess 기반 권한 검증: campus 소분류는 대학 소속 회원만
+    if (minorId) {
+      const minor = categories.find(c => c.id === minorId);
+      if (minor?.postAccess === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)) {
+        toast('이 카테고리는 대학 소속 인증 회원만 이용할 수 있습니다.');
+        return;
+      }
     }
 
     const errs = validate();
@@ -542,7 +552,6 @@ function WritePageContent() {
     const postData = {
       title: title.trim(),
       body: body.trim(),
-      boardType: majorId ? getBoardType(majorId) : 'campus' as BoardType,
       universityId,
       categoryMajorId: majorId!,
       categoryMinorId: minorId!,
@@ -617,13 +626,59 @@ function WritePageContent() {
         {/* 카테고리 통합 선택 (한 화면) */}
         {step !== 'form' && (() => {
           const isCampusMember = user ? CAMPUS_MEMBER_TYPES.includes(user.memberType) : true;
-          const writeBoardType: BoardType = !isCampusMember ? 'ad' : showAdBoard ? 'ad' : 'campus';
+          const allGroups = getCategoryGroups();
+
+          // 캠퍼스 회원 → 전체 카테고리
+          if (isCampusMember) {
+            return (
+              <div>
+                <p className="mb-2 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
+                <div className="columns-2 gap-4">
+                  {allGroups.map(({ major, minors }) => (
+                    <div key={major.id} className="mb-3 break-inside-avoid">
+                      <div className="flex items-center gap-1.5 py-1.5">
+                        <span className="cat-icon text-lg">{major.icon}</span>
+                        <span className="text-lg font-bold">{major.name}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 pb-1">
+                        {minors.map(minor => (
+                          <button
+                            key={minor.id}
+                            onClick={() => { setMajorId(major.id); setMinorId(minor.id); setStep('form'); }}
+                            className="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-blue-500/10 hover:text-blue-500"
+                          >
+                            {minor.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          // 비캠퍼스 회원 → 필터 우선 표시
+          const openGroups = allGroups
+            .map(g => ({ major: g.major, minors: g.minors.filter(m => m.postAccess === 'open') }))
+            .filter(g => g.minors.length > 0);
+          const campusGroups = allGroups
+            .map(g => ({ major: g.major, minors: g.minors.filter(m => m.postAccess === 'campus') }))
+            .filter(g => g.minors.length > 0);
+          const campusMinorCount = campusGroups.reduce((sum, g) => sum + g.minors.length, 0);
+
           return (
             <div>
-              <h2 className="text-lg font-bold">카테고리 선택</h2>
-              <p className="mt-1 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
-              <div className="mt-3 columns-2 gap-4">
-                {getCategoryGroups(writeBoardType).map(({ major, minors }) => (
+              {/* 안내 배너 */}
+              <div className="mb-3 rounded-lg bg-blue-500/10 px-3 py-2.5 text-sm text-blue-600 dark:text-blue-400">
+                {user?.memberType === 'merchant' ? '🏪 인근상인' : '👤 일반'} 회원님, 아래 카테고리에 글을 작성할 수 있어요
+              </div>
+
+              <p className="mb-2 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
+
+              {/* open 카테고리 목록 */}
+              <div className="columns-2 gap-4">
+                {openGroups.map(({ major, minors }) => (
                   <div key={major.id} className="mb-3 break-inside-avoid">
                     <div className="flex items-center gap-1.5 py-1.5">
                       <span className="cat-icon text-lg">{major.icon}</span>
@@ -643,16 +698,46 @@ function WritePageContent() {
                   </div>
                 ))}
               </div>
-              {/* 보드 전환 링크 */}
-              {isCampusMember && (
+
+              {/* 캠퍼스 전용 접기/펼치기 */}
+              <div className="mt-4 border-t border-border pt-3">
                 <button
-                  type="button"
-                  onClick={() => { setShowAdBoard(!showAdBoard); setMajorId(null); setMinorId(null); }}
-                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-border py-2.5 text-sm text-muted-foreground transition-colors hover:border-orange-500/50 hover:text-orange-500"
+                  onClick={() => setShowLocked(!showLocked)}
+                  className="flex w-full items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  {showAdBoard ? '📚 캠퍼스 게시판으로 돌아가기' : '📢 업체 광고로 글쓰기 →'}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${showLocked ? 'rotate-90' : ''}`}>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  🔒 캠퍼스 인증 회원 전용 ({campusMinorCount}개)
                 </button>
-              )}
+
+                {showLocked && (
+                  <div className="mt-3 columns-2 gap-4 opacity-50">
+                    {campusGroups.map(({ major, minors }) => (
+                      <div key={major.id} className="mb-3 break-inside-avoid">
+                        <div className="flex items-center gap-1.5 py-1.5">
+                          <span className="cat-icon text-lg">{major.icon}</span>
+                          <span className="text-lg font-bold">{major.name}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1 pb-1">
+                          {minors.map(minor => (
+                            <button
+                              key={minor.id}
+                              onClick={() => toast('이 카테고리는 대학 소속 인증 회원만 이용 가능합니다')}
+                              className="cursor-not-allowed rounded-md px-2 py-1 text-sm text-muted-foreground/60"
+                            >
+                              🔒 {minor.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    <p className="mt-1 break-inside-avoid text-xs text-muted-foreground">
+                      학부생·대학원생·교수·교직원·졸업생 인증 시 이용 가능
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })()}

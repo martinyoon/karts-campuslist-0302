@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPosts, getUniversityBySlug } from '@/lib/api';
 import UniversityTabs from '@/components/post/UniversityTabs';
@@ -37,7 +38,17 @@ export default async function UniversityPage({ params, searchParams }: Props) {
   if (!university) notFound();
 
   const sortBy = (sort as 'latest' | 'price_asc' | 'price_desc' | 'popular') || 'latest';
-  const posts = await getPosts({ universitySlug: slug, boardType: 'campus', sortBy, limit: 20 });
+
+  const posts = await getPosts({
+    universitySlug: slug,
+    sortBy,
+    limit: 20,
+  });
+
+  const buildSortHref = (sortValue: string) => {
+    if (sortValue === 'latest') return `/${slug}`;
+    return `/${slug}?sort=${sortValue}`;
+  };
 
   return (
     <div>
@@ -49,7 +60,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
         <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{university.region} · {university.nameEn}</p>
       </div>
 
-      <CategoryGrid universitySlug={slug} boardType="campus" />
+      <CategoryGrid universitySlug={slug} />
 
       <Separator />
 
@@ -60,21 +71,20 @@ export default async function UniversityPage({ params, searchParams }: Props) {
         </div>
         <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide">
           {sortOptions.map(opt => (
-            <a key={opt.value} href={`/${slug}?sort=${opt.value}`}>
+            <Link key={opt.value} href={buildSortHref(opt.value)}>
               <Badge
                 variant={sortBy === opt.value ? 'default' : 'outline'}
                 className={`shrink-0 cursor-pointer ${sortBy === opt.value ? 'bg-blue-600 text-white' : 'hover:bg-muted'}`}
               >
                 {opt.label}
               </Badge>
-            </a>
+            </Link>
           ))}
         </div>
 
         <PostFeedWithLocal
           serverPosts={posts}
           universityId={university.id}
-          boardType="campus"
           sortBy={sortBy}
           emptyState={<EmptyState message="아직 게시글이 없습니다." />}
         />
