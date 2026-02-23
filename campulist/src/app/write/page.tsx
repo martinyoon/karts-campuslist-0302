@@ -452,19 +452,30 @@ function WritePageContent() {
 
   // 랜덤 예시 뽑기 (슬롯머신 애니메이션)
   const spinnerRef = useRef<HTMLSpanElement>(null);
+  const spinIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 컴포넌트 언마운트 시 interval 정리
+  useEffect(() => {
+    return () => {
+      if (spinIntervalRef.current) clearInterval(spinIntervalRef.current);
+    };
+  }, []);
+
   const fillRandomExample = () => {
     if (!user || exExamples.length === 0) return;
     if (exExamples.length === 1) { fillSmartExamples(0); return; }
+    const capturedUser = user;
     setIsSpinning(true);
     let count = 0;
-    const interval = setInterval(() => {
+    spinIntervalRef.current = setInterval(() => {
       if (spinnerRef.current) {
         const randEx = exExamples[Math.floor(Math.random() * exExamples.length)];
-        spinnerRef.current.textContent = fillTemplate(randEx.title, user!, universityId).slice(0, 30) + '...';
+        spinnerRef.current.textContent = fillTemplate(randEx.title, capturedUser, universityId).slice(0, 30) + '...';
       }
       count++;
       if (count > 10) {
-        clearInterval(interval);
+        if (spinIntervalRef.current) clearInterval(spinIntervalRef.current);
+        spinIntervalRef.current = null;
         const finalIdx = Math.floor(Math.random() * exExamples.length);
         fillSmartExamples(finalIdx);
         setIsSpinning(false);
@@ -638,6 +649,9 @@ function WritePageContent() {
             {/* 예시 채우기 영역 */}
             {hasExample && (
               <div className="space-y-2.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+                {/* 섹션 안내 */}
+                <p className="text-sm font-medium text-foreground">글 작성이 막막하신가요?</p>
+
                 {/* 시즌 배지 */}
                 {seasonHint && seasonLabel && (
                   <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
@@ -646,10 +660,10 @@ function WritePageContent() {
                   </div>
                 )}
 
-                {/* 톤 선택기 */}
+                {/* 문체 선택기 */}
                 {exSet?.tones && Object.keys(exSet.tones).length > 0 && (
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground">톤:</span>
+                    <span className="text-xs text-muted-foreground">문체:</span>
                     {TONE_OPTIONS.map(opt => (
                       <button
                         key={opt.value}
@@ -667,20 +681,27 @@ function WritePageContent() {
                   </div>
                 )}
 
-                {/* 랜덤 예시 뽑기 버튼 */}
+                {/* 예시로 채우기 버튼 */}
                 <button
                   type="button"
                   onClick={fillRandomExample}
                   disabled={isSpinning}
                   className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-blue-500/30 bg-background py-2.5 text-sm font-medium text-blue-500 transition-colors hover:bg-blue-500/10 disabled:opacity-60"
                 >
-                  <span className={isSpinning ? 'animate-spin' : ''}>🎲</span>
                   {isSpinning ? (
-                    <span ref={spinnerRef} className="truncate max-w-[200px]">뽑는 중...</span>
+                    <>
+                      <span className="animate-spin">✨</span>
+                      <span ref={spinnerRef} className="truncate max-w-[200px]">예시 고르는 중...</span>
+                    </>
                   ) : (
-                    exExamples.length > 1 ? '랜덤 예시 뽑기 (빈칸만 채움)' : '⚡ 빈칸 자동완성'
+                    '✨ 예시로 채우기'
                   )}
                 </button>
+
+                {/* 서브텍스트 */}
+                <p className="text-center text-xs text-muted-foreground">
+                  이미 작성한 항목은 유지돼요{exExamples.length > 1 && ' · 누를 때마다 다른 예시!'}
+                </p>
               </div>
             )}
 
