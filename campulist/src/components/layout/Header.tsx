@@ -102,27 +102,6 @@ export default function Header() {
               <span className="hidden text-xs text-muted-foreground md:block">Campulist.com</span>
             </Link>
 
-            {/* 데스크톱: 카테고리 네비게이션 */}
-            <nav className="hidden items-center gap-1 md:flex">
-              {majorCategories.map(cat => {
-                const catHref = currentUniSlug ? `/${currentUniSlug}/${cat.slug}` : `/all/${cat.slug}`;
-                const isActive = pathname.includes(`/${cat.slug}`);
-                return (
-                  <Link
-                    key={cat.slug}
-                    href={catHref}
-                    className={`rounded-md px-2 py-1 text-sm transition-colors ${
-                      isActive
-                        ? 'font-semibold text-blue-500'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <span className="cat-icon">{cat.icon}</span> {cat.name}
-                  </Link>
-                );
-              })}
-            </nav>
-
             {/* 데스크톱: 검색 */}
             <form onSubmit={handleSearch} className="hidden flex-1 md:block">
               <Input
