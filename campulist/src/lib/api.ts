@@ -267,6 +267,9 @@ export function deletePost(postId: string): void {
 }
 
 // 게시글 생성 (localStorage에 저장)
+// TODO: Supabase 연동 시 RLS로 boardType vs memberType 권한 검증 필요
+// - campus 게시판: CAMPUS_MEMBER_TYPES만 작성 가능
+// - ad 게시판: 모든 회원 작성 가능
 export function createPost(input: {
   title: string;
   body: string;

@@ -255,11 +255,25 @@ function WritePageContent() {
       }
     }
 
+    // URL에서 board 파라미터 확인 (광고 게시판에서 진입 시)
+    const boardParam = params.get('board');
+    if (boardParam === 'ad') {
+      setShowAdBoard(true);
+    }
+
     // URL에서 major/minor 카테고리 파라미터 확인 (카테고리 페이지에서 진입 시)
     const majorParam = params.get('major');
     if (majorParam) {
       const majorCat = getCategoryBySlug(majorParam);
       if (majorCat && majorCat.parentId === null) {
+        // 권한 체크: 캠퍼스 카테고리인데 캠퍼스 회원이 아니면 URL 파라미터 무시
+        const catBoardType = getBoardType(majorCat.id);
+        if (catBoardType === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)) {
+          initialized.current = true;
+          setShowAdBoard(false);
+          return; // 광고 카테고리 선택으로 전환
+        }
+
         initialized.current = true;
         setMajorId(majorCat.id);
         const minorParam = params.get('minor');
@@ -498,6 +512,14 @@ function WritePageContent() {
 
   const handleSubmit = () => {
     if (submitting) return;
+
+    // 보드 권한 검증: 캠퍼스 게시판은 대학 소속 회원만 이용 가능
+    const targetBoardType = majorId ? getBoardType(majorId) : 'campus';
+    if (targetBoardType === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)) {
+      toast('캠퍼스 게시판은 대학 소속 인증 회원만 이용할 수 있습니다.');
+      return;
+    }
+
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) {
