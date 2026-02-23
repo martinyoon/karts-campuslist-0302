@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getPosts } from '@/lib/api';
+import type { BoardType } from '@/lib/types';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
 import RecentSearches from '@/components/search/RecentSearches';
@@ -7,7 +8,7 @@ import PriceFilter from '@/components/search/PriceFilter';
 import { Badge } from '@/components/ui/badge';
 
 interface Props {
-  searchParams: Promise<{ q?: string; sort?: string; priceMin?: string; priceMax?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; priceMin?: string; priceMax?: string; board?: string }>;
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
@@ -21,14 +22,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function SearchPage({ searchParams }: Props) {
-  const { q, sort, priceMin: pMin, priceMax: pMax } = await searchParams;
+  const { q, sort, priceMin: pMin, priceMax: pMax, board } = await searchParams;
   const query = q?.trim() || '';
   const sortBy = (sort as 'latest' | 'price_asc' | 'price_desc' | 'popular') || 'latest';
   const priceMin = pMin ? Number(pMin) : undefined;
   const priceMax = pMax ? Number(pMax) : undefined;
+  const boardType = (board === 'campus' || board === 'ad') ? board as BoardType : undefined;
 
   const posts = query
-    ? await getPosts({ query, sortBy, priceMin, priceMax, limit: 50 })
+    ? await getPosts({ query, sortBy, priceMin, priceMax, boardType, limit: 50 })
     : [];
 
   const sortOptions = [
@@ -56,14 +58,43 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
       </div>
 
-      {/* 정렬 옵션 + 가격 필터 */}
+      {/* 보드 필터 + 정렬 옵션 + 가격 필터 */}
       {query && posts.length > 0 && (
         <>
+          {/* 보드 필터 탭 */}
+          <div className="flex gap-2 overflow-x-auto border-b border-border px-4 py-3 scrollbar-hide">
+            {([
+              { value: '', label: '전체' },
+              { value: 'campus', label: '📚 캠퍼스' },
+              { value: 'ad', label: '📢 광고' },
+            ] as const).map(opt => {
+              const params = new URLSearchParams({ q: query, sort: sortBy });
+              if (priceMin !== undefined) params.set('priceMin', String(priceMin));
+              if (priceMax !== undefined) params.set('priceMax', String(priceMax));
+              if (opt.value) params.set('board', opt.value);
+              const isActive = (boardType || '') === opt.value;
+              return (
+                <a key={opt.value} href={`/search?${params.toString()}`}>
+                  <Badge
+                    variant={isActive ? 'default' : 'outline'}
+                    className={`shrink-0 cursor-pointer ${
+                      isActive ? 'bg-blue-600 text-white' : 'hover:bg-muted'
+                    }`}
+                  >
+                    {opt.label}
+                  </Badge>
+                </a>
+              );
+            })}
+          </div>
+
+          {/* 정렬 옵션 */}
           <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">
             {sortOptions.map(opt => {
               const params = new URLSearchParams({ q: query, sort: opt.value });
               if (priceMin !== undefined) params.set('priceMin', String(priceMin));
               if (priceMax !== undefined) params.set('priceMax', String(priceMax));
+              if (boardType) params.set('board', boardType);
               return (
                 <a key={opt.value} href={`/search?${params.toString()}`}>
                   <Badge
@@ -92,6 +123,7 @@ export default async function SearchPage({ searchParams }: Props) {
             sortBy={sortBy}
             priceMin={priceMin}
             priceMax={priceMax}
+            boardType={boardType}
             emptyState={<EmptyState message={`\u201C${query}\u201D에 대한 검색 결과가 없습니다.`} sub="검색어를 줄이거나 다른 단어로 검색해보세요." />}
           />
         ) : (

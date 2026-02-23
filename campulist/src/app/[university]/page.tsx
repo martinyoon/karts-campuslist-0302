@@ -37,7 +37,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
   if (!university) notFound();
 
   const sortBy = (sort as 'latest' | 'price_asc' | 'price_desc' | 'popular') || 'latest';
-  const posts = await getPosts({ universitySlug: slug, sortBy, limit: 20 });
+  const posts = await getPosts({ universitySlug: slug, boardType: 'campus', sortBy, limit: 20 });
 
   return (
     <div>
@@ -49,7 +49,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
         <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{university.region} · {university.nameEn}</p>
       </div>
 
-      <CategoryGrid universitySlug={slug} />
+      <CategoryGrid universitySlug={slug} boardType="campus" />
 
       <Separator />
 
@@ -74,6 +74,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
         <PostFeedWithLocal
           serverPosts={posts}
           universityId={university.id}
+          boardType="campus"
           sortBy={sortBy}
           emptyState={<EmptyState message="아직 게시글이 없습니다." />}
         />

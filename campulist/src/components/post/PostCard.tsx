@@ -42,6 +42,11 @@ export default function PostCard({ post }: PostCardProps) {
       {/* 정보 */}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center gap-1.5">
+          {post.boardType === 'ad' && (
+            <Badge variant="outline" className="shrink-0 text-[10px] border-orange-400/40 bg-orange-500/10 text-orange-600 dark:text-orange-400">
+              광고
+            </Badge>
+          )}
           {post.status !== 'active' && (
             <Badge variant="outline" className={`shrink-0 text-[10px] ${post.status === 'reserved' ? 'text-orange-500 border-orange-500/30' : 'text-green-500 border-green-500/30'}`}>
               {post.status === 'reserved' ? '예약중' : '거래완료'}

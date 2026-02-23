@@ -1,7 +1,7 @@
-import type { Category, CategoryGroup } from '@/lib/types';
+import type { Category, CategoryGroup, BoardType } from '@/lib/types';
 
 export const categories: Category[] = [
-  // 대분류
+  // ===== 캠퍼스 대분류 =====
   { id: 1, name: '중고마켓', slug: 'market', parentId: null, icon: '📦', sortOrder: 1 },
   { id: 2, name: '주거', slug: 'housing', parentId: null, icon: '🏠', sortOrder: 2 },
   { id: 3, name: '일자리', slug: 'jobs', parentId: null, icon: '💼', sortOrder: 3 },
@@ -69,16 +69,68 @@ export const categories: Category[] = [
   { id: 74, name: '촬영/편집', slug: 'media', parentId: 7, icon: '📸', sortOrder: 4 },
   { id: 75, name: '설문/참여', slug: 'survey', parentId: 7, icon: '📊', sortOrder: 5 },
   { id: 76, name: '기타 의뢰', slug: 'etc-gig', parentId: 7, icon: '✨', sortOrder: 6 },
+
+  // ===== 광고 대분류 (ID 101~) =====
+  { id: 101, name: '맛집·카페', slug: 'ad-restaurant', parentId: null, icon: '🍽️', sortOrder: 101 },
+  { id: 102, name: '학원·교육', slug: 'ad-academy', parentId: null, icon: '📖', sortOrder: 102 },
+  { id: 103, name: '뷰티·건강', slug: 'ad-beauty', parentId: null, icon: '💇', sortOrder: 103 },
+  { id: 104, name: '쇼핑·편의', slug: 'ad-shopping', parentId: null, icon: '🛍️', sortOrder: 104 },
+  { id: 105, name: '부동산·원룸', slug: 'ad-housing', parentId: null, icon: '🏠', sortOrder: 105 },
+  { id: 106, name: '구인·알바모집', slug: 'ad-hiring', parentId: null, icon: '💼', sortOrder: 106 },
+  { id: 107, name: '기타 광고', slug: 'ad-etc', parentId: null, icon: '📢', sortOrder: 107 },
+
+  // 광고 소분류
+  { id: 1011, name: '한식', slug: 'ad-korean', parentId: 101, icon: '🍚', sortOrder: 1 },
+  { id: 1012, name: '카페·디저트', slug: 'ad-cafe', parentId: 101, icon: '☕', sortOrder: 2 },
+  { id: 1013, name: '양식·일식·중식', slug: 'ad-world', parentId: 101, icon: '🍝', sortOrder: 3 },
+  { id: 1014, name: '배달·포장', slug: 'ad-delivery', parentId: 101, icon: '🛵', sortOrder: 4 },
+  { id: 1015, name: '주점·바', slug: 'ad-bar', parentId: 101, icon: '🍺', sortOrder: 5 },
+
+  { id: 1021, name: '학원·입시', slug: 'ad-cram', parentId: 102, icon: '📝', sortOrder: 1 },
+  { id: 1022, name: '어학·외국어', slug: 'ad-language', parentId: 102, icon: '🌐', sortOrder: 2 },
+  { id: 1023, name: '자격증·취업', slug: 'ad-cert', parentId: 102, icon: '📋', sortOrder: 3 },
+  { id: 1024, name: '음악·미술·체육', slug: 'ad-arts', parentId: 102, icon: '🎵', sortOrder: 4 },
+
+  { id: 1031, name: '헤어·네일', slug: 'ad-hair', parentId: 103, icon: '✂️', sortOrder: 1 },
+  { id: 1032, name: '피트니스·요가', slug: 'ad-fitness', parentId: 103, icon: '💪', sortOrder: 2 },
+  { id: 1033, name: '병원·약국', slug: 'ad-medical', parentId: 103, icon: '🏥', sortOrder: 3 },
+
+  { id: 1041, name: '편의점·마트', slug: 'ad-mart', parentId: 104, icon: '🏪', sortOrder: 1 },
+  { id: 1042, name: '의류·잡화', slug: 'ad-fashion', parentId: 104, icon: '👕', sortOrder: 2 },
+  { id: 1043, name: '전자기기·수리', slug: 'ad-tech', parentId: 104, icon: '📱', sortOrder: 3 },
+
+  { id: 1051, name: '원룸·오피스텔', slug: 'ad-studio', parentId: 105, icon: '🚪', sortOrder: 1 },
+  { id: 1052, name: '고시원·하숙', slug: 'ad-boarding', parentId: 105, icon: '🏨', sortOrder: 2 },
+  { id: 1053, name: '공유오피스', slug: 'ad-cowork', parentId: 105, icon: '🏢', sortOrder: 3 },
+
+  { id: 1061, name: '매장 알바', slug: 'ad-store-job', parentId: 106, icon: '🏪', sortOrder: 1 },
+  { id: 1062, name: '배달·물류', slug: 'ad-logistics', parentId: 106, icon: '📦', sortOrder: 2 },
+  { id: 1063, name: '사무·기타', slug: 'ad-office-job', parentId: 106, icon: '💻', sortOrder: 3 },
+
+  { id: 1071, name: '이벤트·할인', slug: 'ad-event', parentId: 107, icon: '🎉', sortOrder: 1 },
+  { id: 1072, name: '신규오픈', slug: 'ad-new-open', parentId: 107, icon: '🎊', sortOrder: 2 },
+  { id: 1073, name: '기타', slug: 'ad-other', parentId: 107, icon: '📋', sortOrder: 3 },
 ];
 
 export const majorCategories = categories.filter(c => c.parentId === null);
+
+// 보드별 대분류: 캠퍼스(ID < 100), 광고(ID >= 100)
+export function getBoardType(categoryId: number): BoardType {
+  return categoryId >= 100 ? 'ad' : 'campus';
+}
+
+export const campusMajorCategories = majorCategories.filter(c => c.id < 100);
+export const adMajorCategories = majorCategories.filter(c => c.id >= 100);
 
 export function getMinorCategories(majorId: number): Category[] {
   return categories.filter(c => c.parentId === majorId);
 }
 
-export function getCategoryGroups(): CategoryGroup[] {
-  return majorCategories.map(major => ({
+export function getCategoryGroups(boardType?: BoardType): CategoryGroup[] {
+  const majors = boardType === 'ad' ? adMajorCategories
+    : boardType === 'campus' ? campusMajorCategories
+    : majorCategories;
+  return majors.map(major => ({
     major,
     minors: getMinorCategories(major.id),
   }));

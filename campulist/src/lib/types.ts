@@ -9,6 +9,10 @@ export type BizPlan = 'basic' | 'pro' | 'premium';
 export type ReportReason = 'spam' | 'fraud' | 'inappropriate' | 'duplicate' | 'other';
 export type ReportStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed';
 export type MemberType = 'undergraduate' | 'graduate' | 'professor' | 'staff' | 'alumni' | 'merchant' | 'general';
+export type BoardType = 'campus' | 'ad';
+
+// 캠퍼스 게시판 글쓰기 가능 회원 유형
+export const CAMPUS_MEMBER_TYPES: MemberType[] = ['undergraduate', 'graduate', 'professor', 'staff', 'alumni'];
 
 export interface Campus {
   name: string;
@@ -87,6 +91,7 @@ export interface Post {
   price: number | null;
   priceNegotiable: boolean;
   isPremium: boolean;
+  boardType: BoardType;
   status: PostStatus;
   locationDetail: string | null;
   contactMethods?: ContactMethods;
@@ -109,6 +114,7 @@ export interface PostListItem {
   likeCount: number;
   createdAt: string;
   bumpedAt: string;
+  boardType: BoardType;
   author: UserSummary;
   university: Pick<University, 'id' | 'name' | 'slug'>;
   categoryMinor: Pick<Category, 'id' | 'name' | 'slug'>;
@@ -131,6 +137,7 @@ export interface PostFilters {
   query?: string;
   priceMin?: number;
   priceMax?: number;
+  boardType?: BoardType;
   status?: PostStatus;
   sortBy?: 'latest' | 'price_asc' | 'price_desc' | 'popular';
   page?: number;
@@ -196,6 +203,7 @@ export interface PaginatedResult<T> {
 export interface PostCreateInput {
   title: string;
   body: string;
+  boardType: BoardType;
   universityId: number;
   categoryMajorId: number;
   categoryMinorId: number;

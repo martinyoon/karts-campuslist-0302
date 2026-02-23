@@ -13,11 +13,12 @@ import AuthGuard from '@/components/auth/AuthGuard';
 import { createPost, getPostForEdit, updatePost, deletePost } from '@/lib/api';
 import { getPostImages } from '@/data/posts';
 import { LIMITS } from '@/lib/constants';
-import type { PostStatus, MemberType } from '@/lib/types';
+import type { PostStatus, MemberType, BoardType } from '@/lib/types';
+import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
 import CategorySummary from '@/components/write/CategorySummary';
 import { categoryExamples, categoryExampleSets } from '@/data/categoryExamples';
 import type { ToneType } from '@/data/categoryExamples';
-import { getCategoryBySlug, getCategoryGroups } from '@/data/categories';
+import { getCategoryBySlug, getCategoryGroups, getBoardType } from '@/data/categories';
 import type { User } from '@/lib/types';
 
 interface WriteDraft {
@@ -123,6 +124,7 @@ function WritePageContent() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [showAdBoard, setShowAdBoard] = useState(false);
 
   // 확장 예시 세트
   const exSet = minorId ? categoryExampleSets[minorId] : null;
@@ -518,6 +520,7 @@ function WritePageContent() {
     const postData = {
       title: title.trim(),
       body: body.trim(),
+      boardType: majorId ? getBoardType(majorId) : 'campus' as BoardType,
       universityId,
       categoryMajorId: majorId!,
       categoryMinorId: minorId!,
@@ -590,33 +593,47 @@ function WritePageContent() {
 
       <div className="mt-6">
         {/* 카테고리 통합 선택 (한 화면) */}
-        {step !== 'form' && (
-          <div>
-            <h2 className="text-lg font-bold">카테고리 선택</h2>
-            <p className="mt-1 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
-            <div className="mt-3 columns-2 gap-4">
-              {getCategoryGroups().map(({ major, minors }) => (
-                <div key={major.id} className="mb-3 break-inside-avoid">
-                  <div className="flex items-center gap-1.5 py-1.5">
-                    <span className="cat-icon text-lg">{major.icon}</span>
-                    <span className="text-lg font-bold">{major.name}</span>
+        {step !== 'form' && (() => {
+          const isCampusMember = user ? CAMPUS_MEMBER_TYPES.includes(user.memberType) : true;
+          const writeBoardType: BoardType = !isCampusMember ? 'ad' : showAdBoard ? 'ad' : 'campus';
+          return (
+            <div>
+              <h2 className="text-lg font-bold">카테고리 선택</h2>
+              <p className="mt-1 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
+              <div className="mt-3 columns-2 gap-4">
+                {getCategoryGroups(writeBoardType).map(({ major, minors }) => (
+                  <div key={major.id} className="mb-3 break-inside-avoid">
+                    <div className="flex items-center gap-1.5 py-1.5">
+                      <span className="cat-icon text-lg">{major.icon}</span>
+                      <span className="text-lg font-bold">{major.name}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 pb-1">
+                      {minors.map(minor => (
+                        <button
+                          key={minor.id}
+                          onClick={() => { setMajorId(major.id); setMinorId(minor.id); setStep('form'); }}
+                          className="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-blue-500/10 hover:text-blue-500"
+                        >
+                          {minor.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-1 pb-1">
-                    {minors.map(minor => (
-                      <button
-                        key={minor.id}
-                        onClick={() => { setMajorId(major.id); setMinorId(minor.id); setStep('form'); }}
-                        className="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-blue-500/10 hover:text-blue-500"
-                      >
-                        {minor.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              {/* 보드 전환 링크 */}
+              {isCampusMember && (
+                <button
+                  type="button"
+                  onClick={() => { setShowAdBoard(!showAdBoard); setMajorId(null); setMinorId(null); }}
+                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-border py-2.5 text-sm text-muted-foreground transition-colors hover:border-orange-500/50 hover:text-orange-500"
+                >
+                  {showAdBoard ? '📚 캠퍼스 게시판으로 돌아가기' : '📢 업체 광고로 글쓰기 →'}
+                </button>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* 글쓰기 폼 */}
         {step === 'form' && (

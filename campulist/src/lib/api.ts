@@ -3,7 +3,7 @@
 // Phase B에서 이 파일만 Supabase 버전으로 교체하면 전환 완료
 // ============================================================
 
-import type { Post, PostListItem, PostDetail, PostFilters, PostStatus, User } from './types';
+import type { Post, PostListItem, PostDetail, PostFilters, PostStatus, User, BoardType } from './types';
 import { mockPosts, toPostListItem, getPostImages, getPostTags } from '@/data/posts';
 import { universities } from '@/data/universities';
 import { categories } from '@/data/categories';
@@ -47,6 +47,10 @@ function getAllPosts(): Post[] {
 
 export async function getPosts(filters?: PostFilters): Promise<PostListItem[]> {
   let posts = getAllPosts().filter(p => p.status === 'active');
+
+  if (filters?.boardType) {
+    posts = posts.filter(p => (p.boardType ?? 'campus') === filters.boardType);
+  }
 
   if (filters?.universitySlug) {
     const uni = universities.find(u => u.slug === filters.universitySlug);
@@ -267,6 +271,7 @@ export function createPost(input: {
   title: string;
   body: string;
   authorId: string;
+  boardType?: BoardType;
   universityId: number;
   categoryMajorId: number;
   categoryMinorId: number;
@@ -289,6 +294,7 @@ export function createPost(input: {
     price: input.price,
     priceNegotiable: input.priceNegotiable,
     isPremium: false,
+    boardType: input.boardType ?? 'campus',
     status: 'active',
     locationDetail: input.locationDetail,
     contactMethods: input.contactMethods,
@@ -383,9 +389,11 @@ export function getFilteredLocalPosts(filters?: {
   authorId?: string;
   priceMin?: number;
   priceMax?: number;
+  boardType?: BoardType;
 }): PostListItem[] {
   // getAllPosts에서 로컬 게시글 + 오버라이드 적용된 것만 추출
   let posts = getAllPosts().filter(p => p.id.startsWith('local-') && p.status === 'active');
+  if (filters?.boardType) posts = posts.filter(p => (p.boardType ?? 'campus') === filters.boardType);
   if (filters?.universityId) posts = posts.filter(p => p.universityId === filters.universityId);
   if (filters?.categoryMajorId) posts = posts.filter(p => p.categoryMajorId === filters.categoryMajorId);
   if (filters?.categoryMinorId) posts = posts.filter(p => p.categoryMinorId === filters.categoryMinorId);

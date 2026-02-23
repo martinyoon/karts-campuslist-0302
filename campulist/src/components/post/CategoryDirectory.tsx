@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCategoryGroups } from '@/data/categories';
+import type { BoardType } from '@/lib/types';
 import {
   Sheet,
   SheetContent,
@@ -15,6 +16,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   activeMajorId: number | null;
   universitySlug?: string;
+  boardType?: BoardType;
 }
 
 export default function CategoryDirectory({
@@ -22,9 +24,10 @@ export default function CategoryDirectory({
   onOpenChange,
   activeMajorId,
   universitySlug,
+  boardType,
 }: Props) {
   const router = useRouter();
-  const groups = getCategoryGroups();
+  const groups = getCategoryGroups(boardType);
   const activeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

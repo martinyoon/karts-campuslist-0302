@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import PostCard from './PostCard';
 import { getFilteredLocalPosts } from '@/lib/api';
-import type { PostListItem } from '@/lib/types';
+import type { PostListItem, BoardType } from '@/lib/types';
 
 interface Props {
   serverPosts: PostListItem[];
@@ -14,6 +14,7 @@ interface Props {
   authorId?: string;
   priceMin?: number;
   priceMax?: number;
+  boardType?: BoardType;
   sortBy?: 'latest' | 'price_asc' | 'price_desc' | 'popular';
   emptyState?: React.ReactNode;
 }
@@ -25,14 +26,14 @@ interface Props {
  */
 export default function PostFeedWithLocal({
   serverPosts, universityId, categoryMajorId, categoryMinorId,
-  query, authorId, priceMin, priceMax, sortBy = 'latest', emptyState,
+  query, authorId, priceMin, priceMax, boardType, sortBy = 'latest', emptyState,
 }: Props) {
   const [posts, setPosts] = useState<PostListItem[]>(serverPosts);
 
   useEffect(() => {
     const localPosts = getFilteredLocalPosts({
       universityId, categoryMajorId, categoryMinorId,
-      query, authorId, priceMin, priceMax,
+      query, authorId, priceMin, priceMax, boardType,
     });
 
     if (localPosts.length > 0) {
@@ -60,7 +61,7 @@ export default function PostFeedWithLocal({
       }
     }
     setPosts(serverPosts);
-  }, [serverPosts, universityId, categoryMajorId, categoryMinorId, query, authorId, priceMin, priceMax, sortBy]);
+  }, [serverPosts, universityId, categoryMajorId, categoryMinorId, query, authorId, priceMin, priceMax, boardType, sortBy]);
 
   if (posts.length === 0) {
     return emptyState ? <>{emptyState}</> : null;
