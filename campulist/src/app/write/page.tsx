@@ -116,6 +116,7 @@ function WritePageContent() {
   const [submitting, setSubmitting] = useState(false);
   const initialized = useRef(false);
   const uniFromUrl = useRef(false);
+  const isEditRef = useRef(false);
 
   // ── 7가지 개선 기능 상태 ──
   const [selectedTone, setSelectedTone] = useState<ToneType>('clean');
@@ -214,6 +215,7 @@ function WritePageContent() {
       const post = getPostForEdit(editParam);
       if (post && post.authorId === user.id) {
         initialized.current = true;
+        isEditRef.current = true;
         setEditId(editParam);
         setIsEditMode(true);
         setTitle(post.title);
@@ -308,7 +310,7 @@ function WritePageContent() {
 
   // 사용자 대학교를 기본값으로 설정 + 제목 접두어 자동 삽입
   useEffect(() => {
-    if (user && !isEditMode && !draftLoaded) {
+    if (user && !isEditMode && !draftLoaded && !isEditRef.current) {
       if (!uniFromUrl.current) {
         setUniversityId(user.universityId);
       }
