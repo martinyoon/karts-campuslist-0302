@@ -81,7 +81,8 @@ interface User {
 | `17362ca` | docs: NOTES.md 업데이트 + Supabase 연동 가이드 추가 |
 | `6cb3ecc` | feat: 게시판 분리 — 캠퍼스 게시판 vs 광고 게시판 |
 | `86b2910` | fix: 글쓰기 권한 버그 수정 — 회원유형별 보드 접근 제한 |
-| (현재) | refactor: 보드 통합 + 오픈 소분류 전환 + 글쓰기 UX 개선 |
+| `5c5f921` | refactor: 보드 분리 제거 + 오픈 소분류 체계 구현 |
+| (현재) | feat: UI/UX 전면 개선 14건 (이미지/헤더/카테고리/검색/캠톡 등) |
 
 ---
 
@@ -305,6 +306,98 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
 - 삭제할 파일/localStorage 키 vs 유지할 파일 목록
 - RLS 정책 (테이블별 SELECT/INSERT/UPDATE/DELETE 규칙)
 
+### 10. UI/UX 전면 개선 — 14개 항목 (Critical 3 + High 4 + Medium 7)
+
+전체 앱(18개 페이지, 30+ 컴포넌트)을 탐색하여 발견한 UI/UX 문제 14건을 일괄 개선.
+구현 난이도가 낮고, Supabase 연동에 문제 없으며, 기존 코드 패턴을 유지하면서 수정.
+
+#### 수정 파일 목록 (15개)
+
+| # | 파일 | 수정 내용 | 등급 |
+|---|------|----------|------|
+| A1 | `components/post/ImageGallery.tsx` | w-1/3→w-full, aspect-[4/3], 버튼 확대, lazy | Critical |
+| A2+C1 | `components/layout/Header.tsx` | 데스크톱 카테고리 링크 + 모바일 1줄 컴팩트 | Critical |
+| A3 | `components/post/ContactMethodsDisplay.tsx` | tel:, mailto:, 복사 토스트 | Critical |
+| B1 | `components/post/CategoryGrid.tsx` | Sheet→Link 직접 이동 (2클릭→1클릭) | High |
+| B2 | `app/search/page.tsx` | 검색 폼 추가 + a→Link | High |
+| B3 | `app/camtalk/page.tsx` | 대화목록에 게시글 제목 표시 | High |
+| B4 | `app/post/[id]/page.tsx` | 하단바에서 본문 제거, 가격만 표시 | High |
+| B4 | `components/post/LocalPostView.tsx` | 동일 (하단바 본문 제거) | High |
+| C2 | `app/[university]/[category]/page.tsx` | a→Link (클라이언트 네비게이션) | Medium |
+| C2 | `app/all/[category]/page.tsx` | a→Link (클라이언트 네비게이션) | Medium |
+| C3 | `components/post/ShareButton.tsx` | Web Share API + 클립보드 폴백 | Medium |
+| C4 | `components/post/PostStatusControl.tsx` | window.confirm→Sheet 모달 | Medium |
+| C5 | `components/post/PostCard.tsx` | 이미지 loading="lazy" | Medium |
+| C6 | `app/auth/page.tsx` | 회원유형 캠퍼스/외부 2그룹 분리 | Medium |
+| C7 | `app/camtalk/[id]/page.tsx` | router.back()→push('/camtalk') | Medium |
+
+#### A. Critical 버그 수정 (3개)
+
+**A1. ImageGallery 크기 수정**
+- 이미지 `w-1/3 aspect-[16/9]` → `w-full aspect-[4/3]` (모바일 ~120px→전체 너비)
+- 좌우 화살표 `h-6 w-6` → `h-8 w-8` (터치 타겟 확대)
+- 인디케이터 `h-1` → `h-1.5`, 활성 `w-3` → `w-4`
+- `loading="lazy"` 추가
+- `mx-4 mt-4` 제거 (부모가 패딩 담당)
+
+**A2. 데스크톱 네비게이션 추가 + C1. 모바일 헤더 컴팩트화**
+- 데스크톱: 7개 대분류 카테고리 링크를 로고와 검색 사이에 배치 (`hidden md:flex`)
+- 모바일: 2줄 헤더(로고바+검색바) → 1줄 + 돋보기 아이콘 검색 오버레이
+- `showMobileSearch` state로 검색 모드 토글
+- 현재 pathname 기반 활성 카테고리 하이라이트
+- `currentUniSlug` 기반 컨텍스트 인식 카테고리 URL
+
+**A3. 전화번호 tap-to-call + 이메일 mailto**
+- 전화번호: `<span>` → `<a href="tel:...">` (녹색)
+- 이메일: `<span>` → `<a href="mailto:...">` + 복사 시 `toast()` 피드백
+
+#### B. High Impact 개선 (4개)
+
+**B1. 카테고리 직접 이동**
+- CategoryGrid에서 Sheet(CategoryDirectory) 제거, `<Link>` 직접 이동
+- `'use client'` 제거, `useState` 제거 — 서버 컴포넌트 가능
+- `grid-cols-3` → `grid-cols-4` (7개 아이콘에 더 적합)
+
+**B2. 검색 페이지에 검색 폼 추가**
+- `<form action="/search">` 네이티브 폼 (서버 컴포넌트 유지)
+- 정렬 `<a>` → `<Link>` (클라이언트 네비게이션)
+
+**B3. 캠톡 대화목록에 게시글 정보 추가**
+- `getMessages()` import 추가
+- 첫 메시지에서 게시글 제목 파싱: `firstMsg.match(/^\[(.+?)\]\n\/post\//)`
+- 닉네임 아래에 파란색 게시글 제목 표시
+
+**B4. 게시글 하단 고정바 정리**
+- `post.body` 텍스트 제거 → 가격만 크게 표시
+- `priceNegotiable`은 별도 줄로 분리
+- `page.tsx` + `LocalPostView.tsx` 양쪽 동일하게 수정
+
+#### C. Medium Impact 개선 (7개)
+
+**C1.** (A2와 병합 — 모바일 헤더 컴팩트화)
+
+**C2. 필터/정렬을 `<Link>`로 변경**
+- `app/[university]/[category]/page.tsx`, `app/all/[category]/page.tsx`
+- `<a>` → `<Link>` — 풀 페이지 리로드 → 클라이언트 네비게이션
+
+**C3. ShareButton에 Web Share API 추가**
+- `navigator.share()` 지원 시 네이티브 공유 시트
+- 미지원 시 클립보드 복사 폴백
+
+**C4. 게시글 삭제 확인 — window.confirm → Sheet**
+- `showDeleteSheet` state + Sheet bottom panel
+- 스타일된 취소/삭제 버튼
+
+**C5. PostCard 이미지 lazy loading**
+- `<img>` 태그에 `loading="lazy"` 추가
+
+**C6. 로그인 페이지 회원유형 그룹 분리**
+- `MEMBER_TYPES` → `CAMPUS_MEMBER_TYPES` (5개, 5열) + `EXTERNAL_MEMBER_TYPES` (2개, 2열)
+- "캠퍼스 회원" / "외부 회원" 그룹 라벨 추가
+
+**C7. 캠톡 뒤로가기 → 목록으로**
+- `router.back()` → `router.push('/camtalk')` — 항상 캠톡 목록으로
+
 ---
 
 ## 현재 상태
@@ -321,6 +414,20 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
 [완료] 캠퍼스/광고 보드 통합 → "오픈 소분류" 방식 (18개 파일 수정, app/ad/ 삭제)
 [완료] 글쓰기 UX 개선 — 필터 우선 카테고리 표시 (비캠퍼스: open만, 캠퍼스: 전체)
 [완료] campus 카테고리 조기 차단 (URL 파라미터, 임시저장, 수정 모드 3개 경로)
+[완료] UI/UX 전면 개선 14건 — Critical 3 + High 4 + Medium 7
+       A1. ImageGallery w-full + aspect-[4/3] + lazy loading
+       A2. 데스크톱 카테고리 네비게이션 + 모바일 헤더 컴팩트
+       A3. 전화번호 tap-to-call + 이메일 mailto + 복사 토스트
+       B1. 카테고리 직접 이동 (Sheet 제거 → Link)
+       B2. 검색 페이지 검색 폼 추가
+       B3. 캠톡 대화목록 게시글 제목 표시
+       B4. 하단 고정바 본문 제거 (가격만 표시)
+       C2. 필터/정렬 <a>→<Link> (클라이언트 네비게이션)
+       C3. ShareButton Web Share API
+       C4. 삭제 확인 Sheet 모달
+       C5. PostCard 이미지 lazy loading
+       C6. 회원가입 유형 2그룹 분리
+       C7. 캠톡 뒤로가기 → 목록으로
 [완료] npm run build 성공 (TypeScript 에러 없음)
 [완료] GitHub 푸시 완료
 ```
@@ -373,3 +480,8 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
 - `isCampusBlocked()` — write/page.tsx useEffect 내 인라인 헬퍼, URL/드래프트/수정 3곳에서 사용
 - `getCategoryGroups()` — 인자 없이 호출 (boardType 파라미터 제거됨)
 - `app/ad/` 라우트는 완전 삭제됨 (리다이렉트 없음, 404 반환)
+- Header `showMobileSearch` — 모바일에서 돋보기 클릭 시 헤더 전체가 검색 모드로 전환
+- Header `currentUniSlug` — pathname에서 대학 slug 추출하여 카테고리 URL에 반영
+- CategoryGrid — `'use client'` 제거, Sheet/useState 없는 순수 서버 컴포넌트로 변환
+- `navigator.share()` — iOS/Android 네이티브 공유 시트, 미지원 브라우저는 클립보드 폴백
+- CamTalk 게시글 제목 파싱 — 첫 메시지 `[제목]\n/post/id` 형식에서 정규식 추출

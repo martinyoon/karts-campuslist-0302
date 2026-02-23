@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
 import { deletePost } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import type { PostStatus } from '@/lib/types';
 
 interface PostStatusControlProps {
@@ -18,6 +20,7 @@ export default function PostStatusControl({ postId, authorId }: PostStatusContro
   const { toast } = useToast();
   const { user } = useAuth();
   const [isOwner, setIsOwner] = useState(false);
+  const [showDeleteSheet, setShowDeleteSheet] = useState(false);
 
   useEffect(() => {
     setIsOwner(!!user && authorId === user.id);
@@ -29,10 +32,10 @@ export default function PostStatusControl({ postId, authorId }: PostStatusContro
     router.push(`/write?edit=${postId}`);
   };
 
-  const handleDelete = () => {
-    if (!window.confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+  const confirmDelete = () => {
     deletePost(postId);
     toast('게시글이 삭제되었습니다');
+    setShowDeleteSheet(false);
     router.push('/my');
   };
 
@@ -50,7 +53,7 @@ export default function PostStatusControl({ postId, authorId }: PostStatusContro
           수정하기
         </button>
         <button
-          onClick={handleDelete}
+          onClick={() => setShowDeleteSheet(true)}
           className="flex items-center justify-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -60,6 +63,25 @@ export default function PostStatusControl({ postId, authorId }: PostStatusContro
           삭제
         </button>
       </div>
+
+      <Sheet open={showDeleteSheet} onOpenChange={setShowDeleteSheet}>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+          <div className="pb-6">
+            <p className="text-lg font-bold">게시글 삭제</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </p>
+            <div className="mt-6 flex gap-2">
+              <Button variant="outline" onClick={() => setShowDeleteSheet(false)} className="flex-1">
+                취소
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete} className="flex-1">
+                삭제
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

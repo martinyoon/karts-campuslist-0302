@@ -11,12 +11,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { universities } from '@/data/universities';
 import type { MemberType } from '@/lib/types';
 
-const MEMBER_TYPES: { value: MemberType; label: string; icon: string }[] = [
+const CAMPUS_MEMBER_TYPES: { value: MemberType; label: string; icon: string }[] = [
   { value: 'undergraduate', label: '학부생', icon: '🎓' },
   { value: 'graduate', label: '대학원생', icon: '📚' },
   { value: 'professor', label: '교수', icon: '👨‍🏫' },
   { value: 'staff', label: '교직원', icon: '🏢' },
   { value: 'alumni', label: '졸업생', icon: '🎒' },
+];
+
+const EXTERNAL_MEMBER_TYPES: { value: MemberType; label: string; icon: string }[] = [
   { value: 'merchant', label: '인근상인', icon: '🏪' },
   { value: 'general', label: '일반인', icon: '👤' },
 ];
@@ -127,8 +130,27 @@ export default function AuthPage() {
               {/* 회원 유형 */}
               <div>
                 <label className="mb-2 block text-sm font-medium">회원 유형</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {MEMBER_TYPES.map(type => (
+                <p className="mb-1.5 text-xs text-muted-foreground">캠퍼스 회원</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {CAMPUS_MEMBER_TYPES.map(type => (
+                    <button
+                      key={type.value}
+                      type="button"
+                      onClick={() => setMemberType(type.value)}
+                      className={`flex flex-col items-center gap-1 rounded-lg border px-1 py-2.5 text-xs font-medium transition-colors ${
+                        memberType === type.value
+                          ? 'border-blue-500 bg-blue-500/10 text-blue-600'
+                          : 'border-border text-muted-foreground hover:bg-muted'
+                      }`}
+                    >
+                      <span className="text-base">{type.icon}</span>
+                      {type.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="mb-1.5 mt-3 text-xs text-muted-foreground">외부 회원</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {EXTERNAL_MEMBER_TYPES.map(type => (
                     <button
                       key={type.value}
                       type="button"

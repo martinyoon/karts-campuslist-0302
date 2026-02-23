@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import EmptyState from '@/components/ui/EmptyState';
-import { getMyRooms } from '@/lib/camtalk';
+import { getMyRooms, getMessages } from '@/lib/camtalk';
 import type { CamTalkRoom } from '@/lib/camtalk';
 import { formatRelativeTime } from '@/lib/format';
 import { getUserSummary } from '@/data/users';
@@ -49,6 +49,12 @@ function CamTalkContent() {
             const displayNickname = partnerProfile.nickname !== '알 수 없음' ? partnerProfile.nickname : partner.nickname;
             const myUnread = room.unread[userId] || 0;
 
+            // 첫 메시지에서 게시글 제목 추출: [제목]\n/post/id 형식
+            const msgs = getMessages(room.id);
+            const firstMsg = msgs[0]?.content || '';
+            const postTitleMatch = firstMsg.match(/^\[(.+?)\]\n\/post\//);
+            const postTitle = postTitleMatch?.[1] || null;
+
             return (
               <Link
                 key={room.id}
@@ -66,6 +72,9 @@ function CamTalkContent() {
                       {room.lastMessageAt ? formatRelativeTime(room.lastMessageAt) : ''}
                     </span>
                   </div>
+                  {postTitle && (
+                    <p className="truncate text-xs text-blue-500">{postTitle}</p>
+                  )}
                   <p className="truncate text-sm text-muted-foreground">
                     {room.lastMessage || '캠톡을 시작해보세요'}
                   </p>

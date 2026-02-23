@@ -7,6 +7,12 @@ export default function ShareButton() {
   const { toast } = useToast();
 
   const handleShare = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ url: window.location.href });
+        return;
+      } catch { /* 사용자 취소 */ }
+    }
     try {
       await navigator.clipboard.writeText(window.location.href);
       toast('링크가 복사되었습니다');

@@ -31,6 +31,7 @@ export default function PostCard({ post }: PostCardProps) {
             src={post.thumbnail}
             alt={post.title}
             className="h-full w-full object-cover"
+            loading="lazy"
           />
         </div>
       ) : (

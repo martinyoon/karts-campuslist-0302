@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getPosts } from '@/lib/api';
+import Link from 'next/link';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
 import RecentSearches from '@/components/search/RecentSearches';
@@ -40,19 +41,24 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div>
-      {/* 검색 결과 헤더 */}
+      {/* 검색 폼 + 결과 헤더 */}
       <div className="border-b border-border px-4 py-4">
-        {query ? (
-          <>
-            <h1 className="text-xl font-bold">
-              &ldquo;{query}&rdquo; 검색 결과
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {posts.length}건의 결과
-            </p>
-          </>
-        ) : (
-          <h1 className="text-xl font-bold">검색</h1>
+        <form action="/search" className="flex gap-2">
+          <input
+            type="search"
+            name="q"
+            defaultValue={query}
+            placeholder="검색어를 입력하세요"
+            className="flex h-10 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+          <button type="submit" className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+            검색
+          </button>
+        </form>
+        {query && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            &ldquo;{query}&rdquo; {posts.length}건의 결과
+          </p>
         )}
       </div>
 
@@ -65,7 +71,7 @@ export default async function SearchPage({ searchParams }: Props) {
               if (priceMin !== undefined) params.set('priceMin', String(priceMin));
               if (priceMax !== undefined) params.set('priceMax', String(priceMax));
               return (
-                <a key={opt.value} href={`/search?${params.toString()}`}>
+                <Link key={opt.value} href={`/search?${params.toString()}`}>
                   <Badge
                     variant={sortBy === opt.value ? 'default' : 'outline'}
                     className={`shrink-0 cursor-pointer ${
@@ -74,7 +80,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   >
                     {opt.label}
                   </Badge>
-                </a>
+                </Link>
               );
             })}
           </div>

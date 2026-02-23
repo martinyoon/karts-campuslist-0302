@@ -179,7 +179,7 @@ function CamTalkDetailContent() {
       {/* 상단 헤더 */}
       <div className="border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-muted-foreground hover:text-foreground" aria-label="뒤로가기">
+          <button onClick={() => router.push('/camtalk')} className="text-muted-foreground hover:text-foreground" aria-label="뒤로가기">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <Link href={`/user/${partner.id}`} className="min-w-0 flex-1 transition-opacity hover:opacity-70">

@@ -100,37 +100,37 @@ export default async function AllCategoryPage({ params, searchParams }: Props) {
 
       {/* 소분류 필터 */}
       <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">
-        <a href={buildUrl({ minor: '' })}>
+        <Link href={buildUrl({ minor: '' })}>
           <Badge
             variant={!minorSlug ? 'default' : 'outline'}
             className={`shrink-0 cursor-pointer ${!minorSlug ? 'bg-blue-600 text-white' : 'hover:bg-muted'}`}
           >
             전체보기
           </Badge>
-        </a>
+        </Link>
         {minors.map(minor => (
-          <a key={minor.slug} href={buildUrl({ minor: minor.slug })}>
+          <Link key={minor.slug} href={buildUrl({ minor: minor.slug })}>
             <Badge
               variant={minorSlug === minor.slug ? 'default' : 'outline'}
               className={`shrink-0 cursor-pointer ${minorSlug === minor.slug ? 'bg-blue-600 text-white' : 'hover:bg-muted'}`}
             >
               <span className="cat-icon">{minor.icon} </span>{minor.name}
             </Badge>
-          </a>
+          </Link>
         ))}
       </div>
 
       {/* 정렬 옵션 */}
       <div className="flex gap-2 overflow-x-auto border-b border-border px-4 pb-3 scrollbar-hide">
         {sortOptions.map(opt => (
-          <a key={opt.value} href={buildUrl({ sort: opt.value })}>
+          <Link key={opt.value} href={buildUrl({ sort: opt.value })}>
             <Badge
               variant={sortBy === opt.value ? 'default' : 'outline'}
               className={`shrink-0 cursor-pointer ${sortBy === opt.value ? 'bg-blue-600 text-white' : 'hover:bg-muted'}`}
             >
               {opt.label}
             </Badge>
-          </a>
+          </Link>
         ))}
       </div>
 
