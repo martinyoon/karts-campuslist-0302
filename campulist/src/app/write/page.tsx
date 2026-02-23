@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { universities } from '@/data/universities';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { useToast } from '@/components/ui/Toast';
@@ -125,6 +126,7 @@ function WritePageContent() {
   const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [showLocked, setShowLocked] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<'title' | 'price' | 'body' | 'delete' | null>(null);
   // 확장 예시 세트
   const exSet = minorId ? categoryExampleSets[minorId] : null;
   const exExamples = exSet?.examples ?? (minorId && categoryExamples[minorId] ? [categoryExamples[minorId]] : []);
@@ -411,28 +413,66 @@ function WritePageContent() {
 
   const fillTitleExample = () => {
     if (!user || exExamples.length === 0) return;
-    const ex = applyTone(exExamples[0], selectedTone);
     const uniShort = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '';
     const prefixOnly = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}] `;
     if (title.trim() && title.trim() !== prefixOnly.trim()) {
-      if (!window.confirm('기존 제목을 예시로 대체할까요?')) return;
+      setConfirmAction('title');
+      return;
     }
+    const ex = applyTone(exExamples[0], selectedTone);
     setTitle(fillTemplate(ex.title, user, universityId));
   };
 
   const fillPriceExample = () => {
     if (!user || exExamples.length === 0) return;
+    if (price) {
+      setConfirmAction('price');
+      return;
+    }
     const ex = exExamples[0];
-    if (price && !window.confirm('기존 가격을 예시로 대체할까요?')) return;
     setPrice(ex.price);
     setPriceNegotiable(ex.negotiable);
   };
 
   const fillBodyExample = () => {
     if (!user || exExamples.length === 0) return;
+    if (body.trim()) {
+      setConfirmAction('body');
+      return;
+    }
     const ex = applyTone(exExamples[0], selectedTone);
-    if (body.trim() && !window.confirm('기존 내용을 예시로 대체할까요?')) return;
     setBody(fillTemplate(ex.body, user, universityId));
+  };
+
+  const handleConfirmAction = () => {
+    if (!user || exExamples.length === 0) { setConfirmAction(null); return; }
+    switch (confirmAction) {
+      case 'title': {
+        const ex = applyTone(exExamples[0], selectedTone);
+        setTitle(fillTemplate(ex.title, user, universityId));
+        break;
+      }
+      case 'price': {
+        const ex = exExamples[0];
+        setPrice(ex.price);
+        setPriceNegotiable(ex.negotiable);
+        break;
+      }
+      case 'body': {
+        const ex = applyTone(exExamples[0], selectedTone);
+        setBody(fillTemplate(ex.body, user, universityId));
+        break;
+      }
+      case 'delete': {
+        if (editId) {
+          deletePost(editId);
+          toast('게시글이 삭제되었습니다');
+          router.push('/my');
+        }
+        break;
+      }
+    }
+    setConfirmAction(null);
   };
 
   // 스마트 빈칸 채우기: 비어있는 필드만 채움
@@ -575,10 +615,7 @@ function WritePageContent() {
 
   const handleDelete = () => {
     if (!editId) return;
-    if (!window.confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
-    deletePost(editId);
-    toast('게시글이 삭제되었습니다');
-    router.push('/my');
+    setConfirmAction('delete');
   };
 
   return (
@@ -939,7 +976,7 @@ function WritePageContent() {
                 onChange={e => setBody(e.target.value)}
                 rows={8}
                 maxLength={5000}
-                className={`w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
+                className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
               />
               <p className="mt-1 text-right text-xs text-muted-foreground">{body.length}/5,000</p>
               {errors.body && <p className="mt-1 text-xs text-red-500">{errors.body}</p>}
@@ -1141,68 +1178,61 @@ function WritePageContent() {
               👀 미리보기
             </button>
 
-            {/* 미리보기 바텀시트 */}
-            {showPreview && (
-              <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={() => setShowPreview(false)}>
-                <div
-                  className="w-full max-w-lg animate-in slide-in-from-bottom rounded-t-2xl bg-background p-4 pb-8 shadow-xl"
-                  style={{ maxHeight: '85vh', overflowY: 'auto' }}
-                  onClick={e => e.stopPropagation()}
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">다른 사람에게 이렇게 보여요!</span>
-                    <button onClick={() => setShowPreview(false)} className="rounded-full p-1 text-muted-foreground hover:bg-muted">&times;</button>
-                  </div>
-                  <div className="space-y-3">
-                    {/* 이미지 미리보기 */}
-                    {images.length > 0 && (
-                      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                        {images.map((src, i) => (
-                          <img key={i} src={src} alt="" className="h-48 w-48 shrink-0 rounded-lg object-cover" />
-                        ))}
-                      </div>
-                    )}
-                    {/* 제목 */}
-                    <h2 className="text-lg font-bold">{title.trim() || '(제목 없음)'}</h2>
-                    {/* 가격 */}
-                    {price && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold">{Number(price).toLocaleString()}원</span>
-                        {priceNegotiable && <Badge variant="secondary" className="text-xs">협의가능</Badge>}
-                      </div>
-                    )}
-                    {/* 본문 */}
-                    <div className="whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
-                      {body.trim() || '(내용 없음)'}
+            {/* 미리보기 Sheet */}
+            <Sheet open={showPreview} onOpenChange={setShowPreview}>
+              <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+                <SheetHeader className="pb-2">
+                  <SheetTitle className="text-sm font-normal text-muted-foreground">다른 사람에게 이렇게 보여요!</SheetTitle>
+                </SheetHeader>
+                <div className="space-y-3 px-4 pb-6">
+                  {/* 이미지 미리보기 */}
+                  {images.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                      {images.map((src, i) => (
+                        <img key={i} src={src} alt="" className="h-48 w-48 shrink-0 rounded-lg object-cover" />
+                      ))}
                     </div>
-                    {/* 태그 */}
-                    {tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">#{tag}</Badge>
-                        ))}
-                      </div>
-                    )}
-                    {/* 장소 */}
-                    {location.trim() && (
-                      <p className="text-xs text-muted-foreground">📍 {location}</p>
-                    )}
-                    {/* 작성자 */}
-                    <div className="flex items-center gap-2 border-t border-border pt-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-sm font-bold text-blue-500">
-                        {user?.nickname?.charAt(0) || '?'}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{user?.nickname || '사용자'}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {universities.find(u => u.id === universityId)?.name} · 방금 전
-                        </p>
-                      </div>
+                  )}
+                  {/* 제목 */}
+                  <h2 className="text-lg font-bold">{title.trim() || '(제목 없음)'}</h2>
+                  {/* 가격 */}
+                  {price && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl font-bold">{Number(price).toLocaleString()}원</span>
+                      {priceNegotiable && <Badge variant="secondary" className="text-xs">협의가능</Badge>}
+                    </div>
+                  )}
+                  {/* 본문 */}
+                  <div className="whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
+                    {body.trim() || '(내용 없음)'}
+                  </div>
+                  {/* 태그 */}
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {tags.map(tag => (
+                        <Badge key={tag} variant="outline" className="text-xs">#{tag}</Badge>
+                      ))}
+                    </div>
+                  )}
+                  {/* 장소 */}
+                  {location.trim() && (
+                    <p className="text-xs text-muted-foreground">📍 {location}</p>
+                  )}
+                  {/* 작성자 */}
+                  <div className="flex items-center gap-2 border-t border-border pt-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-sm font-bold text-blue-500">
+                      {user?.nickname?.charAt(0) || '?'}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{user?.nickname || '사용자'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {universities.find(u => u.id === universityId)?.name} · 방금 전
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              </SheetContent>
+            </Sheet>
 
             {/* 등록 버튼 */}
             <div>
@@ -1235,6 +1265,36 @@ function WritePageContent() {
           </div>
         )}
       </div>
+
+      {/* 확인 Sheet (예시 대체 / 삭제 공용) */}
+      <Sheet open={!!confirmAction} onOpenChange={open => { if (!open) setConfirmAction(null); }}>
+        <SheetContent side="bottom" className="rounded-t-2xl" showCloseButton={false}>
+          <SheetHeader className="pb-2">
+            <SheetTitle className={`text-lg ${confirmAction === 'delete' ? 'text-destructive' : ''}`}>
+              {confirmAction === 'delete' ? '게시글 삭제' : '예시로 대체'}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4 px-4 pb-6">
+            <p className="text-sm text-muted-foreground">
+              {confirmAction === 'title' && '기존 제목을 예시로 대체할까요?'}
+              {confirmAction === 'price' && '기존 가격을 예시로 대체할까요?'}
+              {confirmAction === 'body' && '기존 내용을 예시로 대체할까요?'}
+              {confirmAction === 'delete' && '정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'}
+            </p>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => setConfirmAction(null)}>
+                취소
+              </Button>
+              <Button
+                className={`flex-1 ${confirmAction === 'delete' ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                onClick={handleConfirmAction}
+              >
+                {confirmAction === 'delete' ? '삭제' : '대체하기'}
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

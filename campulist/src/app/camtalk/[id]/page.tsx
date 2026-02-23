@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { getRoom, getMessages, sendMessage, markRead } from '@/lib/camtalk';
 import { getUserSummary } from '@/data/users';
 import { universities } from '@/data/universities';
@@ -175,7 +176,7 @@ function CamTalkDetailContent() {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-64px)] flex-col md:h-[calc(100dvh-80px)]">
+    <div className="flex h-[calc(100dvh-112px)] flex-col md:h-[calc(100dvh-56px)]">
       {/* 상단 헤더 */}
       <div className="border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
@@ -346,147 +347,137 @@ function CamTalkDetailContent() {
         </form>
       </div>
 
-      {/* 약속 잡기 패널 */}
-      {appointmentOpen && (
-        <>
-          <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setAppointmentOpen(false)} />
-          <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-border bg-background px-4 pb-6 pt-4">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold">거래 약속 잡기</h3>
-              <button
-                type="button"
-                onClick={() => setAppointmentOpen(false)}
-                className="rounded-md px-3 py-1 text-base font-semibold text-yellow-500 hover:bg-yellow-500/10 dark:text-yellow-400"
-              >
-                취소
-              </button>
+      {/* 약속 잡기 Sheet */}
+      <Sheet open={appointmentOpen} onOpenChange={setAppointmentOpen}>
+        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-lg">거래 약속 잡기</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4 px-4 pb-6">
+            <div>
+              <label className="mb-1 block text-sm font-medium">날짜</label>
+              <input
+                ref={appDateRef}
+                type="date"
+                onChange={checkCanSend}
+                onInput={checkCanSend}
+                className="border-input h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {(() => {
+                  const today = new Date();
+                  return [0, 1, 2, 7].map(offset => {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() + offset);
+                    const value = d.toISOString().split('T')[0];
+                    const day = d.toLocaleDateString('ko-KR', { weekday: 'short' });
+                    const label = offset === 0 ? `오늘(${day})` : offset === 1 ? `내일(${day})` : offset === 2 ? `모레(${day})` : `일주일 후(${day})`;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          if (appDateRef.current) {
+                            appDateRef.current.value = value;
+                            checkCanSend();
+                          }
+                        }}
+                        className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                      >
+                        {label}
+                      </button>
+                    );
+                  });
+                })()}
+              </div>
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium">날짜</label>
-                <input
-                  ref={appDateRef}
-                  type="date"
-                  onChange={checkCanSend}
-                  onInput={checkCanSend}
-                  className="border-input h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                />
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {(() => {
-                    const today = new Date();
-                    return [0, 1, 2, 7].map(offset => {
-                      const d = new Date(today);
-                      d.setDate(d.getDate() + offset);
-                      const value = d.toISOString().split('T')[0];
-                      const day = d.toLocaleDateString('ko-KR', { weekday: 'short' });
-                      const label = offset === 0 ? `오늘(${day})` : offset === 1 ? `내일(${day})` : offset === 2 ? `모레(${day})` : `일주일 후(${day})`;
-                      return (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => {
-                            if (appDateRef.current) {
-                              appDateRef.current.value = value;
-                              checkCanSend();
-                            }
-                          }}
-                          className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                        >
-                          {label}
-                        </button>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">시간</label>
-                <select
-                  ref={appTimeRef}
-                  onChange={checkCanSend}
-                  className="border-input h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                  defaultValue=""
-                >
-                  <option value="" disabled>시간 선택</option>
-                  {Array.from({ length: 48 }, (_, i) => {
-                    const h = (10 + Math.floor(i / 2)) % 24;
-                    const m = i % 2 === 0 ? '00' : '30';
-                    const period = h < 12 ? '오전' : '오후';
-                    const h12 = h === 0 ? 12 : h === 12 ? 12 : h > 12 ? h - 12 : h;
-                    const label = `${period} ${h12}:${m}`;
-                    return <option key={label} value={label}>{label}</option>;
-                  })}
-                </select>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {['오전 10:00', '오후 12:00', '오후 2:00', '오후 4:00', '오후 6:00'].map(time => (
-                    <button
-                      key={time}
-                      type="button"
-                      onClick={() => {
-                        if (appTimeRef.current) {
-                          appTimeRef.current.value = time;
-                          checkCanSend();
-                        }
-                      }}
-                      className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                    >
-                      {time}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">장소 (선택)</label>
-                <input
-                  ref={appLocationRef}
-                  placeholder="예: 중앙도서관 앞"
-                  className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                />
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {['중앙도서관 앞', '정문 앞', '학생회관 1층', '기숙사 로비', '카페'].map(place => (
-                    <button
-                      key={place}
-                      type="button"
-                      onClick={() => { if (appLocationRef.current) appLocationRef.current.value = univPrefix ? `${univPrefix} ${place}` : place; }}
-                      className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                    >
-                      {place}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">약속 내용 (선택)</label>
-                <input
-                  ref={appNoteRef}
-                  placeholder="예: 교재 2권 거래"
-                  className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                />
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {['교재 거래', '전자기기 거래', '의류 거래', '생활용품 거래', '양도'].map(note => (
-                    <button
-                      key={note}
-                      type="button"
-                      onClick={() => { if (appNoteRef.current) appNoteRef.current.value = note; }}
-                      className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-                    >
-                      {note}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <Button
-                type="button"
-                onClick={handleAppointment}
-                disabled={!canSendApp}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+            <div>
+              <label className="mb-1 block text-sm font-medium">시간</label>
+              <select
+                ref={appTimeRef}
+                onChange={checkCanSend}
+                className="border-input h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                defaultValue=""
               >
-                약속 보내기
-              </Button>
+                <option value="" disabled>시간 선택</option>
+                {Array.from({ length: 48 }, (_, i) => {
+                  const h = (10 + Math.floor(i / 2)) % 24;
+                  const m = i % 2 === 0 ? '00' : '30';
+                  const period = h < 12 ? '오전' : '오후';
+                  const h12 = h === 0 ? 12 : h === 12 ? 12 : h > 12 ? h - 12 : h;
+                  const label = `${period} ${h12}:${m}`;
+                  return <option key={label} value={label}>{label}</option>;
+                })}
+              </select>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {['오전 10:00', '오후 12:00', '오후 2:00', '오후 4:00', '오후 6:00'].map(time => (
+                  <button
+                    key={time}
+                    type="button"
+                    onClick={() => {
+                      if (appTimeRef.current) {
+                        appTimeRef.current.value = time;
+                        checkCanSend();
+                      }
+                    }}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
             </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">장소 (선택)</label>
+              <input
+                ref={appLocationRef}
+                placeholder="예: 중앙도서관 앞"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {['중앙도서관 앞', '정문 앞', '학생회관 1층', '기숙사 로비', '카페'].map(place => (
+                  <button
+                    key={place}
+                    type="button"
+                    onClick={() => { if (appLocationRef.current) appLocationRef.current.value = univPrefix ? `${univPrefix} ${place}` : place; }}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {place}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">약속 내용 (선택)</label>
+              <input
+                ref={appNoteRef}
+                placeholder="예: 교재 2권 거래"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {['교재 거래', '전자기기 거래', '의류 거래', '생활용품 거래', '양도'].map(note => (
+                  <button
+                    key={note}
+                    type="button"
+                    onClick={() => { if (appNoteRef.current) appNoteRef.current.value = note; }}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {note}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Button
+              type="button"
+              onClick={handleAppointment}
+              disabled={!canSendApp}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              약속 보내기
+            </Button>
           </div>
-        </>
-      )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

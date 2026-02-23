@@ -57,7 +57,7 @@ export default function Header() {
               onChange={e => setSearchQuery(e.target.value)}
               className="flex-1"
             />
-            <Button type="button" variant="ghost" size="icon" onClick={() => setShowMobileSearch(false)}>
+            <Button type="button" variant="ghost" size="icon" onClick={() => setShowMobileSearch(false)} aria-label="검색 닫기">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
             </Button>
           </form>
@@ -66,7 +66,7 @@ export default function Header() {
             {/* 모바일 메뉴 */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
+                <Button variant="ghost" size="icon" className="md:hidden" aria-label="메뉴 열기">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
                 </Button>
               </SheetTrigger>
@@ -119,6 +119,7 @@ export default function Header() {
               size="icon"
               className="ml-auto md:hidden"
               onClick={() => setShowMobileSearch(true)}
+              aria-label="검색"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             </Button>
@@ -137,7 +138,7 @@ export default function Header() {
                     </Button>
                   </Link>
                   <Link href="/camtalk" className="relative">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" aria-label="캠톡">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                     </Button>
                     {unreadCount > 0 && (
@@ -147,7 +148,7 @@ export default function Header() {
                     )}
                   </Link>
                   <Link href="/my" className="hidden md:block">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" aria-label="마이페이지">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
                     </Button>
                   </Link>

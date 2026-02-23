@@ -55,7 +55,7 @@ export default function PostCard({ post }: PostCardProps) {
         </p>
         <p className="mt-1 text-lg font-bold text-foreground">
           {formatPrice(post.price)}
-          {post.priceNegotiable && <span className="ml-1 text-sm font-normal text-muted-foreground">협의가능</span>}
+          {post.price !== null && post.priceNegotiable && <span className="ml-1 text-sm font-normal text-muted-foreground">협의가능</span>}
         </p>
 
         <div className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
