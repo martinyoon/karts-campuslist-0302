@@ -82,7 +82,8 @@ interface User {
 | `6cb3ecc` | feat: 게시판 분리 — 캠퍼스 게시판 vs 광고 게시판 |
 | `86b2910` | fix: 글쓰기 권한 버그 수정 — 회원유형별 보드 접근 제한 |
 | `5c5f921` | refactor: 보드 분리 제거 + 오픈 소분류 체계 구현 |
-| (현재) | feat: UI/UX 전면 개선 14건 (이미지/헤더/카테고리/검색/캠톡 등) |
+| `9b6c10c` | feat: UI/UX 전면 개선 14건 (이미지/헤더/카테고리/검색/캠톡 등) |
+| (현재) | refactor: 디자인 통일성 개선 9건 (타이포/활성상태/Toast/Sheet 등) |
 
 ---
 
@@ -398,6 +399,95 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
 **C7. 캠톡 뒤로가기 → 목록으로**
 - `router.back()` → `router.push('/camtalk')` — 항상 캠톡 목록으로
 
+### 11. 디자인 통일성 개선 — 9개 항목 (16개 파일 수정)
+
+전체 앱을 재탐색하여 타이포그래피/색상/활성상태/네비게이션/접근성 불일치 9건을 일괄 개선.
+모두 UI 레이어에 한정 — 데이터/타입 변경 없음, Supabase 연동에 영향 없음.
+
+#### 수정 파일 목록 (16개)
+
+| # | 수정 내용 | 파일 | 상세 |
+|---|----------|------|------|
+| 1 | **타이포그래피 통일** | 15개 파일 (23곳) | 커스텀 픽셀값 전량 제거 |
+| 2 | **섹션 헤더 크기 통일** | `app/[university]/page.tsx` | `text-lg`→`text-xl`, `py-3`→`py-4` |
+| 3 | **활성 상태 패턴 통일** | `components/layout/Header.tsx` | 사이드메뉴 `font-bold`→`font-semibold` |
+| 5 | **대학 페이지 브레드크럼** | `app/[university]/page.tsx` | "모든 대학 › 대학명" 네비게이션 추가 |
+| 6 | **Toast 접근성** | `components/ui/Toast.tsx` | `role="status" aria-live="polite"` 추가 |
+| 7 | **Toast 변형 + 위치** | `components/ui/Toast.tsx` | success/error 색상, `md:bottom-8` |
+| 8 | **BottomNav 글쓰기 활성** | `components/layout/BottomNav.tsx` | 아이콘 `strokeWidth` 활성 변화 추가 |
+| 9 | **로그아웃 Sheet** | `app/my/page.tsx` | `window.confirm`→Sheet 컴포넌트 전환 |
+| 10 | **검색 빈상태** | `app/search/page.tsx` | 커스텀 HTML→EmptyState 재사용 컴포넌트 |
+
+#### 1. 타이포그래피 통일 — 커스텀 픽셀값 전량 제거
+
+앱 전체에 흩어진 5종의 커스텀 픽셀 글자크기를 Tailwind 표준 클래스로 교체:
+
+| 커스텀 값 | Tailwind 표준 | 이유 |
+|-----------|--------------|------|
+| `text-[15px]` (15px) | `text-sm` (14px) | 1px 차이, 표준화 |
+| `text-[13px]` (13px) | `text-xs`/`text-sm` | 용도에 따라 선택 |
+| `text-[11px]` (11px) | `text-xs` (12px) | 가독성 향상 |
+| `text-[10px]` (10px) | `text-xs` (12px) | 접근성, 가독성 |
+| `text-[9px]` (9px) | `text-xs` (12px) | 접근성, 가독성 |
+
+수정된 15개 파일:
+- `UniversityTabs.tsx` — 탭 텍스트 `text-[15px]`→`text-sm`
+- `PopularPostsSection.tsx` — 토글/제목/메타 3곳
+- `PostCard.tsx` — 배지/메타 `text-[10px]`/`text-[13px]`→`text-xs`
+- `BottomNav.tsx` — 뱃지/라벨 `text-[10px]`/`text-[11px]`→`text-xs`
+- `Header.tsx` — 서브타이틀/뱃지 `text-[10px]`→`text-xs`
+- `post/[id]/page.tsx` — 인증 뱃지 `text-[10px]`→`text-xs`
+- `my/page.tsx` — 인증/상태 뱃지
+- `camtalk/[id]/page.tsx` — 인증 뱃지/타임스탬프
+- `user/[id]/page.tsx` — 인증/비즈니스 뱃지
+- `camtalk/page.tsx` — 안읽음 뱃지
+- `write/page.tsx` — 이미지 오버레이 3곳 (`text-[10px]`, `text-[9px]`)
+- `PostBottomAction.tsx` — 빠른 메시지 버튼 `text-[15px]`→`text-sm`
+- `CategoryStepMajor.tsx` — 소분류 태그 `text-[11px]`→`text-xs`
+- `ImageGallery.tsx` — 이미지 카운터 `text-[10px]`→`text-xs`
+- `LocalPostView.tsx` — 인증 뱃지
+
+#### 2. 섹션 헤더 크기 통일
+
+대학 페이지 "게시글" 섹션 헤더를 홈페이지 패턴(`text-xl font-bold`, `py-4`)과 동일하게 통일.
+
+#### 3. 활성 상태 패턴 통일
+
+Header 사이드 메뉴의 활성 링크: `font-bold`→`font-semibold` (데스크톱 카테고리 네비와 통일).
+
+표준 2가지 패턴:
+- **탭형** (수평): `border-b-2 border-blue-500 text-blue-500 font-medium`
+- **메뉴형** (세로/링크): `font-semibold text-blue-500`
+
+#### 5. 대학 페이지 브레드크럼 추가
+
+대학 정보 배너 아래에 "모든 대학 › 대학명" 브레드크럼 삽입. 홈으로의 이동 경로 제공.
+
+#### 6+7. Toast 접근성 + 변형 + 위치
+
+- **접근성**: `role="status" aria-live="polite"` — 스크린 리더 지원
+- **변형**: `variant` 파라미터 추가 (`'default' | 'success' | 'error'`)
+  - `success`: `bg-green-600 text-white`
+  - `error`: `bg-red-600 text-white`
+  - 기본값 `'default'` — 기존 `toast('메시지')` 호출 하위 호환
+- **위치**: 데스크톱에서 `md:bottom-8` (BottomNav 없으므로 더 아래로)
+
+#### 8. BottomNav 글쓰기 아이콘 활성상태
+
+글쓰기 아이콘이 유일하게 `active` 파라미터를 받지 않던 문제.
+`icon: ()` → `icon: (active: boolean)` + `strokeWidth={active ? 2.5 : 2}` (검색 아이콘과 동일 패턴).
+
+#### 9. 로그아웃 Sheet 전환
+
+`window.confirm('로그아웃 하시겠습니까?')` → Sheet 모달.
+회원탈퇴 Sheet와 동일한 패턴 (취소/확인 버튼).
+브라우저 기본 다이얼로그 대신 앱 디자인과 일관된 UI.
+
+#### 10. 검색 빈상태 EmptyState 사용
+
+검색어 미입력 시 커스텀 SVG+텍스트 HTML → `<EmptyState>` 재사용 컴포넌트.
+앱 전체의 빈상태 패턴 통일.
+
 ---
 
 ## 현재 상태
@@ -430,6 +520,17 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
        C7. 캠톡 뒤로가기 → 목록으로
 [완료] npm run build 성공 (TypeScript 에러 없음)
 [완료] GitHub 푸시 완료
+[완료] 디자인 통일성 개선 9건 — 16개 파일 수정
+       1. 타이포그래피 통일 (커스텀 픽셀값 23곳 전량 제거)
+       2. 섹션 헤더 크기 통일 (대학 페이지 text-lg→text-xl)
+       3. 활성 상태 패턴 통일 (Header font-bold→font-semibold)
+       5. 대학 페이지 브레드크럼 추가 (모든 대학 › 대학명)
+       6. Toast 접근성 (role="status" aria-live="polite")
+       7. Toast 변형+위치 (success/error 색상, md:bottom-8)
+       8. BottomNav 글쓰기 아이콘 활성상태
+       9. 로그아웃 Sheet 전환 (window.confirm 제거)
+       10. 검색 빈상태 EmptyState 사용
+[완료] npm run build 성공 (TypeScript 에러 없음)
 ```
 
 ---
@@ -485,3 +586,7 @@ UI 완료 후 Supabase 연동 시 Claude Code에 전달할 지시사항을 10단
 - CategoryGrid — `'use client'` 제거, Sheet/useState 없는 순수 서버 컴포넌트로 변환
 - `navigator.share()` — iOS/Android 네이티브 공유 시트, 미지원 브라우저는 클립보드 폴백
 - CamTalk 게시글 제목 파싱 — 첫 메시지 `[제목]\n/post/id` 형식에서 정규식 추출
+- 커스텀 픽셀 글자크기 전량 제거 완료 — `text-[Npx]` 패턴이 앱에 0개 (grep 확인)
+- Toast `variant` — `toast('메시지')` 기존 호출 하위 호환, `toast('성공!', 'success')` 가능
+- Header 활성 상태 표준: 탭형 `border-b-2 + font-medium`, 메뉴형 `font-semibold`
+- 대학 페이지 브레드크럼 — 배너와 CategoryGrid 사이에 위치

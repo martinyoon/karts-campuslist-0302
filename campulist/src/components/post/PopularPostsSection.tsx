@@ -21,7 +21,7 @@ export default function PopularPostsSection({ posts }: Props) {
         <h2 className="text-xl font-bold">실시간 인기글</h2>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">TOP {posts.length}</span>
-          <span className="text-[13px] text-blue-500">{isOpen ? '접기' : '펴기'}</span>
+          <span className="text-sm text-blue-500">{isOpen ? '접기' : '펴기'}</span>
           <svg
             width="16"
             height="16"
@@ -51,12 +51,12 @@ export default function PopularPostsSection({ posts }: Props) {
                   <span className="text-base font-bold text-orange-500">{index + 1}</span>
                   <span className="text-sm text-blue-500">{post.categoryMinor.name}</span>
                 </div>
-                <h3 className="mt-1 truncate text-[15px] font-medium">{post.title}</h3>
+                <h3 className="mt-1 truncate text-sm font-medium">{post.title}</h3>
                 <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.bodySnippet}</p>
                 {post.price !== null && (
                   <p className="mt-1.5 text-base font-bold">{formatPrice(post.price)}</p>
                 )}
-                <div className="mt-1.5 flex items-center gap-1 text-[13px] text-muted-foreground">
+                <div className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
                   <span>❤️ {post.likeCount}</span>
                   <span>· 조회 {post.viewCount}</span>
                 </div>

@@ -40,7 +40,7 @@ export default function CategoryStepMajor({ selectedMajorId, onSelect, onContinu
               <span className="text-sm font-medium">{cat.name}</span>
               <div className="mt-1 flex flex-wrap gap-1">
                 {getMinorCategories(cat.id).map(m => (
-                  <span key={m.id} className="rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">{m.name}</span>
+                  <span key={m.id} className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{m.name}</span>
                 ))}
               </div>
             </div>

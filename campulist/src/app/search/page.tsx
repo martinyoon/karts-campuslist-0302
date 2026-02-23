@@ -101,11 +101,7 @@ export default async function SearchPage({ searchParams }: Props) {
             emptyState={<EmptyState message={`\u201C${query}\u201D에 대한 검색 결과가 없습니다.`} sub="검색어를 줄이거나 다른 단어로 검색해보세요." />}
           />
         ) : (
-          <div className="px-4 py-16 text-center text-muted-foreground">
-            <svg className="mx-auto mb-4" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-            <p className="text-lg font-medium">검색어를 입력하세요</p>
-            <p className="mt-2 text-sm">물품, 카테고리, 태그 등으로 검색할 수 있습니다.</p>
-          </div>
+          <EmptyState message="검색어를 입력하세요" sub="물품, 카테고리, 태그 등으로 검색할 수 있습니다." />
         )}
       </div>
     </div>

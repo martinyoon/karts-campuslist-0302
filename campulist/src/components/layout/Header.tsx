@@ -76,7 +76,7 @@ export default function Header() {
                   {universities.map(uni => {
                     const isActive = pathname.startsWith(`/${uni.slug}`);
                     return (
-                      <Link key={uni.slug} href={`/${uni.slug}`} className={`text-base ${isActive ? 'font-bold text-blue-500' : 'hover:text-blue-500'}`}>
+                      <Link key={uni.slug} href={`/${uni.slug}`} className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'hover:text-blue-500'}`}>
                         {uni.name}
                       </Link>
                     );
@@ -87,7 +87,7 @@ export default function Header() {
                     const catHref = currentUniSlug ? `/${currentUniSlug}/${cat.slug}` : `/all/${cat.slug}`;
                     const isActive = pathname.startsWith(catHref);
                     return (
-                      <Link key={cat.slug} href={catHref} className={`text-base ${isActive ? 'font-bold text-blue-500' : 'hover:text-blue-500'}`}>
+                      <Link key={cat.slug} href={catHref} className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'hover:text-blue-500'}`}>
                         <span className="cat-icon">{cat.icon} </span>{cat.name}
                       </Link>
                     );
@@ -99,7 +99,7 @@ export default function Header() {
             {/* 로고 */}
             <Link href="/" className="flex shrink-0 flex-col leading-tight">
               <span className="text-xl font-bold text-blue-500">캠퍼스리스트</span>
-              <span className="hidden text-[10px] text-muted-foreground md:block">Campulist.com</span>
+              <span className="hidden text-xs text-muted-foreground md:block">Campulist.com</span>
             </Link>
 
             {/* 데스크톱: 카테고리 네비게이션 */}
@@ -162,7 +162,7 @@ export default function Header() {
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                     </Button>
                     {unreadCount > 0 && (
-                      <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                      <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}

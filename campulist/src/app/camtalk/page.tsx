@@ -82,7 +82,7 @@ function CamTalkContent() {
 
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   {myUnread > 0 && (
-                    <Badge className="h-5 min-w-5 justify-center bg-blue-600 px-1.5 text-[10px] text-white">
+                    <Badge className="h-5 min-w-5 justify-center bg-blue-600 px-1.5 text-xs text-white">
                       {myUnread}
                     </Badge>
                   )}

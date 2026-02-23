@@ -46,6 +46,7 @@ function MyPageContent() {
   const [myPosts, setMyPosts] = useState<PostListItem[]>([]);
   const [likedPosts, setLikedPosts] = useState<PostListItem[]>([]);
   const [recentPosts, setRecentPosts] = useState<PostListItem[]>([]);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [editOpen, setEditOpen] = useState(false);
@@ -104,7 +105,7 @@ function MyPageContent() {
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold">{user.nickname}</h1>
               {user.isVerified && (
-                <Badge variant="secondary" className="gap-0.5 text-[10px] text-blue-500">
+                <Badge variant="secondary" className="gap-0.5 text-xs text-blue-500">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
                   인증됨
                 </Badge>
@@ -117,7 +118,7 @@ function MyPageContent() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { if (window.confirm('로그아웃 하시겠습니까?')) logout(); }}
+              onClick={() => setLogoutOpen(true)}
               className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
               로그아웃
@@ -216,7 +217,7 @@ function MyPageContent() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     {post.status !== 'active' && (
-                      <Badge variant="outline" className={`text-[10px] ${post.status === 'reserved' ? 'text-orange-500 border-orange-500/30' : 'text-green-500 border-green-500/30'}`}>
+                      <Badge variant="outline" className={`text-xs ${post.status === 'reserved' ? 'text-orange-500 border-orange-500/30' : 'text-green-500 border-green-500/30'}`}>
                         {post.status === 'reserved' ? '예약중' : '거래완료'}
                       </Badge>
                     )}
@@ -423,6 +424,26 @@ function MyPageContent() {
             >
               저장
             </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* 로그아웃 확인 Sheet */}
+      <Sheet open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <SheetContent side="bottom" className="rounded-t-2xl" showCloseButton={false}>
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-lg">로그아웃</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4 px-4 pb-6">
+            <p className="text-sm text-muted-foreground">로그아웃 하시겠습니까?</p>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => setLogoutOpen(false)}>
+                취소
+              </Button>
+              <Button className="flex-1 bg-blue-600 text-white hover:bg-blue-700" onClick={() => { setLogoutOpen(false); logout(); }}>
+                로그아웃
+              </Button>
+            </div>
           </div>
         </SheetContent>
       </Sheet>

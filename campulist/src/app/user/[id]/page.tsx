@@ -76,13 +76,13 @@ export default function UserProfilePage() {
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold">{user.nickname}</h1>
               {user.isVerified && (
-                <Badge variant="secondary" className="gap-0.5 text-[10px] text-blue-500">
+                <Badge variant="secondary" className="gap-0.5 text-xs text-blue-500">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
                   인증됨
                 </Badge>
               )}
               {user.role === 'business' && (
-                <Badge variant="outline" className="text-[10px] text-orange-500 border-orange-500/30">
+                <Badge variant="outline" className="text-xs text-orange-500 border-orange-500/30">
                   비즈니스
                 </Badge>
               )}

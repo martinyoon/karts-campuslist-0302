@@ -65,7 +65,7 @@ export default async function PostDetailPage({ params }: Props) {
           <div className="flex items-center gap-1.5">
             <span className="font-medium">{post.author.nickname}</span>
             {post.author.isVerified && (
-              <Badge variant="secondary" className="h-5 gap-0.5 px-1.5 text-[10px] text-blue-500">
+              <Badge variant="secondary" className="h-5 gap-0.5 px-1.5 text-xs text-blue-500">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
                 {post.university.name} 인증
               </Badge>

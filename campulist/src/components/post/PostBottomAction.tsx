@@ -105,7 +105,7 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
               <button
                 key={msg}
                 onClick={() => sendMessage(msg)}
-                className="w-full rounded-lg border border-border px-4 py-3 text-left text-[15px] transition-colors hover:border-blue-500/50 hover:bg-blue-500/5"
+                className="w-full rounded-lg border border-border px-4 py-3 text-left text-sm transition-colors hover:border-blue-500/50 hover:bg-blue-500/5"
               >
                 {msg}
               </button>
@@ -114,7 +114,7 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
             {!showInput ? (
               <button
                 onClick={() => setShowInput(true)}
-                className="w-full rounded-lg border border-dashed border-border px-4 py-3 text-center text-[15px] text-muted-foreground transition-colors hover:border-blue-500/50 hover:text-foreground"
+                className="w-full rounded-lg border border-dashed border-border px-4 py-3 text-center text-sm text-muted-foreground transition-colors hover:border-blue-500/50 hover:text-foreground"
               >
                 직접 입력하기
               </button>

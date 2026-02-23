@@ -2,13 +2,16 @@
 
 import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 
+type ToastVariant = 'default' | 'success' | 'error';
+
 interface ToastItem {
   id: number;
   message: string;
+  variant: ToastVariant;
 }
 
 interface ToastContextValue {
-  toast: (message: string) => void;
+  toast: (message: string, variant?: ToastVariant) => void;
 }
 
 const ToastContext = createContext<ToastContextValue>({ toast: () => {} });
@@ -22,9 +25,9 @@ let nextId = 0;
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const toast = useCallback((message: string) => {
+  const toast = useCallback((message: string, variant: ToastVariant = 'default') => {
     const id = nextId++;
-    setToasts(prev => [...prev, { id, message }]);
+    setToasts(prev => [...prev, { id, message, variant }]);
   }, []);
 
   const remove = useCallback((id: number) => {
@@ -34,7 +37,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-20 left-1/2 z-[100] flex -translate-x-1/2 flex-col gap-2">
+      <div role="status" aria-live="polite" className="fixed bottom-20 left-1/2 z-[100] flex -translate-x-1/2 flex-col gap-2 md:bottom-8">
         {toasts.map(t => (
           <ToastMessage key={t.id} item={t} onDone={remove} />
         ))}
@@ -42,6 +45,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     </ToastContext.Provider>
   );
 }
+
+const variantStyles: Record<ToastVariant, string> = {
+  default: 'bg-foreground text-background',
+  success: 'bg-green-600 text-white',
+  error: 'bg-red-600 text-white',
+};
 
 function ToastMessage({ item, onDone }: { item: ToastItem; onDone: (id: number) => void }) {
   const [visible, setVisible] = useState(false);
@@ -57,7 +66,7 @@ function ToastMessage({ item, onDone }: { item: ToastItem; onDone: (id: number) 
 
   return (
     <div
-      className={`rounded-lg bg-foreground px-4 py-2.5 text-sm text-background shadow-lg transition-all duration-200 ${
+      className={`rounded-lg px-4 py-2.5 text-sm shadow-lg transition-all duration-200 ${variantStyles[item.variant]} ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
       }`}
     >

@@ -44,7 +44,7 @@ export default function PostCard({ post }: PostCardProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center gap-1.5">
           {post.status !== 'active' && (
-            <Badge variant="outline" className={`shrink-0 text-[10px] ${post.status === 'reserved' ? 'text-orange-500 border-orange-500/30' : 'text-green-500 border-green-500/30'}`}>
+            <Badge variant="outline" className={`shrink-0 text-xs ${post.status === 'reserved' ? 'text-orange-500 border-orange-500/30' : 'text-green-500 border-green-500/30'}`}>
               {post.status === 'reserved' ? '예약중' : '거래완료'}
             </Badge>
           )}
@@ -58,9 +58,9 @@ export default function PostCard({ post }: PostCardProps) {
           {post.priceNegotiable && <span className="ml-1 text-sm font-normal text-muted-foreground">협의가능</span>}
         </p>
 
-        <div className="mt-auto flex items-center gap-1.5 text-[13px] text-muted-foreground">
+        <div className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
           {post.author.isVerified && (
-            <Badge variant="secondary" className="h-5 gap-0.5 px-1.5 text-[10px] text-blue-500">
+            <Badge variant="secondary" className="h-5 gap-0.5 px-1.5 text-xs text-blue-500">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
               인증
             </Badge>

@@ -68,7 +68,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
           </div>
 
           {/* 카운터 */}
-          <div className="absolute bottom-1.5 right-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
+          <div className="absolute bottom-1.5 right-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-xs text-white">
             {currentIndex + 1} / {images.length}
           </div>
         </>

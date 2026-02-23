@@ -955,19 +955,19 @@ function WritePageContent() {
                     <button
                       type="button"
                       onClick={() => setImages(images.filter((_, j) => j !== i))}
-                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-[10px] text-white hover:bg-black/80"
+                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-xs text-white hover:bg-black/80"
                     >
                       &times;
                     </button>
                     {i === 0 && (
-                      <span className="absolute bottom-0 left-0 right-0 bg-blue-600/80 py-0.5 text-center text-[9px] font-medium text-white">대표</span>
+                      <span className="absolute bottom-0 left-0 right-0 bg-blue-600/80 py-0.5 text-center text-xs font-medium text-white">대표</span>
                     )}
                   </div>
                 ))}
                 {images.length < LIMITS.MAX_IMAGES && (
                   <label className="flex h-20 w-20 shrink-0 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-blue-500 hover:text-blue-500">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
-                    <span className="mt-1 text-[10px]">{images.length}/{LIMITS.MAX_IMAGES}</span>
+                    <span className="mt-1 text-xs">{images.length}/{LIMITS.MAX_IMAGES}</span>
                     <input
                       type="file"
                       accept="image/*"

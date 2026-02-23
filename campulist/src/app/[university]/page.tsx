@@ -60,13 +60,22 @@ export default async function UniversityPage({ params, searchParams }: Props) {
         <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{university.region} · {university.nameEn}</p>
       </div>
 
+      {/* 브레드크럼 */}
+      <div className="border-b border-border px-4 py-2">
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-foreground hover:underline">모든 대학</Link>
+          <span>›</span>
+          <span className="font-medium text-foreground">{university.name}</span>
+        </nav>
+      </div>
+
       <CategoryGrid universitySlug={slug} />
 
       <Separator />
 
       <section>
-        <div className="flex items-center justify-between px-4 py-3">
-          <h2 className="text-lg font-bold">{university.name} 게시글</h2>
+        <div className="flex items-center justify-between px-4 py-4">
+          <h2 className="text-xl font-bold">{university.name} 게시글</h2>
           <span className="text-sm text-muted-foreground">{posts.length}건</span>
         </div>
         <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide">

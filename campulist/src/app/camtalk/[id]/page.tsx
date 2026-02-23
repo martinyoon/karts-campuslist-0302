@@ -186,7 +186,7 @@ function CamTalkDetailContent() {
             <div className="flex items-center gap-2">
               <span className="font-medium">{partnerNickname}</span>
               {partnerProfile?.isVerified && (
-                <Badge variant="secondary" className="h-4 px-1 text-[10px]">인증</Badge>
+                <Badge variant="secondary" className="h-4 px-1 text-xs">인증</Badge>
               )}
               {partnerProfile && (
                 <span className="text-xs text-muted-foreground">{partnerProfile.mannerTemp}°C</span>
@@ -282,7 +282,7 @@ function CamTalkDetailContent() {
                     >
                       {renderContent(msg.content)}
                     </div>
-                    <span className="shrink-0 text-[10px] text-muted-foreground">
+                    <span className="shrink-0 text-xs text-muted-foreground">
                       {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>

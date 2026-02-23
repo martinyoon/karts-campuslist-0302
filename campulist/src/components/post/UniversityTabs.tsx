@@ -13,7 +13,7 @@ export default function UniversityTabs() {
       <div className="flex gap-1 overflow-x-auto border-b border-border px-4 scrollbar-hide">
         <Link
           href="/"
-          className={`shrink-0 border-b-2 px-4 py-3 text-[15px] font-medium transition-colors ${
+          className={`shrink-0 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
             !currentSlug ? 'border-blue-500 text-blue-500' : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -23,7 +23,7 @@ export default function UniversityTabs() {
           <Link
             key={uni.slug}
             href={`/${uni.slug}`}
-            className={`shrink-0 border-b-2 px-4 py-3 text-[15px] font-medium transition-colors ${
+            className={`shrink-0 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
               currentSlug === uni.slug ? 'border-blue-500 text-blue-500' : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
