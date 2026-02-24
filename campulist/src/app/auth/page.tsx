@@ -13,15 +13,15 @@ import type { MemberType } from '@/lib/types';
 
 const CAMPUS_MEMBER_TYPES: { value: MemberType; label: string; icon: string }[] = [
   { value: 'undergraduate', label: '학부생/예술사(한예종)', icon: '🎓' },
-  { value: 'graduate', label: '대학원생', icon: '📚' },
+  { value: 'graduate', label: '대학원생/전문사(한예종)', icon: '📚' },
   { value: 'professor', label: '교수', icon: '👨‍🏫' },
   { value: 'staff', label: '교직원', icon: '🏢' },
   { value: 'alumni', label: '졸업생', icon: '🎒' },
 ];
 
 const EXTERNAL_MEMBER_TYPES: { value: MemberType; label: string; icon: string }[] = [
-  { value: 'merchant', label: '인근상인', icon: '🏪' },
-  { value: 'general', label: '일반인', icon: '👤' },
+  { value: 'merchant', label: '비지니스 회원', icon: '🏪' },
+  { value: 'general', label: '일반인 회원', icon: '👤' },
 ];
 
 export default function AuthPage() {
@@ -67,7 +67,7 @@ export default function AuthPage() {
       }
     } else {
       if (!isAcKrEmail && !universityId) {
-        toast('관련 대학교를 선택하세요');
+        toast('대학교 선택를 선택하세요');
         return;
       }
       const result = signup({
@@ -207,7 +207,7 @@ export default function AuthPage() {
           {mode === 'signup' && (
             <div>
               {/* 간격 압축: mb-1.5 → mb-1 */}
-              <label htmlFor="auth-university" className="mb-1 block text-sm font-medium">관련 대학교</label>
+              <label htmlFor="auth-university" className="mb-1 block text-sm font-medium">대학교 선택</label>
               {isAcKrEmail ? (
                 <div className="rounded-md border border-green-500/30 bg-green-500/5 px-3 py-2 text-sm font-medium text-green-700 dark:text-green-400">
                   {autoMatchedUni!.name}

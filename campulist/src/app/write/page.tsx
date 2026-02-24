@@ -41,12 +41,12 @@ type WriteStep = 'major' | 'minor' | 'form';
 
 const MEMBER_TYPE_SHORT: Record<MemberType, string> = {
   undergraduate: '학부생/예술사(한예종)',
-  graduate: '대학원생',
+  graduate: '대학원생/전문사(한예종)',
   professor: '교수',
   staff: '교직원',
   alumni: '졸업생',
-  merchant: '인근상인',
-  general: '일반인',
+  merchant: '비지니스 회원',
+  general: '일반인 회원',
 };
 
 function fillTemplate(template: string, user: User, targetUniversityId: number): string {

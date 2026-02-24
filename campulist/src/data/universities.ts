@@ -10,10 +10,12 @@ export const universities: University[] = [
     ],
   },
   {
-    id: 5, name: '한예종', slug: 'karts', nameEn: 'Korea National University of Arts',
+    id: 5, name: '한예종(한국예술종합학교)', slug: 'karts', nameEn: 'Korea National University of Arts',
     domain: 'karts.ac.kr', region: '서울 석관', logoUrl: null, isActive: true,
     campuses: [
-      { name: '석관캠퍼스', region: '서울 석관' },
+      { name: '석관동 캠퍼스', region: '서울 석관' },
+      { name: '서초동 캠퍼스', region: '서울 서초' },
+      { name: '대학로 캠퍼스', region: '서울 대학로' },
     ],
   },
   {
