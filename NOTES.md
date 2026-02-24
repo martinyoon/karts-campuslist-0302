@@ -1290,6 +1290,25 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - 별도 미리보기 버튼 제거 (등록이 미리보기를 여므로 불필요)
 - 하단 버튼: 2버튼(미리보기+등록) → 1버튼(등록) `w-full`로 단순화
 
+### 29. 미리보기 UI 세부 조정 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+#### 1. 등록 버튼 아이콘 제거 + 이름 변경
+- `✏️ 등록하기` → `미리보기 후 등록` (미리보기를 여는 역할이므로 동작 명확화)
+- `✏️ 수정하기` → `미리보기 후 수정`
+
+#### 2. 미리보기 Sheet 헤더 문구/스타일 변경
+- 문구: `다른 사람에게 이렇게 보여요!` → `미리보기 화면입니다 — 하단의 버튼을 눌러, 수정 또는 최종 등록 해주세요`
+- 스타일: `text-xs text-muted-foreground` → `text-xl font-bold text-white border-4 border-white rounded-lg px-3 py-1.5 text-center`
+
+#### 3. 미리보기 Sheet 하단 버튼 통일
+- "수정할래요" → "수정" (간결하게)
+- 두 버튼 모두 `bg-blue-600 text-white`로 바탕색 통일
+
+#### 4. 미리보기 본문 글자 색상
+- `text-base text-amber-600 dark:text-amber-400` (노랑 계열, 전체 표시)
+
 ### Mock Auth PDCA Gap Analysis v4.0 결과 (2026-02-24)
 
 **Overall Match Rate: 99%** (4회 연속 동일)

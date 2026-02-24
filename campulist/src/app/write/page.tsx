@@ -1248,7 +1248,7 @@ function WritePageContent() {
             <Sheet open={showPreview} onOpenChange={setShowPreview}>
               <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl" showCloseButton={false}>
                 <SheetHeader className="pb-0.5">
-                  <SheetTitle className="text-xs font-normal text-muted-foreground">다른 사람에게 이렇게 보여요!</SheetTitle>
+                  <SheetTitle className="rounded-lg border-4 border-white px-3 py-1.5 text-center text-xl font-bold text-white">미리보기 화면입니다 — 하단의 버튼을 눌러, 수정 또는 최종 등록 해주세요</SheetTitle>
                 </SheetHeader>
                 <div className="space-y-1 overflow-y-auto px-4 pb-2" style={{ maxHeight: 'calc(85vh - 100px)' }}>
                   {/* 이미지 미리보기 */}
@@ -1295,9 +1295,9 @@ function WritePageContent() {
                   <button
                     type="button"
                     onClick={() => { setShowPreview(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                    className="flex-1 rounded-lg bg-blue-100 py-2.5 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
+                    className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-bold text-white transition-colors hover:bg-blue-700"
                   >
-                    수정할래요
+                    수정
                   </button>
                   <button
                     type="button"
@@ -1317,7 +1317,7 @@ function WritePageContent() {
                 disabled={!title || !minorId || submitting}
                 className="w-full bg-blue-600 py-3 text-base font-bold hover:bg-blue-700"
               >
-                {submitting ? '처리 중...' : isEditMode ? '✏️ 수정하기' : '✏️ 등록하기'}
+                {submitting ? '처리 중...' : isEditMode ? '미리보기 후 수정' : '미리보기 후 등록'}
               </Button>
               {/* 간격 압축: mt-2 → mt-1 */}
               {(!title || !minorId) && (
