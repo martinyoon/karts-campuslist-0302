@@ -9,7 +9,9 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { universities } from '@/data/universities';
-import type { MemberType } from '@/lib/types';
+import type { MemberType, University } from '@/lib/types';
+
+const uniFullName = (u: University) => u.nameKo ? `${u.name}(${u.nameKo})` : u.name;
 
 const CAMPUS_MEMBER_TYPES: { value: MemberType; label: string; icon: string }[] = [
   { value: 'undergraduate', label: '학부생/예술사(한예종)', icon: '🎓' },
@@ -193,7 +195,7 @@ export default function AuthPage() {
             />
             {mode === 'signup' && isAcKrEmail && (
               <p className="mt-1 text-xs text-green-600">
-                {autoMatchedUni!.name} 자동 인증됩니다.
+                {uniFullName(autoMatchedUni!)} 자동 인증됩니다.
               </p>
             )}
             {mode === 'signup' && !isAcKrEmail && (
@@ -210,7 +212,7 @@ export default function AuthPage() {
               <label htmlFor="auth-university" className="mb-1 block text-sm font-medium">대학교 선택</label>
               {isAcKrEmail ? (
                 <div className="rounded-md border border-green-500/30 bg-green-500/5 px-3 py-2 text-sm font-medium text-green-700 dark:text-green-400">
-                  {autoMatchedUni!.name}
+                  {uniFullName(autoMatchedUni!)}
                 </div>
               ) : (
                 <select
@@ -221,7 +223,7 @@ export default function AuthPage() {
                 >
                   <option value="">대학교를 선택하세요</option>
                   {universities.filter(u => u.isActive).map(u => (
-                    <option key={u.id} value={u.id}>{u.name}</option>
+                    <option key={u.id} value={u.id}>{uniFullName(u)}</option>
                   ))}
                 </select>
               )}

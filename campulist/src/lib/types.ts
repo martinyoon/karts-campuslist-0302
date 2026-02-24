@@ -25,6 +25,7 @@ export interface University {
   name: string;
   slug: string;
   nameEn: string;
+  nameKo?: string;
   domain: string;
   region: string;
   campuses: Campus[];
