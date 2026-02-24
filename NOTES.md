@@ -1318,6 +1318,25 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - After: `글쓰기 위치 : 서울대학교 › 주거 › 룸메이트`
 - 사용자가 게시 위치를 즉시 파악할 수 있도록 안내 문구 명시
 
+### 31. 문체 선택기 삭제 + SheetTitle 접근성 수정 + 버튼 이름 조정 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`, `Header.tsx`, `PostStatusControl.tsx`
+
+#### 문체 선택기 완전 삭제
+- `TONE_OPTIONS` 상수, `selectedTone` 상태, `applyTone()` 함수 삭제
+- `ToneType` import 삭제
+- 문체 Badge UI (📋깔끔/😊친근/🔥급매/😂유머) 4개 삭제
+- 모든 `applyTone()` 호출을 `exExamples[0]` 직접 사용으로 교체
+
+#### SheetTitle 접근성 경고 수정
+- `Header.tsx`: 사이드 메뉴 Sheet에 `sr-only` SheetTitle("메뉴") 추가
+- `PostStatusControl.tsx`: 삭제 확인 Sheet에 `sr-only` SheetTitle("게시글 삭제") 추가
+- Console Error `DialogContent requires a DialogTitle` 해결
+
+#### 기타
+- "글 제목·내용을 어떻게 채울지 막막하다면?" 글자 크기: `text-sm` → `text-xl font-bold`
+- "최종 등록!" → "최종 등록", "최종 수정!" → "최종 수정" (느낌표 제거)
+
 ### Mock Auth PDCA Gap Analysis v4.0 결과 (2026-02-24)
 
 **Overall Match Rate: 99%** (4회 연속 동일)
@@ -1392,7 +1411,6 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - CamTalk 게시글 제목 파싱 — 첫 메시지 `[제목]\n/post/id` 형식에서 정규식 추출
 - 커스텀 픽셀 글자크기 전량 제거 완료 — `text-[Npx]` 패턴이 앱에 0개 (grep 확인)
 - `seasonalHints` 기능 완전 삭제됨 — 인터페이스, 데이터, UI 코드 모두 제거
-- 문체 선택기는 tones 데이터 유무와 관계없이 항상 표시 — `applyTone()`이 tones 없으면 원본 반환
 - `lastExampleIdxRef` — 랜덤 샘플 반복 방지용 useRef, 최대 5회 재시도로 무한루프 방지
 - `fillSmartExamples` — 빈칸 체크 없이 항상 모든 필드 교체, prefix는 `fillTemplate()`이 자동 포함
 - `fetchOtherPosts` — 같은 소분류 게시글 조회, 본인 글 제외, 최대 10개
@@ -1421,7 +1439,9 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - `getWriteUrl()` — pathname에서 uni/major/minor 추출하여 `/write?uni=&major=&minor=` 생성 (Header에서 사용)
 - 글쓰기 카테고리 뷰 pre-selection: `id={major-group-N}` + `ring-2 ring-orange-300 bg-orange-50` + "선택됨" 라벨
 - CategorySummary 브레드크럼: 일반 페이지와 완전 동일 스타일 (text-base, text-orange-400, 풀네임, "모든 대학" 포함)
-- 등록 흐름 패턴: 등록 버튼 → `handlePreviewBeforeSubmit`(validate) → 미리보기 Sheet → "최종 등록!" → `handleSubmit`(실제 등록)
-- 미리보기 Sheet 하단 패턴: 2버튼 ("수정" + "최종 등록!") + 바깥 터치/스와이프 유지
+- 등록 흐름 패턴: 등록 버튼 → `handlePreviewBeforeSubmit`(validate) → 미리보기 Sheet → "최종 등록" → `handleSubmit`(실제 등록)
+- 미리보기 Sheet 하단 패턴: 2버튼 ("수정" + "최종 등록") + 바깥 터치/스와이프 유지
+- 문체 선택기 삭제됨 — `applyTone()`, `TONE_OPTIONS`, `selectedTone` 모두 제거. 예시는 항상 기본(clean) 톤으로 적용
+- SheetTitle 접근성: SheetContent에 SheetTitle 필수 — 보이지 않아도 `sr-only`로 추가 (Radix UI 요구사항)
 - 미리보기 본문: `text-base text-amber-600 dark:text-amber-400` — 노랑 계열로 눈에 띄게, 전체 표시 (line-clamp 없음)
 - 미리보기 브레드크럼 접두어: `글쓰기 위치 : {대학} › {대분류} › {소분류}` — 게시 위치 즉시 파악용

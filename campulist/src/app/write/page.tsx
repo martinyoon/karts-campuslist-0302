@@ -20,7 +20,7 @@ import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
 import WriteUniversityTabs from '@/components/write/WriteUniversityTabs';
 import WriteCategoryGrid from '@/components/write/WriteCategoryGrid';
 import { categoryExamples, categoryExampleSets } from '@/data/categoryExamples';
-import type { ToneType } from '@/data/categoryExamples';
+
 import { getCategoryBySlug, getMinorCategories, majorCategories, categories } from '@/data/categories';
 import type { User } from '@/lib/types';
 
@@ -65,12 +65,7 @@ function fillTemplate(template: string, user: User, targetUniversityId: number):
 }
 
 
-const TONE_OPTIONS: { value: ToneType; label: string; icon: string }[] = [
-  { value: 'clean', label: '깔끔', icon: '📋' },
-  { value: 'friendly', label: '친근', icon: '😊' },
-  { value: 'urgent', label: '급매', icon: '🔥' },
-  { value: 'humor', label: '유머', icon: '😂' },
-];
+
 
 function WritePageContent() {
   const router = useRouter();
@@ -103,8 +98,7 @@ function WritePageContent() {
   const uniFromUrl = useRef(false);
   const isEditRef = useRef(false);
 
-  // ── 7가지 개선 기능 상태 ──
-  const [selectedTone, setSelectedTone] = useState<ToneType>('clean');
+  // ── 예시 채우기 기능 상태 ──
   const [isSpinning, setIsSpinning] = useState(false);
   const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
@@ -412,13 +406,6 @@ function WritePageContent() {
   // ── 예시 채우기 (스마트 버전) ──
   const hasExample = !isEditMode && exExamples.length > 0;
 
-  // 톤 적용: 선택된 톤의 title/body가 있으면 사용
-  const applyTone = (ex: typeof exExamples[0], tone: ToneType) => {
-    if (tone === 'clean' || !exSet?.tones?.[tone]) return ex;
-    const tv = exSet.tones[tone]!;
-    return { ...ex, title: tv.title, body: tv.body };
-  };
-
   const fillTitleExample = () => {
     if (!user || exExamples.length === 0) return;
     const uniShort = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '';
@@ -427,7 +414,7 @@ function WritePageContent() {
       setConfirmAction('title');
       return;
     }
-    const ex = applyTone(exExamples[0], selectedTone);
+    const ex = exExamples[0];
     const ft = fillTemplate(ex.title, user, user.universityId);
     const pfx = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
     setTitle(ft.startsWith(pfx) ? ft : `${pfx} ${ft}`);
@@ -450,7 +437,7 @@ function WritePageContent() {
       setConfirmAction('body');
       return;
     }
-    const ex = applyTone(exExamples[0], selectedTone);
+    const ex = exExamples[0];
     setBody(fillTemplate(ex.body, user, user.universityId));
   };
 
@@ -458,7 +445,7 @@ function WritePageContent() {
     if (!user || exExamples.length === 0) { setConfirmAction(null); return; }
     switch (confirmAction) {
       case 'title': {
-        const ex = applyTone(exExamples[0], selectedTone);
+        const ex = exExamples[0];
         const ft = fillTemplate(ex.title, user, user.universityId);
         const uniS = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '대학';
         const pfx = `[${uniS}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
@@ -472,7 +459,7 @@ function WritePageContent() {
         break;
       }
       case 'body': {
-        const ex = applyTone(exExamples[0], selectedTone);
+        const ex = exExamples[0];
         setBody(fillTemplate(ex.body, user, user.universityId));
         break;
       }
@@ -491,23 +478,22 @@ function WritePageContent() {
   // 샘플 채우기: 매번 모든 필드를 새 샘플로 교체 (prefix 자동 유지)
   const fillSmartExamples = (idx: number) => {
     if (!user || exExamples.length === 0) return;
-    const raw = exExamples[idx % exExamples.length];
-    const ex = applyTone(raw, selectedTone);
+    const ex = exExamples[idx % exExamples.length];
 
     const filledTitle = fillTemplate(ex.title, user, user.universityId);
     const uniShort2 = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '대학';
     const prefix = `[${uniShort2}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
     setTitle(filledTitle.startsWith(prefix) ? filledTitle : `${prefix} ${filledTitle}`);
-    if (raw.price) {
-      setPrice(raw.price);
-      setPriceNegotiable(raw.negotiable);
+    if (ex.price) {
+      setPrice(ex.price);
+      setPriceNegotiable(ex.negotiable);
     }
     setBody(fillTemplate(ex.body, user, user.universityId));
-    if (raw.tags.length > 0) {
-      setTags(raw.tags.slice(0, 5).map(t => fillTemplate(t, user, user.universityId)));
+    if (ex.tags.length > 0) {
+      setTags(ex.tags.slice(0, 5).map((t: string) => fillTemplate(t, user, user.universityId)));
     }
-    if (raw.location) {
-      setLocation(fillTemplate(raw.location, user, user.universityId));
+    if (ex.location) {
+      setLocation(fillTemplate(ex.location, user, user.universityId));
     }
 
     toast('샘플로 채워졌어요!');
@@ -832,27 +818,8 @@ function WritePageContent() {
             {hasExample && (
               <div className="space-y-1.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-1.5">
                 {/* 섹션 안내 */}
-                <p className="text-sm font-medium text-foreground">글 제목·내용을 어떻게 채울지 막막하다면?</p>
+                <p className="text-xl font-bold text-foreground">글 제목·내용을 어떻게 채울지 막막하다면?</p>
 
-
-                {/* 문체 선택기 — 소분류 Badge 스타일 (오렌지 톤) */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-bold text-foreground">문체:</span>
-                  {TONE_OPTIONS.map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setSelectedTone(opt.value)}
-                      className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                        selectedTone === opt.value
-                          ? 'border-2 border-orange-500 font-bold text-orange-600 dark:text-orange-300'
-                          : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'
-                      }`}
-                    >
-                      {opt.icon} {opt.label}
-                    </button>
-                  ))}
-                </div>
 
                 {/* 예시 채우기 + 다른 글 가져오기 — 1줄 가로 배치 */}
                 <div className="flex gap-2">
@@ -1308,7 +1275,7 @@ function WritePageContent() {
                     onClick={() => { setShowPreview(false); handleSubmit(); }}
                     className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-bold text-white transition-colors hover:bg-blue-700"
                   >
-                    {isEditMode ? '최종 수정!' : '최종 등록!'}
+                    {isEditMode ? '최종 수정' : '최종 등록'}
                   </button>
                 </div>
               </SheetContent>

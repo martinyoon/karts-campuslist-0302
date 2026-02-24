@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import ThemeToggle from '@/components/ThemeToggle';
 import IconToggle from '@/components/IconToggle';
 import { universities } from '@/data/universities';
@@ -56,6 +56,7 @@ export default function Header() {
             </button>
             <Sheet open={menuOpen} onOpenChange={handleSheetChange}>
               <SheetContent side="left" className="w-72">
+                <SheetHeader className="sr-only"><SheetTitle>메뉴</SheetTitle></SheetHeader>
                 <nav className="mt-4 flex flex-col gap-2"> {/* 간격 압축: mt-8 → mt-4, gap-4 → gap-2 */}
                   <p className="text-sm font-semibold text-muted-foreground">대학교</p>
                   {universities.map(uni => {

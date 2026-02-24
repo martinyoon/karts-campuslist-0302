@@ -6,7 +6,7 @@ import { useToast } from '@/components/ui/Toast';
 import { deletePost } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import type { PostStatus } from '@/lib/types';
 
 interface PostStatusControlProps {
@@ -66,6 +66,7 @@ export default function PostStatusControl({ postId, authorId }: PostStatusContro
 
       <Sheet open={showDeleteSheet} onOpenChange={setShowDeleteSheet}>
         <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetHeader className="sr-only"><SheetTitle>게시글 삭제</SheetTitle></SheetHeader>
           <div className="pb-6">
             <p className="text-lg font-bold">게시글 삭제</p>
             <p className="mt-2 text-sm text-muted-foreground">
