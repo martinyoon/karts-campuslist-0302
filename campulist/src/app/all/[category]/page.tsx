@@ -76,17 +76,15 @@ export default async function AllCategoryPage({ params, searchParams }: Props) {
           <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
           <span className="text-orange-300">›</span>
           {activeMinor ? (
-            <Link href={buildUrl({ minor: '' })} className="text-orange-400 hover:text-orange-300 hover:underline">
-              <span className="cat-icon">{category.icon} </span>{category.name}
-            </Link>
-          ) : (
-            <span className="font-semibold text-orange-400"><span className="cat-icon">{category.icon} </span>{category.name}</span>
-          )}
-          {activeMinor && (
             <>
+              <Link href={buildUrl({ minor: '' })} className="text-orange-400 hover:text-orange-300 hover:underline">
+                <span className="cat-icon">{category.icon} </span>{category.name}
+              </Link>
               <span className="text-orange-300">›</span>
               <span className="font-semibold text-orange-400">{activeMinor.name}</span>
             </>
+          ) : (
+            <span className="font-semibold text-orange-400"><span className="cat-icon">{category.icon} </span>{category.name} · 전체보기</span>
           )}
         </nav>
       </div>
@@ -96,14 +94,6 @@ export default async function AllCategoryPage({ params, searchParams }: Props) {
 
       {/* 소분류 필터 — 간격 압축: py-3 → py-1.5, gap-2 → gap-1.5 */}
       <div className="flex gap-1.5 overflow-x-auto px-4 py-1.5 scrollbar-hide">
-        <Link href={buildUrl({ minor: '' })}>
-          <Badge
-            variant="outline"
-            className={`shrink-0 cursor-pointer text-sm px-3 py-1 border-2 ${!minorSlug ? 'border-blue-600 text-blue-700 font-extrabold bg-blue-100 shadow-sm dark:border-blue-400 dark:text-blue-300 dark:bg-blue-900' : 'border-blue-300 text-blue-400 font-medium hover:bg-blue-50 dark:border-blue-700 dark:text-blue-500 dark:hover:bg-blue-950'}`}
-          >
-            전체보기
-          </Badge>
-        </Link>
         {minors.map(minor => (
           <Link key={minor.slug} href={buildUrl({ minor: minor.slug })}>
             <Badge

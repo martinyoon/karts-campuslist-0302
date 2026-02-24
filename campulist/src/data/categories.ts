@@ -11,7 +11,7 @@ export const categories: Category[] = [
   { id: 7, name: '긱·의뢰', slug: 'gigs', parentId: null, icon: '📣', sortOrder: 7 },
 
   // 마켓 소분류 (전부 campus)
-  { id: 11, name: '전공서적·교양도서', slug: 'textbooks', parentId: 1, icon: '📚', sortOrder: 1, postAccess: 'campus' },
+  { id: 11, name: '전공서적/교양도서', slug: 'textbooks', parentId: 1, icon: '📚', sortOrder: 1, postAccess: 'campus' },
   { id: 12, name: '전자기기', slug: 'electronics', parentId: 1, icon: '💻', sortOrder: 2, postAccess: 'campus' },
   { id: 13, name: '가구/생활용품', slug: 'furniture', parentId: 1, icon: '🪑', sortOrder: 3, postAccess: 'campus' },
   { id: 14, name: '의류/패션', slug: 'fashion', parentId: 1, icon: '👕', sortOrder: 4, postAccess: 'campus' },
