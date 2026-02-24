@@ -43,7 +43,7 @@ export default function BottomNav() {
               href={item.href === '/write' ? writeHref : item.href}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex flex-col items-center gap-0.5 ${isActive ? 'text-blue-500' : 'text-muted-foreground'}`}
+              className={`relative flex flex-col items-center gap-0.5 ${isActive ? 'text-orange-400' : 'text-muted-foreground'}`}
             >
               {item.icon(isActive)}
               {item.href === '/camtalk' && chatUnread > 0 && (

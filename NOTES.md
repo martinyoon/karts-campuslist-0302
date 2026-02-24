@@ -85,7 +85,8 @@ interface User {
 | `9b6c10c` | feat: UI/UX 전면 개선 14건 (이미지/헤더/카테고리/검색/캠톡 등) |
 | `793cdae` | refactor: 디자인 통일성 개선 9건 (타이포/활성상태/Toast/Sheet 등) |
 | `597dc4e` | fix: Header 데스크톱 카테고리 네비 제거 (CategoryGrid와 중복 해소) |
-| (현재) | refactor: 3차 UI/UX 종합 검토 8건 (버그 수정, Sheet 전환, 접근성) |
+| `8052896` | refactor: 3차 UI/UX 종합 검토 8건 (버그 수정, Sheet 전환, 접근성) |
+| (현재) | refactor: 4차 UI 통일성 개선 — 아이콘 라벨, 활성 색상, 네비 일관성 |
 
 ---
 
@@ -594,6 +595,44 @@ shadcn Sheet 컴포넌트로 교체. 포커스 트랩, Escape 닫기, 접근성 
 {post.price !== null && post.priceNegotiable && <span>협의가능</span>}
 ```
 
+### 14. 4차 UI 통일성 개선 — 아이콘 라벨 + 활성 색상 + 네비 일관성 (5개 파일 수정)
+
+상단/하단 네비게이션의 디자인 통일성과 시인성을 개선. 아이콘에 텍스트 라벨 추가, 활성 상태 색상 변경, 상단·하단 바 동작 일치화.
+
+#### 수정 파일 목록 (5개)
+
+| # | 수정 내용 | 파일 | 유형 |
+|---|----------|------|------|
+| 1 | **실시간 인기글 디폴트 접기** | `components/post/PopularPostsSection.tsx` | UX |
+| 2 | **Header 아이콘 텍스트 라벨 추가** | `components/layout/Header.tsx` | 디자인 통일 |
+| 3 | **IconToggle 텍스트 라벨 추가** | `components/IconToggle.tsx` | 디자인 통일 |
+| 4 | **ThemeToggle 텍스트 라벨 추가** | `components/ThemeToggle.tsx` | 디자인 통일 |
+| 5 | **BottomNav 활성 색상 변경** | `components/layout/BottomNav.tsx` | 시인성 |
+
+#### 1. 실시간 인기글 디폴트 접기
+
+`useState(true)` → `useState(false)` — 홈 화면 진입 시 인기글 섹션이 접힌 상태로 시작.
+
+#### 2. Header 아이콘 텍스트 라벨 + 활성 상태 + 동작 통일
+
+- 검색, 글쓰기, 캠톡, MY 아이콘 아래에 `text-[10px]` 텍스트 라벨 추가
+- 글쓰기 버튼: 텍스트 버튼 → `+` 아이콘(30x30) + "글쓰기" 라벨 (하단 바와 동일)
+- MY 아이콘: `hidden md:block` 제거 → 모바일에서도 항상 표시
+- 모바일 검색: `onClick`(인라인 검색) → `<Link href="/search">` (하단 바와 동일하게 페이지 이동)
+- 인라인 검색 폼 제거: `showMobileSearch` 상태 및 조건분기 코드 정리
+- 활성 상태: `pathname` 기반으로 `text-orange-400` / `text-muted-foreground` 적용
+
+#### 3-4. IconToggle / ThemeToggle 텍스트 라벨 추가
+
+- `size="icon"` → `flex flex-col items-center` 레이아웃 + `text-[10px]` 라벨
+- IconToggle: "아이콘" 라벨
+- ThemeToggle: 다크모드일 때 "라이트", 라이트모드일 때 "다크" 라벨
+
+#### 5. BottomNav 활성 색상 변경
+
+`text-blue-500` → `text-orange-400` — 다크/라이트 모드 모두에서 시인성 개선.
+Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
+
 ---
 
 ## 현재 상태
@@ -650,6 +689,15 @@ shadcn Sheet 컴포넌트로 교체. 포커스 트랩, Escape 닫기, 접근성 
        7. 브레드크럼 aria-label 추가
        8. PostCard 가격 null 방어
 [완료] npm run build 성공 (TypeScript 에러 없음)
+[완료] 4차 UI 통일성 개선 — 아이콘 라벨 + 활성 색상 + 네비 일관성
+       1. 실시간 인기글 디폴트 접기 (useState false)
+       2. Header 아이콘 텍스트 라벨 추가 (검색/글쓰기/캠톡/MY)
+       3. IconToggle/ThemeToggle 텍스트 라벨 추가
+       4. 글쓰기 버튼 아이콘화 (+ 아이콘 30x30)
+       5. MY 아이콘 모바일 항상 표시 (hidden md:block 제거)
+       6. BottomNav 활성 색상 blue→orange (시인성 개선)
+       7. Header 활성 색상 orange 통일 (pathname 기반)
+       8. 모바일 검색 동작 통일 (인라인→/search 페이지 이동)
 ```
 
 ---
@@ -700,7 +748,9 @@ shadcn Sheet 컴포넌트로 교체. 포커스 트랩, Escape 닫기, 접근성 
 - `isCampusBlocked()` — write/page.tsx useEffect 내 인라인 헬퍼, URL/드래프트/수정 3곳에서 사용
 - `getCategoryGroups()` — 인자 없이 호출 (boardType 파라미터 제거됨)
 - `app/ad/` 라우트는 완전 삭제됨 (리다이렉트 없음, 404 반환)
-- Header `showMobileSearch` — 모바일에서 돋보기 클릭 시 헤더 전체가 검색 모드로 전환
+- Header `showMobileSearch` 제거됨 — 모바일 검색은 `/search` 페이지로 이동 (하단 바와 동일)
+- Header/BottomNav 활성 색상 `text-orange-400` 통일 — pathname 기반 활성/비활성 전환
+- Header 아이콘 레이아웃: `flex flex-col items-center gap-0 px-2 py-1` + `text-[10px]` 라벨
 - Header `currentUniSlug` — pathname에서 대학 slug 추출하여 카테고리 URL에 반영
 - CategoryGrid — `'use client'` 제거, Sheet/useState 없는 순수 서버 컴포넌트로 변환
 - `navigator.share()` — iOS/Android 네이티브 공유 시트, 미지원 브라우저는 클립보드 폴백

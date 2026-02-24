@@ -22,7 +22,6 @@ export default function Header() {
   const writeHref = getWriteUrl(pathname, searchParams.toString());
   const [searchQuery, setSearchQuery] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   useEffect(() => {
     const update = () => setUnreadCount(user ? getMyUnreadTotal(user.id) : 0);
@@ -36,7 +35,6 @@ export default function Header() {
     const q = searchQuery.trim();
     if (q) {
       router.push(`/search?q=${encodeURIComponent(q)}`);
-      setShowMobileSearch(false);
     }
   };
 
@@ -46,24 +44,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
-        {/* 모바일: 검색 모드 */}
-        {showMobileSearch ? (
-          <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2 md:hidden">
-            <Input
-              autoFocus
-              type="search"
-              placeholder="검색어를 입력하세요"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="button" variant="ghost" size="icon" onClick={() => setShowMobileSearch(false)} aria-label="검색 닫기">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
-            </Button>
-          </form>
-        ) : (
-          <>
-            {/* 모바일 메뉴 */}
+        {/* 모바일 메뉴 */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden" aria-label="메뉴 열기">
@@ -114,15 +95,10 @@ export default function Header() {
             </form>
 
             {/* 모바일: 돋보기 버튼 */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="ml-auto md:hidden"
-              onClick={() => setShowMobileSearch(true)}
-              aria-label="검색"
-            >
+            <Link href="/search" className={`ml-auto flex h-auto flex-col items-center gap-0 px-2 py-1 md:hidden ${pathname.startsWith('/search') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="검색">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-            </Button>
+              <span className="text-[10px] leading-tight">검색</span>
+            </Link>
 
             {/* 우측 버튼 */}
             <div className="flex items-center gap-1 md:ml-auto">
@@ -133,13 +109,15 @@ export default function Header() {
               {user ? (
                 <>
                   <Link href={writeHref}>
-                    <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
-                      글쓰기
+                    <Button variant="ghost" className={`flex h-auto flex-col items-center gap-0 px-2 py-1 ${pathname.startsWith('/write') ? 'text-orange-400' : 'text-muted-foreground'}`}>
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
+                      <span className="text-[10px] leading-tight">글쓰기</span>
                     </Button>
                   </Link>
                   <Link href="/camtalk" className="relative">
-                    <Button variant="ghost" size="icon" aria-label="캠톡">
+                    <Button variant="ghost" className={`flex h-auto flex-col items-center gap-0 px-2 py-1 ${pathname.startsWith('/camtalk') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="캠톡">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                      <span className="text-[10px] leading-tight">캠톡</span>
                     </Button>
                     {unreadCount > 0 && (
                       <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
@@ -147,9 +125,10 @@ export default function Header() {
                       </span>
                     )}
                   </Link>
-                  <Link href="/my" className="hidden md:block">
-                    <Button variant="ghost" size="icon" aria-label="마이페이지">
+                  <Link href="/my">
+                    <Button variant="ghost" className={`flex h-auto flex-col items-center gap-0 px-2 py-1 ${pathname.startsWith('/my') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="마이페이지">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
+                      <span className="text-[10px] leading-tight">MY</span>
                     </Button>
                   </Link>
                 </>
@@ -161,8 +140,6 @@ export default function Header() {
                 </Link>
               )}
             </div>
-          </>
-        )}
       </div>
     </header>
   );
