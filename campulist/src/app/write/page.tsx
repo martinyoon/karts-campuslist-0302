@@ -1225,58 +1225,66 @@ function WritePageContent() {
 
             {/* 미리보기 Sheet */}
             <Sheet open={showPreview} onOpenChange={setShowPreview}>
-              <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
-                {/* 간격 압축: pb-2 → pb-1 */}
-                <SheetHeader className="pb-1">
-                  <SheetTitle className="text-sm font-normal text-muted-foreground">다른 사람에게 이렇게 보여요!</SheetTitle>
+              <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl" showCloseButton={false}>
+                <SheetHeader className="pb-0.5">
+                  <SheetTitle className="text-xs font-normal text-muted-foreground">다른 사람에게 이렇게 보여요!</SheetTitle>
                 </SheetHeader>
-                {/* 간격 압축: space-y-3 → space-y-1.5, pb-6 → pb-3 */}
-                <div className="space-y-1.5 px-4 pb-3">
-                  {/* 이미지 미리보기: 간격 압축: gap-2 → gap-1.5 */}
+                <div className="space-y-1 overflow-y-auto px-4 pb-2" style={{ maxHeight: 'calc(85vh - 100px)' }}>
+                  {/* 이미지 미리보기 */}
                   {images.length > 0 && (
-                    <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+                    <div className="flex gap-1 overflow-x-auto scrollbar-hide">
                       {images.map((src, i) => (
-                        <img key={i} src={src} alt="" className="h-48 w-48 shrink-0 rounded-lg object-cover" />
+                        <img key={i} src={src} alt="" className="h-28 w-28 shrink-0 rounded-lg object-cover" />
                       ))}
                     </div>
                   )}
                   {/* 제목 */}
-                  <h2 className="text-lg font-bold">{title.trim() || '(제목 없음)'}</h2>
-                  {/* 가격: 간격 압축: gap-2 → gap-1.5 */}
+                  <h2 className="text-base font-bold leading-tight">{title.trim() || '(제목 없음)'}</h2>
+                  {/* 가격 */}
                   {price && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xl font-bold">{Number(price).toLocaleString()}원</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-lg font-bold">{Number(price).toLocaleString()}원</span>
                       {priceNegotiable && <Badge variant="secondary" className="text-xs">협의가능</Badge>}
                     </div>
                   )}
-                  {/* 본문 */}
-                  <div className="whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
+                  {/* 본문 (최대 4줄) */}
+                  <div className="line-clamp-4 whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed">
                     {body.trim() || '(내용 없음)'}
                   </div>
-                  {/* 태그 */}
-                  {tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
+                  {/* 태그 + 장소 (1줄로 합침) */}
+                  {(tags.length > 0 || location.trim()) && (
+                    <div className="flex flex-wrap items-center gap-1">
                       {tags.map(tag => (
-                        <Badge key={tag} variant="outline" className="text-xs">#{tag}</Badge>
+                        <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">#{tag}</Badge>
                       ))}
+                      {location.trim() && <span className="text-[10px] text-muted-foreground">📍 {location}</span>}
                     </div>
                   )}
-                  {/* 장소 */}
-                  {location.trim() && (
-                    <p className="text-xs text-muted-foreground">📍 {location}</p>
-                  )}
-                  {/* 작성자: 간격 압축: gap-2 → gap-1.5, pt-3 → pt-1.5 */}
-                  <div className="flex items-center gap-1.5 border-t border-border pt-1.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-sm font-bold text-blue-500">
+                  {/* 작성자 */}
+                  <div className="flex items-center gap-1.5 border-t border-border pt-1">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/10 text-xs font-bold text-blue-500">
                       {user?.nickname?.charAt(0) || '?'}
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{user?.nickname || '사용자'}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {universities.find(u => u.id === universityId)?.name} · 방금 전
-                      </p>
-                    </div>
+                    <p className="text-xs font-medium">{user?.nickname || '사용자'}</p>
+                    <span className="text-[10px] text-muted-foreground">{universities.find(u => u.id === universityId)?.name} · 방금 전</span>
                   </div>
+                </div>
+                {/* 닫기/수정 버튼 (스크롤 영역 밖 고정) */}
+                <div className="flex gap-2 px-4 pb-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setShowPreview(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className="flex-1 rounded-lg bg-blue-100 py-2.5 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
+                  >
+                    수정할래요
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPreview(false)}
+                    className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-bold text-white transition-colors hover:bg-blue-700"
+                  >
+                    확인했어요
+                  </button>
                 </div>
               </SheetContent>
             </Sheet>
