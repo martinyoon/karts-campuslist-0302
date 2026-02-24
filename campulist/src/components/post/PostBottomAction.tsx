@@ -100,12 +100,13 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
           <SheetHeader className="pb-2">
             <SheetTitle className="text-lg">캠톡 메시지 선택</SheetTitle>
           </SheetHeader>
-          <div className="space-y-2 px-4 pb-6">
+          {/* 간격 압축: space-y-2 → space-y-1, pb-6 → pb-3 */}
+          <div className="space-y-1 px-4 pb-3">
             {QUICK_MESSAGES.map(msg => (
               <button
                 key={msg}
                 onClick={() => sendMessage(msg)}
-                className="w-full rounded-lg border border-border px-4 py-3 text-left text-sm transition-colors hover:border-blue-500/50 hover:bg-blue-500/5"
+                className="w-full rounded-lg border border-border px-4 py-2 text-left text-sm transition-colors hover:border-blue-500/50 hover:bg-blue-500/5" /* 간격 압축: py-3 → py-2 */
               >
                 {msg}
               </button>
@@ -114,7 +115,7 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
             {!showInput ? (
               <button
                 onClick={() => setShowInput(true)}
-                className="w-full rounded-lg border border-dashed border-border px-4 py-3 text-center text-sm text-muted-foreground transition-colors hover:border-blue-500/50 hover:text-foreground"
+                className="w-full rounded-lg border border-dashed border-border px-4 py-2 text-center text-sm text-muted-foreground transition-colors hover:border-blue-500/50 hover:text-foreground" /* 간격 압축: py-3 → py-2 */
               >
                 직접 입력하기
               </button>

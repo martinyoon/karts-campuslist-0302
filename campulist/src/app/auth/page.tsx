@@ -87,15 +87,19 @@ export default function AuthPage() {
   if (isLoading || user) return null;
 
   return (
-    <div className="mx-auto max-w-sm px-4 py-12">
-      <Link href="/" className="mb-8 block text-center">
+    // 간격 압축: py-12 → py-6
+    <div className="mx-auto max-w-sm px-4 py-6">
+      {/* 간격 압축: mb-8 → mb-4 */}
+      <Link href="/" className="mb-4 block text-center">
         <span className="block text-2xl font-bold text-blue-500">캠퍼스리스트</span>
         <span className="text-xs text-muted-foreground">Campu(s)+list+.com = Campulist.com</span>
       </Link>
 
-      <div className="rounded-xl border border-border p-6">
+      {/* 간격 압축: p-6 → p-3 (py-6→py-3 규칙 적용) */}
+      <div className="rounded-xl border border-border p-3">
         {/* 탭 */}
-        <div className="mb-6 flex rounded-lg bg-muted p-1">
+        {/* 간격 압축: mb-6 → mb-3 */}
+        <div className="mb-3 flex rounded-lg bg-muted p-1">
           <button
             onClick={() => setMode('login')}
             className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
@@ -114,11 +118,13 @@ export default function AuthPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* 간격 압축: space-y-4 → space-y-2 */}
+        <form onSubmit={handleSubmit} className="space-y-2">
           {mode === 'signup' && (
             <>
               <div>
-                <label htmlFor="auth-nickname" className="mb-1.5 block text-sm font-medium">닉네임</label>
+                {/* 간격 압축: mb-1.5 → mb-1 */}
+                <label htmlFor="auth-nickname" className="mb-1 block text-sm font-medium">닉네임</label>
                 <Input
                   id="auth-nickname"
                   placeholder="닉네임을 입력하세요"
@@ -129,15 +135,19 @@ export default function AuthPage() {
 
               {/* 회원 유형 */}
               <div>
-                <label className="mb-2 block text-sm font-medium">회원 유형</label>
-                <p className="mb-1.5 text-xs text-muted-foreground">캠퍼스 회원</p>
-                <div className="grid grid-cols-5 gap-2">
+                {/* 간격 압축: mb-2 → mb-1 */}
+                <label className="mb-1 block text-sm font-medium">회원 유형</label>
+                {/* 간격 압축: mb-1.5 → mb-1 */}
+                <p className="mb-1 text-xs text-muted-foreground">캠퍼스 회원</p>
+                {/* 간격 압축: gap-2 → gap-1 (list items) */}
+                <div className="grid grid-cols-5 gap-1">
                   {CAMPUS_MEMBER_TYPES.map(type => (
+                    // 간격 압축: py-2.5 → py-1.5
                     <button
                       key={type.value}
                       type="button"
                       onClick={() => setMemberType(type.value)}
-                      className={`flex flex-col items-center gap-1 rounded-lg border px-1 py-2.5 text-xs font-medium transition-colors ${
+                      className={`flex flex-col items-center gap-1 rounded-lg border px-1 py-1.5 text-xs font-medium transition-colors ${
                         memberType === type.value
                           ? 'border-blue-500 bg-blue-500/10 text-blue-600'
                           : 'border-border text-muted-foreground hover:bg-muted'
@@ -148,14 +158,17 @@ export default function AuthPage() {
                     </button>
                   ))}
                 </div>
-                <p className="mb-1.5 mt-3 text-xs text-muted-foreground">외부 회원</p>
-                <div className="grid grid-cols-2 gap-2">
+                {/* 간격 압축: mb-1.5 → mb-1, mt-3 → mt-1.5 */}
+                <p className="mb-1 mt-1.5 text-xs text-muted-foreground">외부 회원</p>
+                {/* 간격 압축: gap-2 → gap-1 (list items) */}
+                <div className="grid grid-cols-2 gap-1">
                   {EXTERNAL_MEMBER_TYPES.map(type => (
+                    // 간격 압축: py-2.5 → py-1.5
                     <button
                       key={type.value}
                       type="button"
                       onClick={() => setMemberType(type.value)}
-                      className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors ${
+                      className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                         memberType === type.value
                           ? 'border-blue-500 bg-blue-500/10 text-blue-600'
                           : 'border-border text-muted-foreground hover:bg-muted'
@@ -171,7 +184,8 @@ export default function AuthPage() {
           )}
 
           <div>
-            <label htmlFor="auth-email" className="mb-1.5 block text-sm font-medium">이메일</label>
+            {/* 간격 압축: mb-1.5 → mb-1 */}
+            <label htmlFor="auth-email" className="mb-1 block text-sm font-medium">이메일</label>
             <Input
               id="auth-email"
               type="email"
@@ -194,7 +208,8 @@ export default function AuthPage() {
           {/* 대학교 선택 */}
           {mode === 'signup' && (
             <div>
-              <label htmlFor="auth-university" className="mb-1.5 block text-sm font-medium">관련 대학교</label>
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <label htmlFor="auth-university" className="mb-1 block text-sm font-medium">관련 대학교</label>
               {isAcKrEmail ? (
                 <div className="rounded-md border border-green-500/30 bg-green-500/5 px-3 py-2 text-sm font-medium text-green-700 dark:text-green-400">
                   {autoMatchedUni!.name}
@@ -218,24 +233,28 @@ export default function AuthPage() {
           {/* 캠퍼스 선택 */}
           {mode === 'signup' && selectedUni && (
             <div>
-              <label className="mb-1.5 block text-sm font-medium">캠퍼스</label>
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <label className="mb-1 block text-sm font-medium">캠퍼스</label>
               {selectedUni.campuses.length > 1 && (
-                <div className="mb-2 flex flex-wrap gap-2">
-                  {selectedUni.campuses.map(c => (
-                    <button
-                      key={c.name}
-                      type="button"
-                      onClick={() => setCampusName(c.name)}
-                      className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
-                        campusName === c.name
-                          ? 'border-blue-500 bg-blue-500/10 font-medium text-blue-600'
-                          : 'border-border text-muted-foreground hover:border-blue-500/50'
-                      }`}
-                    >
-                      {c.name}
-                    </button>
-                  ))}
-                </div>
+                <>
+                  {/* 간격 압축: mb-2 → mb-1, gap-2 → gap-1 (list items) */}
+                  <div className="mb-1 flex flex-wrap gap-1">
+                    {selectedUni.campuses.map(c => (
+                      <button
+                        key={c.name}
+                        type="button"
+                        onClick={() => setCampusName(c.name)}
+                        className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
+                          campusName === c.name
+                            ? 'border-blue-500 bg-blue-500/10 font-medium text-blue-600'
+                            : 'border-border text-muted-foreground hover:border-blue-500/50'
+                        }`}
+                      >
+                        {c.name}
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
               <Input
                 value={campusName ?? ''}
@@ -246,7 +265,8 @@ export default function AuthPage() {
           )}
 
           <div>
-            <label htmlFor="auth-password" className="mb-1.5 block text-sm font-medium">비밀번호</label>
+            {/* 간격 압축: mb-1.5 → mb-1 */}
+            <label htmlFor="auth-password" className="mb-1 block text-sm font-medium">비밀번호</label>
             <Input
               id="auth-password"
               type="password"
@@ -266,7 +286,8 @@ export default function AuthPage() {
           </Button>
         </form>
 
-        <Separator className="my-6" />
+        {/* 간격 압축: my-6 → my-3 */}
+        <Separator className="my-3" />
 
         {/* 소셜 로그인 — 추후 Supabase OAuth 연동 시 활성화 */}
         <p className="text-center text-xs text-muted-foreground">

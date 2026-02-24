@@ -54,14 +54,14 @@ export default async function UniversityPage({ params, searchParams }: Props) {
     <div>
       <UniversityTabs />
 
-      {/* 대학 정보 배너 */}
-      <div className="bg-blue-950/30 px-4 py-4 dark:bg-blue-950/40">
+      {/* 대학 정보 배너 — 간격 압축: py-4 → py-2 */}
+      <div className="bg-blue-950/30 px-4 py-2 dark:bg-blue-950/40">
         <h1 className="text-xl font-bold text-blue-400 dark:text-blue-300">{university.name}</h1>
         <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{university.region} · {university.nameEn}</p>
       </div>
 
-      {/* 브레드크럼 */}
-      <div className="border-b border-border px-4 py-2">
+      {/* 브레드크럼 — 간격 압축: py-2 → py-1 */}
+      <div className="border-b border-border px-4 py-1">
         <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
           <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
           <span className="text-orange-300">›</span>
@@ -74,11 +74,11 @@ export default async function UniversityPage({ params, searchParams }: Props) {
       <Separator />
 
       <section>
-        <div className="flex items-center justify-between px-4 py-4">
+        <div className="flex items-center justify-between px-4 py-2"> {/* 간격 압축: py-4 → py-2 */}
           <h2 className="text-xl font-bold">{university.name} 게시글</h2>
           <span className="text-sm text-muted-foreground">{posts.length}건</span>
         </div>
-        <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide">
+        <div className="flex gap-1.5 overflow-x-auto px-4 pb-1.5 scrollbar-hide"> {/* 간격 압축: gap-2 → gap-1.5, pb-3 → pb-1.5 */}
           {sortOptions.map(opt => (
             <Link key={opt.value} href={buildSortHref(opt.value)}>
               <Badge

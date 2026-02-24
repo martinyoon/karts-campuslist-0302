@@ -42,7 +42,7 @@ export default async function SearchPage({ searchParams }: Props) {
   return (
     <div>
       {/* 검색 폼 + 결과 헤더 */}
-      <div className="border-b border-border px-4 py-4">
+      <div className="border-b border-border px-4 py-2"> {/* 간격 압축: py-4 → py-2 */}
         <form action="/search" className="flex gap-2">
           <input
             type="search"
@@ -56,7 +56,7 @@ export default async function SearchPage({ searchParams }: Props) {
           </button>
         </form>
         {query && (
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground"> {/* 간격 압축: mt-2 → mt-1 */}
             &ldquo;{query}&rdquo; {posts.length}건의 결과
           </p>
         )}
@@ -65,7 +65,7 @@ export default async function SearchPage({ searchParams }: Props) {
       {/* 정렬 옵션 + 가격 필터 */}
       {query && posts.length > 0 && (
         <>
-          <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">
+          <div className="flex gap-1.5 overflow-x-auto px-4 py-1.5 scrollbar-hide"> {/* 간격 압축: gap-2 → gap-1.5, py-3 → py-1.5 */}
             {sortOptions.map(opt => {
               const params = new URLSearchParams({ q: query, sort: opt.value });
               if (priceMin !== undefined) params.set('priceMin', String(priceMin));

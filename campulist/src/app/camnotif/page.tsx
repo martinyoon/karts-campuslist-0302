@@ -48,9 +48,11 @@ function CamNotifContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between px-4 py-3">
+      {/* 간격 압축: py-3 → py-1.5 */}
+      <div className="flex items-center justify-between px-4 py-1.5">
         <h1 className="text-xl font-bold">캠알림</h1>
-        <div className="flex items-center gap-3">
+        {/* 간격 압축: gap-3 → gap-1.5 */}
+        <div className="flex items-center gap-1.5">
           {unreadCount > 0 && (
             <>
               <span className="text-sm text-blue-500">{unreadCount}개 읽지 않음</span>
@@ -76,7 +78,7 @@ function CamNotifContent() {
               key={notif.id}
               href={notif.link || '#'}
               onClick={() => handleRead(notif.id)}
-              className={`flex gap-3 px-4 py-3.5 transition-colors hover:bg-muted ${
+              className={`flex gap-1.5 px-4 py-2 transition-colors hover:bg-muted ${ /* 간격 압축: gap-3 → gap-1.5, py-3.5 → py-2 */
                 !notif.isRead ? 'bg-blue-500/5' : ''
               }`}
             >
@@ -95,7 +97,7 @@ function CamNotifContent() {
                 {notif.body && (
                   <p className="mt-0.5 truncate text-sm text-muted-foreground">{notif.body}</p>
                 )}
-                <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(notif.createdAt)}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{formatRelativeTime(notif.createdAt)}</p> {/* 간격 압축: mt-1 → mt-0.5 */}
               </div>
             </Link>
           ))}

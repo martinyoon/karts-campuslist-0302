@@ -92,7 +92,8 @@ interface User {
 | `29f51cc` | feat: 카테고리 페이지에 CategoryGrid 유지 — 대분류 네비게이션 일관성 |
 | `49a856e` | refactor: 7차 UI/UX 개선 — 햄버거 메뉴, 브레드크럼, 대학 전환, 소분류 Badge |
 | `b559e1b` | refactor: 8차 UI/UX 개선 — 글쓰기 카테고리 pre-selection + 브레드크럼 스타일 통일 |
-| (현재) | refactor: 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화 |
+| `1f4fe28` | refactor: 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화 |
+| (현재) | refactor: 수직 간격 대폭 압축 — 25개 파일 40~60% 수직 공간 축소 + NOTES.md 업데이트 |
 
 ---
 
@@ -743,7 +744,7 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
        1. 글쓰기 카테고리 뷰에서 pre-selected 대분류 시각적 강조 (오렌지 ring + 배경 + "선택됨")
        2. pre-selected 대분류 자동 스크롤 (useEffect + scrollIntoView)
        3. CategorySummary 브레드크럼 스타일 통일 (blue→orange, text-lg→text-base, 풀네임)
-[진행] 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화
+[완료] 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화
        1. WriteUniversityTabs 컴포넌트 생성 (state 기반 대학 탭)
        2. WriteCategoryGrid 컴포넌트 생성 (state 기반 카테고리 아이콘 그리드)
        3. 글쓰기 페이지 레이아웃 재구성: UniversityTabs → 배너 → 브레드크럼 → CategoryGrid → 소분류 Badge → 폼
@@ -751,6 +752,13 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
        5. 2열 카테고리 텍스트 그리드 제거 → 수평 아이콘 스크롤 (브라우징과 동일)
        6. 소분류 배지 추가 (오렌지 톤, 잠금 표시, 브라우징과 동일)
        7. CategorySummary 제거 (상단 브레드크럼으로 대체)
+[완료] 수직 간격 대폭 압축 — 25개 파일 전체 (40~60% 수직 공간 축소)
+       Phase 1: 공유 컴포넌트 7개 (UniversityTabs, CategoryGrid, PostCard, PopularPosts, Header 등)
+       Phase 2: 주요 페이지 10개 (홈, 대학별, 카테고리별, 검색, 인증, 마이페이지, 캠톡 등)
+       Phase 3: 글쓰기 페이지 (168줄 변경)
+       Phase 4: 기타 페이지 7개 (알림, 소개, 프로필, 개인정보, 약관, PostBottomAction, ContactMethods)
+[완료] npm run build 성공 (JSX 주석 배치 오류 4건 수정 포함)
+[완료] Mock Auth PDCA Gap Analysis v2.0 — 99% Match Rate (4건 Gap 전부 해결)
 ```
 
 ### 15. 7차 UI/UX 개선 — 햄버거 메뉴 + 브레드크럼 + 대학 전환 + 소분류 Badge (8개 파일 수정)
@@ -1005,6 +1013,98 @@ handleChangeCategory() // 변경됨: minorId도 초기화
 - open 소분류: `border-orange-400 text-orange-600` (브라우징과 동일)
 - 선택된 소분류: `border-2 border-orange-500 text-orange-600 font-bold` (브라우징과 동일)
 - 비캠퍼스 회원이 campus 소분류 클릭 시 토스트 안내
+
+---
+
+### 18. 수직 간격 대폭 압축 — 25개 파일 전체 압축 (2026-02-24)
+
+**목적**: 화면 정보 밀도를 높이기 위해 전체 앱의 수직 공간(패딩, 마진, gap)을 40~60% 압축.
+텍스트 크기, 좌우 패딩, 색상, border-radius 등 브랜드 스타일은 유지.
+
+#### 압축 규칙
+
+| 대상 | 축소율 | 예시 |
+|------|--------|------|
+| 섹션/컨테이너 수직 패딩 | 40-50% | py-6→py-3, py-4→py-2 |
+| 버튼/인터랙티브 패딩 | 40-50% (min 36px) | py-3→py-2, py-2.5→py-1.5 |
+| Gap/Space-y | 50-60% | space-y-4→space-y-2, gap-3→gap-1.5 |
+| 마진 | 40-50% | mt-4→mt-2, mb-3→mb-1.5, my-6→my-3 |
+
+**변경 안 함**: font-size, px-/mx- (좌우 패딩), 색상, border-radius, 구조적 패딩(pb-36, pb-24, pb-16)
+
+#### 수정 파일 목록 (25개)
+
+**Phase 1: 공유 컴포넌트 (7개)**
+| 파일 | 주요 변경 |
+|------|----------|
+| `components/post/UniversityTabs.tsx` | py-3→py-2 |
+| `components/write/WriteUniversityTabs.tsx` | py-3→py-2 |
+| `components/post/CategoryGrid.tsx` | py-4→py-2, gap-2→gap-1.5 |
+| `components/write/WriteCategoryGrid.tsx` | 동일 |
+| `components/post/PostCard.tsx` | py-5→py-3, gap-4→gap-2 |
+| `components/post/PopularPostsSection.tsx` | py-4→py-2, gap-3→gap-1.5, p-3.5→p-2 |
+| `components/layout/Header.tsx` | gap-3→gap-1.5, gap-4→gap-2, my-2→my-1 |
+
+**Phase 2: 주요 페이지 (10개)**
+| 파일 | 주요 변경 |
+|------|----------|
+| `app/page.tsx` | 배너 py-4→py-2, 브레드크럼 py-2→py-1 |
+| `app/[university]/page.tsx` | 동일 패턴 |
+| `app/[university]/[category]/page.tsx` | 소분류 py-3→py-1.5, 정렬 pb-3→pb-1.5 |
+| `app/all/[category]/page.tsx` | 동일 패턴 |
+| `app/post/[id]/page.tsx` | py-4→py-2, gap-3→gap-1.5, my-4→my-2 |
+| `app/search/page.tsx` | 패딩/gap 압축 |
+| `app/auth/page.tsx` | py-12→py-6, mb-8→mb-4, space-y-4→space-y-2 |
+| `app/my/page.tsx` | py-6→py-3, gap-4→gap-2, space-y-4→space-y-2 |
+| `app/camtalk/page.tsx` | py-4→py-2, gap-2→gap-1.5 |
+| `app/camtalk/[id]/page.tsx` | py-3→py-1.5, gap-3→gap-1.5, space-y-4→space-y-2 |
+
+**Phase 3: 글쓰기 페이지**
+| 파일 | 주요 변경 |
+|------|----------|
+| `app/write/page.tsx` | space-y-5→space-y-2.5, py-6→py-3, mb/mt/gap 전체 압축 (168줄 변경) |
+
+**Phase 4: 기타 페이지 및 컴포넌트 (7개)**
+| 파일 | 주요 변경 |
+|------|----------|
+| `app/camnotif/page.tsx` | py-3→py-1.5, gap-3→gap-1.5 |
+| `app/about/page.tsx` | py-6→py-3, space-y-4→space-y-2, mt-6→mt-3 |
+| `app/user/[id]/page.tsx` | py-6→py-3, gap-4→gap-2 |
+| `app/privacy/page.tsx` | py-6→py-3, space-y-4→space-y-2, mt-8→mt-4 |
+| `app/terms/page.tsx` | 동일 패턴 |
+| `components/post/PostBottomAction.tsx` | space-y-2→space-y-1, pb-6→pb-3 |
+| `components/post/ContactMethodsDisplay.tsx` | mt-4→mt-2, p-3.5→p-2, space-y-2→space-y-1 |
+
+#### 주석 규칙
+모든 변경 위치에 `{/* 간격 압축: 기존값 → 변경값 */}` 인라인 주석 표기.
+
+#### 빌드 검증
+- `npm run build` 성공 (17개 라우트 전체 컴파일 완료)
+- JSX 주석 배치 오류 4건 수정 (return 루트 sibling, 조건부 표현식 내부)
+
+### Mock Auth PDCA Gap Analysis v2.0 결과 (2026-02-24 확인)
+
+**Overall Match Rate: 99%**
+
+| 카테고리 | 점수 | v1.0 | 변화 |
+|---------|:----:|:----:|:----:|
+| Feature Match | 100% | 95% | +5% |
+| Data Model Match | 97% | 97% | 0% |
+| UI/Screen Match | 100% | 100% | 0% |
+| Architecture | 100% | 93% | +7% |
+| Convention | 100% | 97% | +3% |
+| **Overall** | **99%** | **96%** | **+3%** |
+
+**해결된 Gap 4건:**
+- G-01 (Critical): `createPost`가 `authorId`를 파라미터로 받도록 수정
+- G-02 (Low): `CURRENT_USER_ID` export 완전 제거
+- G-05 (Low): 하드코딩된 storage key → `STORAGE_KEYS.CHAT_OVERRIDES`
+- G-06 (Medium): `/chat` 페이지에 `AuthGuard` 래핑 추가
+
+**Match Rate 변화 이력:**
+```
+Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96% → mock-auth v2: 99%
+```
 
 ---
 

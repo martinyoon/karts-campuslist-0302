@@ -115,7 +115,8 @@ function CamTalkDetailContent() {
     return (
       <div className="px-4 py-16 text-center text-muted-foreground">
         <p className="text-lg font-medium">캠톡을 찾을 수 없습니다</p>
-        <Button variant="outline" className="mt-4" onClick={() => router.push('/camtalk')}>
+        {/* 간격 압축: mt-4 → mt-2 */}
+        <Button variant="outline" className="mt-2" onClick={() => router.push('/camtalk')}>
           캠톡 목록으로
         </Button>
       </div>
@@ -178,13 +179,16 @@ function CamTalkDetailContent() {
   return (
     <div className="flex h-[calc(100dvh-112px)] flex-col md:h-[calc(100dvh-56px)]">
       {/* 상단 헤더 */}
-      <div className="border-b border-border px-4 py-3">
-        <div className="flex items-center gap-3">
+      {/* 간격 압축: py-3 → py-1.5 */}
+      <div className="border-b border-border px-4 py-1.5">
+        {/* 간격 압축: gap-3 → gap-1.5 */}
+        <div className="flex items-center gap-1.5">
           <button onClick={() => router.push('/camtalk')} className="text-muted-foreground hover:text-foreground" aria-label="뒤로가기">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <Link href={`/user/${partner.id}`} className="min-w-0 flex-1 transition-opacity hover:opacity-70">
-            <div className="flex items-center gap-2">
+            {/* 간격 압축: gap-2 → gap-1.5 */}
+            <div className="flex items-center gap-1.5">
               <span className="font-medium">{partnerNickname}</span>
               {partnerProfile?.isVerified && (
                 <Badge variant="secondary" className="h-4 px-1 text-xs">인증</Badge>
@@ -197,9 +201,9 @@ function CamTalkDetailContent() {
         </div>
       </div>
 
-      {/* 확정된 약속 배너 */}
+      {/* 확정된 약속 배너 — 간격 압축: gap-2 → gap-1.5 */}
       {confirmedApp && (
-        <div className="flex items-center gap-2 border-b border-green-500/20 bg-green-500/10 px-4 py-2.5 text-sm">
+        <div className="flex items-center gap-1.5 border-b border-green-500/20 bg-green-500/10 px-4 py-2.5 text-sm">
           <span className="text-base">📅</span>
           <div className="min-w-0 flex-1">
             <span className="font-medium text-green-700 dark:text-green-400">약속 확정</span>
@@ -225,7 +229,8 @@ function CamTalkDetailContent() {
       )}
 
       {/* 메시지 영역 */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      {/* 간격 압축: py-4 → py-2 */}
+      <div className="flex-1 overflow-y-auto px-4 py-2">
         <div className="flex flex-col gap-1">
           {messages.map((msg, i) => {
             const isMine = msg.senderId === myId;
@@ -239,10 +244,12 @@ function CamTalkDetailContent() {
             const hasConfirmAfter = isAppointment && messages.slice(i + 1).some(m => m.content.startsWith('✅ 약속 확정!'));
             const showAppButtons = isAppointment && isFromOther && !hasConfirmAfter;
 
+            // 간격 압축: mt-3 → mt-1.5
             return (
-              <div key={msg.id} className={isFirstInGroup && i > 0 ? 'mt-3' : ''}>
+              <div key={msg.id} className={isFirstInGroup && i > 0 ? 'mt-1.5' : ''}>
                 {showDate && (
-                  <div className="my-4 text-center text-xs text-muted-foreground">
+                  // 간격 압축: my-4 → my-2
+                  <div className="my-2 text-center text-xs text-muted-foreground">
                     {new Date(msg.createdAt).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}
                   </div>
                 )}
@@ -289,9 +296,9 @@ function CamTalkDetailContent() {
                   </div>
                 </div>
 
-                {/* 약속 응답 버튼 */}
+                {/* 약속 응답 버튼 — 간격 압축: mt-1.5 → mt-1, gap-2 → gap-1.5 */}
                 {showAppButtons && (
-                  <div className="mt-1.5 flex gap-2 pl-9">
+                  <div className="mt-1 flex gap-1.5 pl-9">
                     <button
                       onClick={() => handleAccept(msg.content)}
                       className="rounded-lg border border-green-500/40 bg-green-500/10 px-3 py-1.5 text-xs font-medium text-green-600 hover:bg-green-500/20"
@@ -314,10 +321,12 @@ function CamTalkDetailContent() {
       </div>
 
       {/* 메시지 입력 */}
-      <div className="border-t border-border px-4 py-3">
+      {/* 간격 압축: py-3 → py-1.5 */}
+      <div className="border-t border-border px-4 py-1.5">
+        {/* 간격 압축: gap-2 → gap-1.5 */}
         <form
           onSubmit={e => { e.preventDefault(); handleSend(); }}
-          className="flex items-center gap-2"
+          className="flex items-center gap-1.5"
         >
           <button
             type="button"
@@ -353,7 +362,8 @@ function CamTalkDetailContent() {
           <SheetHeader className="pb-2">
             <SheetTitle className="text-lg">거래 약속 잡기</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4 px-4 pb-6">
+          {/* 간격 압축: space-y-4 → space-y-2, pb-6 → pb-3 */}
+          <div className="space-y-2 px-4 pb-3">
             <div>
               <label className="mb-1 block text-sm font-medium">날짜</label>
               <input

@@ -66,9 +66,10 @@ export default function UserProfilePage() {
 
   return (
     <div>
-      {/* 프로필 헤더 */}
-      <div className="px-4 py-6">
-        <div className="flex items-center gap-4">
+      {/* 프로필 헤더 — 간격 압축: py-6 → py-3 */}
+      <div className="px-4 py-3">
+        {/* 간격 압축: gap-4 → gap-2 */}
+        <div className="flex items-center gap-2">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
             {user.nickname.charAt(0)}
           </div>
@@ -97,7 +98,8 @@ export default function UserProfilePage() {
         </div>
 
         {/* 매너온도 + 거래 통계 */}
-        <div className="mt-4 flex gap-4 rounded-lg bg-muted px-4 py-3">
+        {/* 간격 압축: mt-4 → mt-2, gap-4 → gap-2, py-3 → py-1.5 */}
+        <div className="mt-2 flex gap-2 rounded-lg bg-muted px-4 py-1.5">
           <div className="flex-1 text-center">
             <p className={`text-2xl font-bold ${user.mannerTemp >= 38 ? 'text-blue-500' : user.mannerTemp >= 36.5 ? 'text-foreground' : 'text-orange-500'}`}>
               {user.mannerTemp}°
@@ -124,7 +126,8 @@ export default function UserProfilePage() {
 
       {/* 판매 게시글 */}
       <section className="py-2">
-        <div className="flex items-center justify-between px-4 py-3">
+        {/* 간격 압축: py-3 → py-1.5 */}
+        <div className="flex items-center justify-between px-4 py-1.5">
           <h2 className="text-lg font-bold">판매 게시글</h2>
           <span className="text-sm text-muted-foreground">
             판매중 {activePosts.length} · 거래완료 {completedPosts.length}

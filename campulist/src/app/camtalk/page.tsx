@@ -29,7 +29,8 @@ function CamTalkContent() {
 
   return (
     <div>
-      <div className="border-b border-border px-4 py-4">
+      {/* 간격 압축: py-4 → py-2 */}
+      <div className="border-b border-border px-4 py-2">
         <h1 className="text-xl font-bold">캠톡</h1>
       </div>
 
@@ -66,7 +67,8 @@ function CamTalkContent() {
                 </Avatar>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  {/* 간격 압축: gap-2 → gap-1.5 */}
+                  <div className="flex items-center gap-1.5">
                     <span className="font-medium">{displayNickname}</span>
                     <span className="text-xs text-muted-foreground">
                       {room.lastMessageAt ? formatRelativeTime(room.lastMessageAt) : ''}

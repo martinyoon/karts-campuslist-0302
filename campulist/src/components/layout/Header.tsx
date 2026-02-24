@@ -48,7 +48,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
-      <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
+      <div className="mx-auto flex h-14 max-w-5xl items-center gap-1.5 px-4"> {/* 간격 압축: gap-3 → gap-1.5 */}
         {/* 모바일 메뉴 */}
             <button type="button" onClick={handleMenuClick} className={`flex h-auto flex-col items-center gap-0.5 px-2 py-1 transition-colors duration-100 ${menuHighlight ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="메뉴 열기">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
@@ -56,7 +56,7 @@ export default function Header() {
             </button>
             <Sheet open={menuOpen} onOpenChange={handleSheetChange}>
               <SheetContent side="left" className="w-72">
-                <nav className="mt-8 flex flex-col gap-4">
+                <nav className="mt-4 flex flex-col gap-2"> {/* 간격 압축: mt-8 → mt-4, gap-4 → gap-2 */}
                   <p className="text-sm font-semibold text-muted-foreground">대학교</p>
                   {universities.map(uni => {
                     const isActive = pathname.startsWith(`/${uni.slug}`);
@@ -66,7 +66,7 @@ export default function Header() {
                       </Link>
                     );
                   })}
-                  <div className="my-2 border-t border-border" />
+                  <div className="my-1 border-t border-border" /> {/* 간격 압축: my-2 → my-1 */}
                   <p className="text-sm font-semibold text-muted-foreground">카테고리</p>
                   {majorCategories.map(cat => {
                     const catHref = currentUniSlug ? `/${currentUniSlug}/${cat.slug}` : `/all/${cat.slug}`;

@@ -56,8 +56,8 @@ export default async function PostDetailPage({ params }: Props) {
       {/* 이미지 갤러리 */}
       <ImageGallery images={post.images} title={post.title} />
 
-      {/* 작성자 정보 */}
-      <Link href={`/user/${post.authorId}`} className="flex items-center gap-3 border-b border-border px-4 py-4 transition-colors hover:bg-muted/50">
+      {/* 작성자 정보 — 간격 압축: py-4 → py-2, gap-3 → gap-2 */}
+      <Link href={`/user/${post.authorId}`} className="flex items-center gap-2 border-b border-border px-4 py-2 transition-colors hover:bg-muted/50">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-lg font-medium">
           {post.author.nickname.charAt(0)}
         </div>
@@ -77,8 +77,8 @@ export default async function PostDetailPage({ params }: Props) {
         </div>
       </Link>
 
-      {/* 게시글 내용 */}
-      <div className="px-4 py-4">
+      {/* 게시글 내용 — 간격 압축: py-4 → py-2 */}
+      <div className="px-4 py-2">
         <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
           <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
           <span className="text-orange-300">›</span>
@@ -91,7 +91,7 @@ export default async function PostDetailPage({ params }: Props) {
           <span className="font-semibold text-orange-400">{post.categoryMinor.name}</span>
         </nav>
 
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-1 flex items-center gap-1.5"> {/* 간격 압축: mt-2 → mt-1, gap-2 → gap-1.5 */}
           {post.status !== 'active' && (
             <Badge variant={post.status === 'reserved' ? 'secondary' : 'outline'} className={post.status === 'reserved' ? 'bg-orange-500/10 text-orange-500' : 'bg-green-500/10 text-green-500'}>
               {post.status === 'reserved' ? '예약중' : post.status === 'completed' ? '거래완료' : post.status}
@@ -107,7 +107,7 @@ export default async function PostDetailPage({ params }: Props) {
           <ReportButton postId={post.id} />
         </div>
 
-        <Separator className="my-4" />
+        <Separator className="my-2" /> {/* 간격 압축: my-4 → my-2 */}
 
         <div className="whitespace-pre-line text-base leading-relaxed text-foreground/90">
           {post.body}
@@ -115,7 +115,7 @@ export default async function PostDetailPage({ params }: Props) {
 
         {/* 태그 */}
         {post.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-1.5"> {/* 간격 압축: mt-4 → mt-2, gap-2 → gap-1.5 */}
             {post.tags.map(tag => (
               <Link key={tag} href={`/search?q=${encodeURIComponent(tag)}`}>
                 <Badge variant="outline" className="cursor-pointer hover:bg-muted">
@@ -128,7 +128,7 @@ export default async function PostDetailPage({ params }: Props) {
 
         {/* 거래 장소 */}
         {post.locationDetail && (
-          <div className="mt-4 flex items-center gap-2 rounded-lg bg-muted px-3 py-2.5 text-sm text-muted-foreground">
+          <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-muted px-3 py-1.5 text-sm text-muted-foreground"> {/* 간격 압축: mt-4 → mt-2, gap-2 → gap-1.5, py-2.5 → py-1.5 */}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
             {post.locationDetail}
           </div>
@@ -145,8 +145,8 @@ export default async function PostDetailPage({ params }: Props) {
       {relatedPosts.length > 0 && (
         <>
           <Separator />
-          <section className="px-4 py-4">
-            <h2 className="mb-3 text-lg font-bold">관련 게시글</h2>
+          <section className="px-4 py-2"> {/* 간격 압축: py-4 → py-2 */}
+            <h2 className="mb-1.5 text-lg font-bold">관련 게시글</h2> {/* 간격 압축: mb-3 → mb-1.5 */}
             <div>
               {relatedPosts.map(rp => (
                 <PostCard key={rp.id} post={rp} />
@@ -157,8 +157,9 @@ export default async function PostDetailPage({ params }: Props) {
       )}
 
       {/* 하단 고정 바 */}
-      <div className="fixed bottom-14 left-0 right-0 z-10 border-t border-border bg-background px-4 py-3 md:bottom-0">
-        <div className="mx-auto flex max-w-5xl items-center gap-3">
+      {/* 간격 압축: py-3 → py-2, gap-3 → gap-1.5 */}
+      <div className="fixed bottom-14 left-0 right-0 z-10 border-t border-border bg-background px-4 py-2 md:bottom-0">
+        <div className="mx-auto flex max-w-5xl items-center gap-1.5">
           <LikeButton postId={post.id} initialLiked={post.isLiked} initialCount={post.likeCount} />
           <ShareButton />
           <div className="min-w-0 flex-1">

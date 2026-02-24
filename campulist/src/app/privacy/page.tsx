@@ -7,16 +7,16 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="px-4 py-6">
+    <div className="px-4 py-3"> {/* 간격 압축: py-6 → py-3 */}
       <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground">
         &larr; 서비스 소개
       </Link>
-      <h1 className="mt-4 text-2xl font-bold">개인정보처리방침</h1>
-      <Separator className="my-6" />
-      <div className="space-y-4 text-sm leading-relaxed text-foreground/80">
+      <h1 className="mt-2 text-2xl font-bold">개인정보처리방침</h1> {/* 간격 압축: mt-4 → mt-2 */}
+      <Separator className="my-3" /> {/* 간격 압축: my-6 → my-3 */}
+      <div className="space-y-2 text-sm leading-relaxed text-foreground/80"> {/* 간격 압축: space-y-4 → space-y-2 */}
         <p>캠퍼스리스트 개인정보처리방침은 현재 준비 중입니다.</p>
         <p>서비스 정식 출시 전까지 아래 기본 원칙이 적용됩니다:</p>
-        <ul className="list-disc space-y-2 pl-5">
+        <ul className="list-disc space-y-1 pl-5"> {/* 간격 압축: space-y-2 → space-y-1 */}
           <li>수집하는 개인정보: 학교 이메일, 닉네임, 게시글/캠톡 내용</li>
           <li>개인정보는 서비스 제공 목적으로만 사용되며, 제3자에게 제공되지 않습니다.</li>
           <li>사용자는 언제든지 계정 삭제를 요청할 수 있으며, 삭제 시 모든 개인정보가 파기됩니다.</li>
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         </ul>
         <p className="text-muted-foreground">정식 개인정보처리방침은 서비스 출시 시 공지됩니다.</p>
       </div>
-      <p className="mt-8 text-xs text-muted-foreground">&copy; 2026 Campulist. All rights reserved.</p>
+      <p className="mt-4 text-xs text-muted-foreground"> {/* 간격 압축: mt-8 → mt-4 */}&copy; 2026 Campulist. All rights reserved.</p>
     </div>
   );
 }

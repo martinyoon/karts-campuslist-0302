@@ -17,7 +17,7 @@ export default function WriteUniversityTabs({ selectedId, onSelect }: Props) {
           <button
             key={uni.slug}
             onClick={() => onSelect(uni.id)}
-            className={`shrink-0 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+            className={`shrink-0 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${ /* 간격 압축: py-3 → py-2 */
               selectedSlug === uni.slug ? 'border-blue-500 text-blue-500' : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >

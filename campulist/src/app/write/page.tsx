@@ -650,13 +650,15 @@ function WritePageContent() {
       <WriteUniversityTabs selectedId={universityId} onSelect={setUniversityId} />
 
       {/* 대학 정보 배너 */}
-      <div className="bg-blue-950/30 px-4 py-4 dark:bg-blue-950/40">
+      {/* 간격 압축: py-4 → py-2 */}
+      <div className="bg-blue-950/30 px-4 py-2 dark:bg-blue-950/40">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-blue-400 dark:text-blue-300">{selectedUni?.name || '대학교'}</h1>
             <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{selectedUni?.region} · {selectedUni?.nameEn}</p>
           </div>
-          <div className="flex items-center gap-2">
+          {/* 간격 압축: gap-2 → gap-1.5 */}
+          <div className="flex items-center gap-1.5">
             {lastSaved && <span className="text-xs text-blue-400/60">임시저장됨</span>}
             {draftLoaded && (
               <button onClick={handleReset} className="text-xs text-blue-400/60 hover:text-blue-300 hover:underline">초기화</button>
@@ -666,8 +668,10 @@ function WritePageContent() {
       </div>
 
       {/* 브레드크럼 */}
-      <div className="border-b border-border px-4 py-2">
-        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
+      {/* 간격 압축: py-2 → py-1 */}
+      <div className="border-b border-border px-4 py-1">
+        {/* 간격 압축: gap-2 → gap-1.5 */}
+        <nav aria-label="브레드크럼" className="flex items-center gap-1.5 text-base text-muted-foreground">
           <span className="text-orange-400">모든 대학</span>
           <span className="text-orange-300">›</span>
           <span className="text-orange-400">{selectedUni?.name || '대학'}</span>
@@ -700,8 +704,9 @@ function WritePageContent() {
       <WriteCategoryGrid activeId={majorId} onSelect={handleMajorSelect} />
 
       {/* 소분류 배지 */}
+      {/* 간격 압축: gap-2 → gap-1.5, py-3 → py-1.5 */}
       {majorId && (
-        <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">
+        <div className="flex gap-1.5 overflow-x-auto px-4 py-1.5 scrollbar-hide">
           {currentMinors.map(m => {
             const isLocked = m.postAccess === 'campus' && !isCampusMember;
             const isActive = minorId === m.id;
@@ -726,32 +731,37 @@ function WritePageContent() {
       )}
 
       {/* 비캠퍼스 회원 안내 */}
+      {/* 간격 압축: pb-2 → pb-1 */}
       {majorId && !isCampusMember && currentMinors.some(m => m.postAccess === 'campus') && step !== 'form' && (
-        <div className="px-4 pb-2">
+        <div className="px-4 pb-1">
           <p className="text-xs text-muted-foreground">🔒 표시는 대학 소속 인증 회원 전용 카테고리입니다</p>
         </div>
       )}
 
       {/* 카테고리 미선택 시 안내 */}
+      {/* 간격 압축: py-8 → py-4 */}
       {!majorId && step !== 'form' && (
-        <div className="px-4 py-8 text-center">
+        <div className="px-4 py-4 text-center">
           <p className="text-muted-foreground">대분류를 선택해주세요</p>
         </div>
       )}
 
       {/* 소분류 미선택 시 안내 */}
+      {/* 간격 압축: py-6 → py-3 */}
       {majorId && !minorId && step !== 'form' && (
-        <div className="px-4 py-6 text-center">
+        <div className="px-4 py-3 text-center">
           <p className="text-muted-foreground">소분류를 선택하면 글쓰기를 시작합니다</p>
         </div>
       )}
 
       {/* 글쓰기 폼 */}
+      {/* 간격 압축: py-4 → py-2, space-y-5 → space-y-2.5 */}
       {step === 'form' && (
-        <div className="px-4 py-4">
-          <div className="space-y-5">
+        <div className="px-4 py-2">
+          <div className="space-y-2.5">
             {/* 완성도 점수 프로그레스 바 */}
-            <div className="rounded-lg border border-border bg-muted/30 p-3">
+            {/* 간격 압축: p-3 → p-1.5 */}
+            <div className="rounded-lg border border-border bg-muted/30 p-1.5">
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">{scoreLabel} {completionScore}점</span>
                 <span className="text-xs text-muted-foreground">{completionScore}/100</span>
@@ -767,9 +777,9 @@ function WritePageContent() {
               <p className="mt-1.5 text-xs text-muted-foreground">{nextHint}</p>
             </div>
 
-            {/* 예시 채우기 영역 */}
+            {/* 예시 채우기 영역: 간격 압축: space-y-2.5 → space-y-1.5, p-3 → p-1.5 */}
             {hasExample && (
-              <div className="space-y-2.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+              <div className="space-y-1.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-1.5">
                 {/* 섹션 안내 */}
                 <p className="text-sm font-medium text-foreground">글 제목·내용을 어떻게 채울지 막막하다면?</p>
 
@@ -803,11 +813,12 @@ function WritePageContent() {
                 )}
 
                 {/* 예시로 채우기 버튼 */}
+                {/* 간격 압축: py-2.5 → py-1.5 */}
                 <button
                   type="button"
                   onClick={fillRandomExample}
                   disabled={isSpinning}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-blue-500/30 bg-background py-2.5 text-sm font-medium text-blue-500 transition-colors hover:bg-blue-500/10 disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-blue-500/30 bg-background py-1.5 text-sm font-medium text-blue-500 transition-colors hover:bg-blue-500/10 disabled:opacity-60"
                 >
                   {isSpinning ? (
                     <>
@@ -829,8 +840,10 @@ function WritePageContent() {
             {/* 거래 상태 (수정 모드만) */}
             {isEditMode && (
               <div>
-                <label className="mb-2 block text-sm font-medium">거래 상태</label>
-                <div className="flex gap-2">
+                {/* 간격 압축: mb-2 → mb-1 */}
+                <label className="mb-1 block text-sm font-medium">거래 상태</label>
+                {/* 간격 압축: gap-2 → gap-1.5 */}
+                <div className="flex gap-1.5">
                   <button
                     type="button"
                     onClick={() => setPostStatus('active')}
@@ -870,7 +883,8 @@ function WritePageContent() {
 
             {/* 제목 */}
             <div id="field-title">
-              <div className="mb-1.5 flex items-center justify-between">
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <div className="mb-1 flex items-center justify-between">
                 <label className="text-sm font-medium">제목 <span className="text-red-500">*</span></label>
                 {hasExample && (
                   <button type="button" onClick={fillTitleExample} className="text-xs text-blue-500 hover:underline">💡 예시</button>
@@ -883,7 +897,8 @@ function WritePageContent() {
                 maxLength={100}
                 className={highlightedFields.includes('제목') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}
               />
-              <div className="mt-1 flex items-center justify-between">
+              {/* 간격 압축: mt-1 → mt-0.5 */}
+              <div className="mt-0.5 flex items-center justify-between">
                 {errors.title ? <p className="text-xs text-red-500">{errors.title}</p> : <span />}
                 <p className="text-xs text-muted-foreground">{title.length}/100</p>
               </div>
@@ -891,13 +906,15 @@ function WritePageContent() {
 
             {/* 가격 */}
             <div id="field-price">
-              <div className="mb-1.5 flex items-center justify-between">
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <div className="mb-1 flex items-center justify-between">
                 <label className="text-sm font-medium">가격</label>
                 {hasExample && (
                   <button type="button" onClick={fillPriceExample} className="text-xs text-blue-500 hover:underline">💡 예시</button>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              {/* 간격 압축: gap-2 → gap-1.5 */}
+              <div className="flex items-center gap-1.5">
                 <Input
                   type="number"
                   min="0"
@@ -908,7 +925,8 @@ function WritePageContent() {
                 />
                 <span className="text-sm text-muted-foreground">원</span>
               </div>
-              <label className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+              {/* 간격 압축: mt-2 → mt-1, gap-2 → gap-1.5 */}
+              <label className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={priceNegotiable}
@@ -917,12 +935,14 @@ function WritePageContent() {
                 />
                 가격 협의 가능
               </label>
-              {errors.price && <p className="mt-1 text-xs text-red-500">{errors.price}</p>}
+              {/* 간격 압축: mt-1 → mt-0.5 */}
+              {errors.price && <p className="mt-0.5 text-xs text-red-500">{errors.price}</p>}
             </div>
 
             {/* 본문 */}
             <div id="field-body">
-              <div className="mb-1.5 flex items-center justify-between">
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <div className="mb-1 flex items-center justify-between">
                 <label className="text-sm font-medium">내용 <span className="text-red-500">*</span></label>
                 {hasExample && (
                   <button type="button" onClick={fillBodyExample} className="text-xs text-blue-500 hover:underline">💡 예시</button>
@@ -936,14 +956,18 @@ function WritePageContent() {
                 maxLength={5000}
                 className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
               />
-              <p className="mt-1 text-right text-xs text-muted-foreground">{body.length}/5,000</p>
-              {errors.body && <p className="mt-1 text-xs text-red-500">{errors.body}</p>}
+              {/* 간격 압축: mt-1 → mt-0.5 */}
+              <p className="mt-0.5 text-right text-xs text-muted-foreground">{body.length}/5,000</p>
+              {/* 간격 압축: mt-1 → mt-0.5 */}
+              {errors.body && <p className="mt-0.5 text-xs text-red-500">{errors.body}</p>}
             </div>
 
             {/* 이미지 */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">사진 (최대 {LIMITS.MAX_IMAGES}장)</label>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <label className="mb-1 block text-sm font-medium">사진 (최대 {LIMITS.MAX_IMAGES}장)</label>
+              {/* 간격 압축: gap-2 → gap-1.5, pb-2 → pb-1 */}
+              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                 {images.map((src, i) => (
                   <div key={i} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-border">
                     <img src={src} alt="" className="h-full w-full object-cover" />
@@ -973,15 +997,18 @@ function WritePageContent() {
                   </label>
                 )}
               </div>
+              {/* 간격 압축: mt-1 → mt-0.5 */}
               {images.length === 0 && (
-                <p className="mt-1 text-xs text-muted-foreground">사진을 추가하면 관심을 더 많이 받을 수 있어요.</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">사진을 추가하면 관심을 더 많이 받을 수 있어요.</p>
               )}
             </div>
 
             {/* 태그 */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">태그 (최대 5개)</label>
-              <div className="flex gap-2">
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <label className="mb-1 block text-sm font-medium">태그 (최대 5개)</label>
+              {/* 간격 압축: gap-2 → gap-1.5 */}
+              <div className="flex gap-1.5">
                 <Input
                   placeholder="태그 입력 후 Enter"
                   value={tagInput}
@@ -991,8 +1018,9 @@ function WritePageContent() {
                 />
                 <Button variant="outline" onClick={addTag}>추가</Button>
               </div>
+              {/* 간격 압축: mt-2 → mt-1, gap-2 → gap-1.5 */}
               {tags.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-1 flex flex-wrap gap-1.5">
                   {tags.map(tag => (
                     <Badge key={tag} variant="secondary" className="gap-1">
                       #{tag}
@@ -1001,9 +1029,9 @@ function WritePageContent() {
                   ))}
                 </div>
               )}
-              {/* 인기 태그 추천 */}
+              {/* 인기 태그 추천: 간격 압축: mt-2 → mt-1 */}
               {suggestedTags.length > 0 && tags.length < 5 && (
-                <div className="mt-2">
+                <div className="mt-1">
                   <span className="text-xs text-muted-foreground">인기 태그: </span>
                   <div className="mt-1 flex flex-wrap gap-1.5">
                     {suggestedTags.slice(0, 8).map(tag => (
@@ -1023,7 +1051,8 @@ function WritePageContent() {
 
             {/* 거래 장소 */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium">거래 희망 장소 (선택)</label>
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <label className="mb-1 block text-sm font-medium">거래 희망 장소 (선택)</label>
               <Input
                 placeholder="예: 서울대 정문 GS25 앞"
                 value={location}
@@ -1034,10 +1063,13 @@ function WritePageContent() {
 
             {/* 연락 방법 */}
             <div>
-              <label className="mb-2 block text-sm font-medium">연락 방법</label>
-              <div className="space-y-3 rounded-xl border border-border p-4">
+              {/* 간격 압축: mb-2 → mb-1 */}
+              <label className="mb-1 block text-sm font-medium">연락 방법</label>
+              {/* 간격 압축: space-y-3 → space-y-1.5, p-4 → p-2 */}
+              <div className="space-y-1.5 rounded-xl border border-border p-2">
                 {/* 캠퍼스리스트 캠톡 (항상 활성) */}
-                <label className="flex items-center gap-2.5 text-sm">
+                {/* 간격 압축: gap-2.5 → gap-1.5 */}
+                <label className="flex items-center gap-1.5 text-sm">
                   <input type="checkbox" checked disabled className="rounded" />
                   <span className="font-medium text-foreground">캠퍼스리스트 캠톡</span>
                   <span className="text-xs text-muted-foreground">(기본)</span>
@@ -1045,7 +1077,8 @@ function WritePageContent() {
 
                 {/* 전화번호 */}
                 <div>
-                  <label className="flex items-center gap-2.5 text-sm">
+                  {/* 간격 압축: gap-2.5 → gap-1.5 */}
+                  <label className="flex items-center gap-1.5 text-sm">
                     <input
                       type="checkbox"
                       checked={!!contactPhone}
@@ -1054,8 +1087,9 @@ function WritePageContent() {
                     />
                     <span className="text-foreground">전화번호 공개</span>
                   </label>
+                  {/* 간격 압축: mt-2 → mt-1, space-y-2 → space-y-1 */}
                   {!!contactPhone && (
-                    <div className="mt-2 ml-7 space-y-2">
+                    <div className="mt-1 ml-7 space-y-1">
                       <Input
                         type="tel"
                         placeholder="010-0000-0000"
@@ -1063,7 +1097,8 @@ function WritePageContent() {
                         onChange={e => setContactPhone(e.target.value)}
                         className="max-w-xs"
                       />
-                      <div className="flex gap-4">
+                      {/* 간격 압축: gap-4 → gap-2 */}
+                      <div className="flex gap-2">
                         <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <input type="checkbox" checked={contactPhoneCall} onChange={e => setContactPhoneCall(e.target.checked)} className="rounded" />
                           전화 OK
@@ -1079,7 +1114,8 @@ function WritePageContent() {
 
                 {/* 카카오 오픈채팅 */}
                 <div>
-                  <label className="flex items-center gap-2.5 text-sm">
+                  {/* 간격 압축: gap-2.5 → gap-1.5 */}
+                  <label className="flex items-center gap-1.5 text-sm">
                     <input
                       type="checkbox"
                       checked={!!contactKakao}
@@ -1088,8 +1124,9 @@ function WritePageContent() {
                     />
                     <span className="text-foreground">카카오 오픈채팅</span>
                   </label>
+                  {/* 간격 압축: mt-2 → mt-1 */}
                   {!!contactKakao && (
-                    <div className="mt-2 ml-7">
+                    <div className="mt-1 ml-7">
                       <Input
                         type="url"
                         placeholder="https://open.kakao.com/o/..."
@@ -1103,7 +1140,8 @@ function WritePageContent() {
 
                 {/* 이메일 */}
                 <div>
-                  <label className="flex items-center gap-2.5 text-sm">
+                  {/* 간격 압축: gap-2.5 → gap-1.5 */}
+                  <label className="flex items-center gap-1.5 text-sm">
                     <input
                       type="checkbox"
                       checked={!!contactEmail}
@@ -1112,8 +1150,9 @@ function WritePageContent() {
                     />
                     <span className="text-foreground">이메일 공개</span>
                   </label>
+                  {/* 간격 압축: mt-2 → mt-1 */}
                   {!!contactEmail && (
-                    <div className="mt-2 ml-7">
+                    <div className="mt-1 ml-7">
                       <Input
                         type="email"
                         placeholder="example@university.ac.kr"
@@ -1127,11 +1166,11 @@ function WritePageContent() {
               </div>
             </div>
 
-            {/* 미리보기 버튼 */}
+            {/* 미리보기 버튼: 간격 압축: py-2.5 → py-1.5 */}
             <button
               type="button"
               onClick={() => setShowPreview(true)}
-              className="w-full rounded-lg border border-border bg-muted/30 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="w-full rounded-lg border border-border bg-muted/30 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               👀 미리보기
             </button>
@@ -1139,13 +1178,15 @@ function WritePageContent() {
             {/* 미리보기 Sheet */}
             <Sheet open={showPreview} onOpenChange={setShowPreview}>
               <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
-                <SheetHeader className="pb-2">
+                {/* 간격 압축: pb-2 → pb-1 */}
+                <SheetHeader className="pb-1">
                   <SheetTitle className="text-sm font-normal text-muted-foreground">다른 사람에게 이렇게 보여요!</SheetTitle>
                 </SheetHeader>
-                <div className="space-y-3 px-4 pb-6">
-                  {/* 이미지 미리보기 */}
+                {/* 간격 압축: space-y-3 → space-y-1.5, pb-6 → pb-3 */}
+                <div className="space-y-1.5 px-4 pb-3">
+                  {/* 이미지 미리보기: 간격 압축: gap-2 → gap-1.5 */}
                   {images.length > 0 && (
-                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                       {images.map((src, i) => (
                         <img key={i} src={src} alt="" className="h-48 w-48 shrink-0 rounded-lg object-cover" />
                       ))}
@@ -1153,9 +1194,9 @@ function WritePageContent() {
                   )}
                   {/* 제목 */}
                   <h2 className="text-lg font-bold">{title.trim() || '(제목 없음)'}</h2>
-                  {/* 가격 */}
+                  {/* 가격: 간격 압축: gap-2 → gap-1.5 */}
                   {price && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span className="text-xl font-bold">{Number(price).toLocaleString()}원</span>
                       {priceNegotiable && <Badge variant="secondary" className="text-xs">협의가능</Badge>}
                     </div>
@@ -1176,8 +1217,8 @@ function WritePageContent() {
                   {location.trim() && (
                     <p className="text-xs text-muted-foreground">📍 {location}</p>
                   )}
-                  {/* 작성자 */}
-                  <div className="flex items-center gap-2 border-t border-border pt-3">
+                  {/* 작성자: 간격 압축: gap-2 → gap-1.5, pt-3 → pt-1.5 */}
+                  <div className="flex items-center gap-1.5 border-t border-border pt-1.5">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-sm font-bold text-blue-500">
                       {user?.nickname?.charAt(0) || '?'}
                     </div>
@@ -1192,17 +1233,18 @@ function WritePageContent() {
               </SheetContent>
             </Sheet>
 
-            {/* 등록 버튼 */}
+            {/* 등록 버튼: 간격 압축: py-6 → py-3 */}
             <div>
               <Button
                 onClick={handleSubmit}
                 disabled={!title || !minorId || submitting}
-                className="w-full bg-blue-600 py-6 text-base hover:bg-blue-700"
+                className="w-full bg-blue-600 py-3 text-base hover:bg-blue-700"
               >
                 {submitting ? '처리 중...' : isEditMode ? '수정하기' : '등록하기'}
               </Button>
+              {/* 간격 압축: mt-2 → mt-1 */}
               {(!title || !minorId) && (
-                <p className="mt-2 text-center text-xs text-muted-foreground">
+                <p className="mt-1 text-center text-xs text-muted-foreground">
                   {!minorId && !title
                     ? '카테고리를 선택하고 제목을 입력해주세요'
                     : !minorId
@@ -1210,11 +1252,12 @@ function WritePageContent() {
                       : '제목을 입력해주세요'}
                 </p>
               )}
+              {/* 간격 압축: mt-3 → mt-1.5, py-2.5 → py-1.5 */}
               {isEditMode && (
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="mt-3 w-full rounded-lg border border-red-500/30 bg-red-500/5 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15"
+                  className="mt-1.5 w-full rounded-lg border border-red-500/30 bg-red-500/5 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15"
                 >
                   삭제하기
                 </button>
@@ -1227,19 +1270,22 @@ function WritePageContent() {
       {/* 확인 Sheet (예시 대체 / 삭제 공용) */}
       <Sheet open={!!confirmAction} onOpenChange={open => { if (!open) setConfirmAction(null); }}>
         <SheetContent side="bottom" className="rounded-t-2xl" showCloseButton={false}>
-          <SheetHeader className="pb-2">
+          {/* 간격 압축: pb-2 → pb-1 */}
+          <SheetHeader className="pb-1">
             <SheetTitle className={`text-lg ${confirmAction === 'delete' ? 'text-destructive' : ''}`}>
               {confirmAction === 'delete' ? '게시글 삭제' : '예시로 대체'}
             </SheetTitle>
           </SheetHeader>
-          <div className="space-y-4 px-4 pb-6">
+          {/* 간격 압축: space-y-4 → space-y-2, pb-6 → pb-3 */}
+          <div className="space-y-2 px-4 pb-3">
             <p className="text-sm text-muted-foreground">
               {confirmAction === 'title' && '기존 제목을 예시로 대체할까요?'}
               {confirmAction === 'price' && '기존 가격을 예시로 대체할까요?'}
               {confirmAction === 'body' && '기존 내용을 예시로 대체할까요?'}
               {confirmAction === 'delete' && '정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'}
             </p>
-            <div className="flex gap-3">
+            {/* 간격 압축: gap-3 → gap-1.5 */}
+            <div className="flex gap-1.5">
               <Button variant="outline" className="flex-1" onClick={() => setConfirmAction(null)}>
                 취소
               </Button>

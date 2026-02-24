@@ -96,8 +96,10 @@ function MyPageContent() {
   return (
     <div>
       {/* 프로필 카드 */}
-      <div className="px-4 py-6">
-        <div className="flex items-center gap-4">
+      {/* 간격 압축: py-6 → py-3 */}
+      <div className="px-4 py-3">
+        {/* 간격 압축: gap-4 → gap-2 */}
+        <div className="flex items-center gap-2">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
             {user.nickname.charAt(0)}
           </div>
@@ -116,7 +118,8 @@ function MyPageContent() {
             </p>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
-          <div className="flex items-center gap-2">
+          {/* 간격 압축: gap-2 → gap-1 (stacked list items) */}
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setLogoutOpen(true)}
               className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
@@ -144,7 +147,8 @@ function MyPageContent() {
         </div>
 
         {/* 매너온도 + 거래 통계 */}
-        <div className="mt-4 flex gap-4 rounded-lg bg-muted px-4 py-3">
+        {/* 간격 압축: mt-4 → mt-2, gap-4 → gap-2, py-3 → py-1.5 */}
+        <div className="mt-2 flex gap-2 rounded-lg bg-muted px-4 py-1.5">
           <div className="flex-1 text-center">
             <p className="text-2xl font-bold text-blue-500">{user.mannerTemp}°</p>
             <p className="text-xs text-muted-foreground">매너온도</p>
@@ -186,10 +190,11 @@ function MyPageContent() {
       {/* 탭 바 */}
       <div className="flex border-b border-border">
         {tabs.map(tab => (
+          // 간격 압축: py-3 → py-1.5
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
+            className={`flex-1 py-1.5 text-center text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'border-b-2 border-blue-500 text-blue-500'
                 : 'text-muted-foreground hover:text-foreground'
@@ -206,7 +211,8 @@ function MyPageContent() {
         {activeTab === 'selling' && (
           myPosts.length > 0 ? (
             myPosts.map(post => (
-              <Link key={post.id} href={`/post/${post.id}`} className="flex gap-3 border-b border-border px-4 py-3 transition-colors hover:bg-muted/50">
+              // 간격 압축: gap-3 → gap-1.5, py-3 → py-1.5
+              <Link key={post.id} href={`/post/${post.id}`} className="flex gap-1.5 border-b border-border px-4 py-1.5 transition-colors hover:bg-muted/50">
                 {post.thumbnail ? (
                   <img src={post.thumbnail} alt="" className="h-24 w-24 shrink-0 rounded-xl object-cover" />
                 ) : (
@@ -253,7 +259,8 @@ function MyPageContent() {
         {activeTab === 'likes' && (
           likedPosts.length > 0 ? (
             likedPosts.map(post => (
-              <Link key={post.id} href={`/post/${post.id}`} className="flex gap-3 border-b border-border px-4 py-3 transition-colors hover:bg-muted/50">
+              // 간격 압축: gap-3 → gap-1.5, py-3 → py-1.5
+              <Link key={post.id} href={`/post/${post.id}`} className="flex gap-1.5 border-b border-border px-4 py-1.5 transition-colors hover:bg-muted/50">
                 {post.thumbnail ? (
                   <img src={post.thumbnail} alt="" className="h-24 w-24 shrink-0 rounded-xl object-cover" />
                 ) : (
@@ -281,7 +288,8 @@ function MyPageContent() {
         {activeTab === 'recent' && (
           recentPosts.length > 0 ? (
             recentPosts.map(post => (
-              <Link key={post.id} href={`/post/${post.id}`} className="flex gap-3 border-b border-border px-4 py-3 transition-colors hover:bg-muted/50">
+              // 간격 압축: gap-3 → gap-1.5, py-3 → py-1.5
+              <Link key={post.id} href={`/post/${post.id}`} className="flex gap-1.5 border-b border-border px-4 py-1.5 transition-colors hover:bg-muted/50">
                 {post.thumbnail ? (
                   <img src={post.thumbnail} alt="" className="h-24 w-24 shrink-0 rounded-xl object-cover" />
                 ) : (
@@ -309,9 +317,11 @@ function MyPageContent() {
         {activeTab === 'reviews' && (
           mockReviews.length > 0 ? (
             mockReviews.map(review => (
-              <div key={review.id} className="border-b border-border px-4 py-4">
+              // 간격 압축: py-4 → py-2
+              <div key={review.id} className="border-b border-border px-4 py-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  {/* 간격 압축: gap-2 → gap-1 (inline icon group) */}
+                  <div className="flex items-center gap-1">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
                       {review.reviewer.charAt(0)}
                     </div>
@@ -325,7 +335,8 @@ function MyPageContent() {
                     ))}
                   </div>
                 </div>
-                <p className="mt-2 text-sm text-foreground/90">{review.content}</p>
+                {/* 간격 압축: mt-2 → mt-1 */}
+                <p className="mt-1 text-sm text-foreground/90">{review.content}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(review.createdAt)}</p>
               </div>
             ))
@@ -341,7 +352,8 @@ function MyPageContent() {
           <SheetHeader className="pb-2">
             <SheetTitle className="text-lg">프로필 수정</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4 px-4 pb-6">
+          {/* 간격 압축: space-y-4 → space-y-2, pb-6 → pb-3 */}
+          <div className="space-y-2 px-4 pb-3">
             <div>
               <label className="mb-1.5 block text-sm font-medium">닉네임</label>
               <Input
@@ -361,7 +373,8 @@ function MyPageContent() {
             <div>
               <label className="mb-1.5 block text-sm font-medium">캠퍼스</label>
               {university && university.campuses.length > 1 && (
-                <div className="mb-2 flex flex-wrap gap-2">
+                // 간격 압축: mb-2 → mb-1, gap-2 → gap-1 (stacked list items)
+                <div className="mb-1 flex flex-wrap gap-1">
                   {university.campuses.map(c => (
                     <button
                       key={c.name}
@@ -385,7 +398,8 @@ function MyPageContent() {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium">회원 유형</label>
-              <div className="flex flex-wrap gap-2">
+              {/* 간격 압축: gap-2 → gap-1 (stacked list items) */}
+              <div className="flex flex-wrap gap-1">
                 {(Object.entries(MEMBER_TYPE_LABELS) as [MemberType, string][]).map(([value, label]) => (
                   <button
                     key={value}
@@ -434,9 +448,11 @@ function MyPageContent() {
           <SheetHeader className="pb-2">
             <SheetTitle className="text-lg">로그아웃</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4 px-4 pb-6">
+          {/* 간격 압축: space-y-4 → space-y-2, pb-6 → pb-3 */}
+          <div className="space-y-2 px-4 pb-3">
             <p className="text-sm text-muted-foreground">로그아웃 하시겠습니까?</p>
-            <div className="flex gap-3">
+            {/* 간격 압축: gap-3 → gap-1.5 */}
+            <div className="flex gap-1.5">
               <Button variant="outline" className="flex-1" onClick={() => setLogoutOpen(false)}>
                 취소
               </Button>
@@ -454,7 +470,8 @@ function MyPageContent() {
           <SheetHeader className="pb-2">
             <SheetTitle className="text-lg text-destructive">회원탈퇴</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4 px-4 pb-6">
+          {/* 간격 압축: space-y-4 → space-y-2, pb-6 → pb-3 */}
+          <div className="space-y-2 px-4 pb-3">
             <p className="text-sm text-muted-foreground">
               탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.
             </p>
