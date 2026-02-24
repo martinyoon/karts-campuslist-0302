@@ -93,7 +93,8 @@ interface User {
 | `49a856e` | refactor: 7차 UI/UX 개선 — 햄버거 메뉴, 브레드크럼, 대학 전환, 소분류 Badge |
 | `b559e1b` | refactor: 8차 UI/UX 개선 — 글쓰기 카테고리 pre-selection + 브레드크럼 스타일 통일 |
 | `1f4fe28` | refactor: 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화 |
-| (현재) | refactor: 수직 간격 대폭 압축 — 25개 파일 40~60% 수직 공간 축소 + NOTES.md 업데이트 |
+| `848d8ce` | refactor: 수직 간격 대폭 압축 — 25개 파일 40~60% 수직 공간 축소 + NOTES.md 업데이트 |
+| (현재) | feat: 글쓰기 UI 개선 8건 — 문체/샘플 버튼 디자인 + 랜덤 알고리즘 + "다른 사람 글 가져오기" 기능 |
 
 ---
 
@@ -1082,6 +1083,56 @@ handleChangeCategory() // 변경됨: minorId도 초기화
 - `npm run build` 성공 (17개 라우트 전체 컴파일 완료)
 - JSX 주석 배치 오류 4건 수정 (return 루트 sibling, 조건부 표현식 내부)
 
+### 19. 글쓰기 UI 개선 8건 — 문체/샘플 버튼 디자인 + 랜덤 알고리즘 + 다른 사람 글 가져오기 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`, `campulist/src/data/categoryExamples.ts`
+
+#### 1. 문체 선택기 항상 표시
+- 이전: `exSet?.tones` 조건부 렌더링 → 10/46 카테고리에서만 표시
+- 변경: 조건 제거, 모든 카테고리에서 표시 (`applyTone`이 tones 없으면 원본 반환)
+
+#### 2. 시즌 힌트 기능 삭제
+- `getCurrentSeason()`, `SEASON_LABELS`, 시즌 배지 UI 삭제 (write/page.tsx)
+- `seasonalHints` 인터페이스 필드 + 9개 카테고리 데이터 삭제 (categoryExamples.ts)
+
+#### 3. 문체 선택기 스타일 개선 — 오렌지 Badge 스타일
+| 요소 | Before | After |
+|------|--------|-------|
+| 글자 크기 | text-xs | text-sm |
+| 패딩 | px-2 py-0.5 | px-3 py-1 |
+| 색상 | blue 계열 | orange 계열 (소분류 Badge와 통일) |
+| "문체:" 라벨 | text-xs 흐린 회색 | text-lg font-bold text-foreground |
+
+#### 4. 샘플 채우기 버튼 디자인 변경
+- 버튼 이름: `📝 미리 준비된 샘플 글로 일단 채워보기` → `샘플 글로 채워보기 · 누를 때마다 랜덤!`
+- 아이콘 📝 제거, 서브텍스트 버튼 안에 통합
+- 스타일: 오렌지 테두리 (`rounded-full border-2 border-orange-500`)
+- 반응형 글자: `text-[clamp(0.65rem,2.8vw,1rem)]` + `whitespace-nowrap` (1줄 유지)
+
+#### 5. 샘플 채우기 동작 변경 — 항상 모든 필드 교체
+- 이전: 빈 필드만 채움 → "모든 필드가 이미 작성되어 있어요!" 경고
+- 변경: 매번 모든 필드를 새 샘플로 교체 (prefix `[대학][학부생]` 자동 유지)
+- 토스트: "샘플로 채워졌어요!"
+- "이미 작성되어 있어요" 경고 삭제
+
+#### 6. 랜덤 반복 방지 알고리즘
+- `lastExampleIdxRef` (useRef)로 이전 선택 인덱스 기억
+- 같은 인덱스가 나오면 최대 5회 재시도
+- `exExamples.length > 1` 조건으로 샘플 1개 카테고리에서 재시도 건너뜀
+- 반복 확률: 2개 샘플 50%→3.1%, 3개 샘플 33%→0.4%
+
+#### 7. "다른 사람 글 가져와서 고치기" 기능 (신규)
+- 샘플 버튼 아래에 새 버튼 추가
+- 같은 소분류 게시글 조회 (getPosts) → 본인 글 제외, 최대 10개
+- Bottom Sheet에 글 목록 표시 (제목 + 본문 요약 + 작성자 + 가격)
+- 선택 시 `getPostDetail()`로 전체 내용 조회
+- 제목의 다른 사람 prefix → 내 prefix로 교체 (`[서울대][학부생]`)
+- 내용, 가격, 태그, 장소 채움 (이미지는 복사 안 함)
+- 토스트: "가져온 글을 자유롭게 수정하세요!"
+
+#### 8. 기타
+- 서브텍스트 변경: "작성한 내용은 그대로 유지돼요 · 누를 때마다 새로운 샘플!" → "누를 때마다 랜덤으로 새로운 샘플!" → 버튼에 통합
+
 ### Mock Auth PDCA Gap Analysis v2.0 결과 (2026-02-24 확인)
 
 **Overall Match Rate: 99%**
@@ -1162,6 +1213,12 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - `navigator.share()` — iOS/Android 네이티브 공유 시트, 미지원 브라우저는 클립보드 폴백
 - CamTalk 게시글 제목 파싱 — 첫 메시지 `[제목]\n/post/id` 형식에서 정규식 추출
 - 커스텀 픽셀 글자크기 전량 제거 완료 — `text-[Npx]` 패턴이 앱에 0개 (grep 확인)
+- `seasonalHints` 기능 완전 삭제됨 — 인터페이스, 데이터, UI 코드 모두 제거
+- 문체 선택기는 tones 데이터 유무와 관계없이 항상 표시 — `applyTone()`이 tones 없으면 원본 반환
+- `lastExampleIdxRef` — 랜덤 샘플 반복 방지용 useRef, 최대 5회 재시도로 무한루프 방지
+- `fillSmartExamples` — 빈칸 체크 없이 항상 모든 필드 교체, prefix는 `fillTemplate()`이 자동 포함
+- `fetchOtherPosts` — 같은 소분류 게시글 조회, 본인 글 제외, 최대 10개
+- `fillFromOtherPost` — 다른 사람 글 prefix를 내 prefix로 교체 후 필드 채움 (이미지 제외)
 - Toast `variant` — `toast('메시지')` 기존 호출 하위 호환, `toast('성공!', 'success')` 가능
 - Header 활성 상태 표준: 탭형 `border-b-2 + font-medium`, 메뉴형 `font-semibold`
 - 대학 페이지 브레드크럼 — 배너와 CategoryGrid 사이에 위치

@@ -11,7 +11,8 @@ import { STORAGE_KEYS } from '@/lib/constants';
 import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
-import { createPost, getPostForEdit, updatePost, deletePost } from '@/lib/api';
+import { createPost, getPostForEdit, updatePost, deletePost, getPosts, getPostDetail } from '@/lib/api';
+import type { PostListItem } from '@/lib/types';
 import { getPostImages } from '@/data/posts';
 import { LIMITS } from '@/lib/constants';
 import type { PostStatus, MemberType } from '@/lib/types';
@@ -63,25 +64,6 @@ function fillTemplate(template: string, user: User, targetUniversityId: number):
     .replace(/\{\{memberType\}\}/g, typeLabel);
 }
 
-// ── 시즌 감지 ──
-function getCurrentSeason(): string {
-  const m = new Date().getMonth() + 1;
-  if (m >= 2 && m <= 3) return '2-3';
-  if (m === 4 || m === 10) return '4,10';
-  if (m === 5 || m === 9) return '5,9';
-  if (m >= 6 && m <= 7) return '6-7';
-  if (m >= 11 && m <= 12) return '11-12';
-  return '12-1';
-}
-
-const SEASON_LABELS: Record<string, string> = {
-  '2-3': '🌸 신학기 맞춤',
-  '4,10': '📝 시험 시즌',
-  '5,9': '🎉 축제 시즌',
-  '6-7': '☀️ 여름방학',
-  '11-12': '❄️ 겨울방학',
-  '12-1': '❄️ 겨울방학',
-};
 
 const TONE_OPTIONS: { value: ToneType; label: string; icon: string }[] = [
   { value: 'clean', label: '깔끔', icon: '📋' },
@@ -128,12 +110,12 @@ function WritePageContent() {
   const [showPreview, setShowPreview] = useState(false);
   const [showLocked, setShowLocked] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'title' | 'price' | 'body' | 'delete' | null>(null);
+  const [showOtherPosts, setShowOtherPosts] = useState(false);
+  const [otherPosts, setOtherPosts] = useState<PostListItem[]>([]);
+  const [loadingOthers, setLoadingOthers] = useState(false);
   // 확장 예시 세트
   const exSet = minorId ? categoryExampleSets[minorId] : null;
   const exExamples = exSet?.examples ?? (minorId && categoryExamples[minorId] ? [categoryExamples[minorId]] : []);
-  const season = getCurrentSeason();
-  const seasonHint = exSet?.seasonalHints?.[season];
-  const seasonLabel = SEASON_LABELS[season];
 
   // 현재 선택된 대학/카테고리 정보
   const selectedUni = universities.find(u => u.id === universityId);
@@ -501,50 +483,34 @@ function WritePageContent() {
     setConfirmAction(null);
   };
 
-  // 스마트 빈칸 채우기: 비어있는 필드만 채움
+  // 샘플 채우기: 매번 모든 필드를 새 샘플로 교체 (prefix 자동 유지)
   const fillSmartExamples = (idx: number) => {
     if (!user || exExamples.length === 0) return;
     const raw = exExamples[idx % exExamples.length];
     const ex = applyTone(raw, selectedTone);
-    const filled: string[] = [];
 
-    const uniShort = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '';
-    const prefixOnly = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}] `;
-
-    if (!title.trim() || title.trim() === prefixOnly.trim()) {
-      setTitle(fillTemplate(ex.title, user, universityId));
-      filled.push('제목');
-    }
-    if (!price && raw.price) {
+    setTitle(fillTemplate(ex.title, user, universityId));
+    if (raw.price) {
       setPrice(raw.price);
       setPriceNegotiable(raw.negotiable);
-      filled.push('가격');
     }
-    if (!body.trim()) {
-      setBody(fillTemplate(ex.body, user, universityId));
-      filled.push('내용');
-    }
-    if (tags.length === 0 && raw.tags.length > 0) {
+    setBody(fillTemplate(ex.body, user, universityId));
+    if (raw.tags.length > 0) {
       setTags(raw.tags.slice(0, 5).map(t => fillTemplate(t, user, universityId)));
-      filled.push('태그');
     }
-    if (!location.trim() && raw.location) {
+    if (raw.location) {
       setLocation(fillTemplate(raw.location, user, universityId));
-      filled.push('장소');
     }
 
-    if (filled.length > 0) {
-      toast(`${filled.length}개 항목 자동완성: ${filled.join(', ')}`);
-      setHighlightedFields(filled);
-      setTimeout(() => setHighlightedFields([]), 1500);
-    } else {
-      toast('모든 필드가 이미 작성되어 있어요!');
-    }
+    toast('샘플로 채워졌어요!');
+    setHighlightedFields(['제목', '가격', '내용', '태그', '장소']);
+    setTimeout(() => setHighlightedFields([]), 1500);
   };
 
   // 랜덤 예시 뽑기 (슬롯머신 애니메이션)
   const spinnerRef = useRef<HTMLSpanElement>(null);
   const spinIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastExampleIdxRef = useRef<number>(-1);
 
   // 컴포넌트 언마운트 시 interval 정리
   useEffect(() => {
@@ -568,11 +534,62 @@ function WritePageContent() {
       if (count > 10) {
         if (spinIntervalRef.current) clearInterval(spinIntervalRef.current);
         spinIntervalRef.current = null;
-        const finalIdx = Math.floor(Math.random() * exExamples.length);
+        let finalIdx = Math.floor(Math.random() * exExamples.length);
+        for (let i = 0; i < 5 && finalIdx === lastExampleIdxRef.current && exExamples.length > 1; i++) {
+          finalIdx = Math.floor(Math.random() * exExamples.length);
+        }
+        lastExampleIdxRef.current = finalIdx;
         fillSmartExamples(finalIdx);
         setIsSpinning(false);
       }
     }, 80);
+  };
+
+  // 다른 사람들 글 가져오기: 같은 소분류 게시글 조회
+  const fetchOtherPosts = async () => {
+    if (!minorId || !user) return;
+    setLoadingOthers(true);
+    const minor = categories.find(c => c.id === minorId);
+    if (!minor) { setLoadingOthers(false); return; }
+
+    const posts = await getPosts({
+      categoryMinorSlug: minor.slug,
+      sortBy: 'latest',
+      limit: 20,
+    });
+    const filtered = posts.filter(p => p.author.id !== user.id).slice(0, 10);
+    setOtherPosts(filtered);
+    setLoadingOthers(false);
+    setShowOtherPosts(true);
+  };
+
+  // 선택한 글로 필드 채우기 (prefix 유지)
+  const fillFromOtherPost = async (postId: string) => {
+    const detail = await getPostDetail(postId);
+    if (!detail || !user) return;
+
+    const uniShort = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '';
+    const typeLabel = MEMBER_TYPE_SHORT[user.memberType] || '';
+    const prefix = `[${uniShort}][${typeLabel}] `;
+    const rawTitle = detail.title.replace(/^\[.*?\]\[.*?\]\s*/, '');
+    setTitle(prefix + rawTitle);
+
+    setBody(detail.body);
+    if (detail.price !== null) {
+      setPrice(String(detail.price));
+      setPriceNegotiable(detail.priceNegotiable);
+    }
+    if (detail.tags.length > 0) {
+      setTags(detail.tags.slice(0, 5));
+    }
+    if (detail.locationDetail) {
+      setLocation(detail.locationDetail);
+    }
+
+    setShowOtherPosts(false);
+    toast('가져온 글을 자유롭게 수정하세요!');
+    setHighlightedFields(['제목', '가격', '내용', '태그', '장소']);
+    setTimeout(() => setHighlightedFields([]), 1500);
   };
 
   const validate = (): Record<string, string> => {
@@ -783,34 +800,25 @@ function WritePageContent() {
                 {/* 섹션 안내 */}
                 <p className="text-sm font-medium text-foreground">글 제목·내용을 어떻게 채울지 막막하다면?</p>
 
-                {/* 시즌 배지 */}
-                {seasonHint && seasonLabel && (
-                  <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
-                    <span>{seasonLabel}</span>
-                    {seasonHint.bodyHint && <span className="text-muted-foreground">· {seasonHint.bodyHint}</span>}
-                  </div>
-                )}
 
-                {/* 문체 선택기 */}
-                {exSet?.tones && Object.keys(exSet.tones).length > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground">문체:</span>
-                    {TONE_OPTIONS.map(opt => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setSelectedTone(opt.value)}
-                        className={`rounded-full border px-2 py-0.5 text-xs transition-colors ${
-                          selectedTone === opt.value
-                            ? 'border-blue-500 bg-blue-500/10 font-medium text-blue-600'
-                            : 'border-border text-muted-foreground hover:border-blue-500/50'
-                        }`}
-                      >
-                        {opt.icon} {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {/* 문체 선택기 — 소분류 Badge 스타일 (오렌지 톤) */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg font-bold text-foreground">문체:</span>
+                  {TONE_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setSelectedTone(opt.value)}
+                      className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                        selectedTone === opt.value
+                          ? 'border-2 border-orange-500 font-bold text-orange-600 dark:text-orange-300'
+                          : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'
+                      }`}
+                    >
+                      {opt.icon} {opt.label}
+                    </button>
+                  ))}
+                </div>
 
                 {/* 예시로 채우기 버튼 */}
                 {/* 간격 압축: py-2.5 → py-1.5 */}
@@ -818,7 +826,7 @@ function WritePageContent() {
                   type="button"
                   onClick={fillRandomExample}
                   disabled={isSpinning}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-blue-500/30 bg-background py-1.5 text-sm font-medium text-blue-500 transition-colors hover:bg-blue-500/10 disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
                 >
                   {isSpinning ? (
                     <>
@@ -826,14 +834,19 @@ function WritePageContent() {
                       <span ref={spinnerRef} className="truncate max-w-[200px]">샘플 고르는 중...</span>
                     </>
                   ) : (
-                    '📝 미리 준비된 샘플 글로 일단 채워보기'
+                    '샘플 글로 채워보기 · 누를 때마다 랜덤!'
                   )}
                 </button>
 
-                {/* 서브텍스트 */}
-                <p className="text-center text-xs text-muted-foreground">
-                  작성한 내용은 그대로 유지돼요{exExamples.length > 1 && ' · 누를 때마다 새로운 샘플!'}
-                </p>
+                {/* 다른 사람들 글 가져오기 버튼 */}
+                <button
+                  type="button"
+                  onClick={fetchOtherPosts}
+                  disabled={loadingOthers}
+                  className="flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
+                >
+                  {loadingOthers ? '불러오는 중...' : '다른 사람 글 가져와서 고치기'}
+                </button>
               </div>
             )}
 
@@ -1174,6 +1187,38 @@ function WritePageContent() {
             >
               👀 미리보기
             </button>
+
+            {/* 다른 사람들 글 가져오기 Sheet */}
+            <Sheet open={showOtherPosts} onOpenChange={setShowOtherPosts}>
+              <SheetContent side="bottom" className="max-h-[60vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+                <SheetHeader className="pb-1">
+                  <SheetTitle className="text-sm font-normal text-muted-foreground">같은 카테고리의 다른 글</SheetTitle>
+                </SheetHeader>
+                <div className="space-y-1.5 px-4 pb-3">
+                  {otherPosts.length === 0 ? (
+                    <p className="py-6 text-center text-sm text-muted-foreground">
+                      같은 카테고리에 다른 글이 없어요
+                    </p>
+                  ) : (
+                    otherPosts.map(post => (
+                      <button
+                        key={post.id}
+                        type="button"
+                        onClick={() => fillFromOtherPost(post.id)}
+                        className="w-full rounded-lg border p-2.5 text-left transition-colors hover:bg-muted"
+                      >
+                        <p className="truncate text-sm font-medium">{post.title}</p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{post.bodySnippet}</p>
+                        <div className="mt-1 flex gap-2 text-xs text-muted-foreground">
+                          <span>{post.author.nickname}</span>
+                          {post.price !== null && <span>{post.price.toLocaleString()}원</span>}
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
 
             {/* 미리보기 Sheet */}
             <Sheet open={showPreview} onOpenChange={setShowPreview}>

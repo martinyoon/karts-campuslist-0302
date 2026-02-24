@@ -30,7 +30,6 @@ export interface CategoryExampleSet {
   examples: CategoryExample[];
   tones?: Partial<Record<ToneType, ToneVariant>>;
   popularTags: string[];
-  seasonalHints?: Record<string, { titleSuffix?: string; bodyHint?: string }>;
 }
 
 // ── 기존 단일 예시 (하위 호환) ──
@@ -889,7 +888,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
       humor: { title: '이 교재와 나의 인연은 여기까지... {{department}} 전공책', body: '한 학기 동안 동고동락한 전공서적,\n새 주인을 찾습니다... (눈물)\n\n📖 과목: (과목명)\n💔 이별 사유: 학기 종료\n✨ 상태: 제가 아꼈습니다 (정말로)\n\n좋은 분에게 보내고 싶어요 🥹' },
     },
     popularTags: ['교재', '전공서적', '반값', '깨끗', '직거래', '새책급', '밑줄없음', '세트'],
-    seasonalHints: { '2-3': { titleSuffix: '(새학기 교재)', bodyHint: '새학기 시작 전 미리 구매하세요!' }, '6-7': { titleSuffix: '(학기말 정리)', bodyHint: '학기 끝나고 정리합니다.' } },
   },
 
   12: {
@@ -926,7 +924,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
       humor: { title: '이 가구들의 새로운 집을 찾습니다 (자취방 정리)', body: '주인이 이사를 간다고 합니다...\n이 착한 가구들을 거둬주실 분 없나요?\n\n🪑 책상: 조용하고 순한 아이입니다\n💺 의자: 등받이가 편안합니다\n📅 함께한 시간: 약 1년\n\n입양(구매) 문의 환영합니다 🏠' },
     },
     popularTags: ['가구', '자취', '이케아', '책상', '의자', '침대', '살림', '정리'],
-    seasonalHints: { '6-7': { titleSuffix: '(방학 정리)', bodyHint: '방학 전 정리 중입니다.' }, '2-3': { titleSuffix: '(새학기 자취 준비)', bodyHint: '새학기 자취 시작하시는 분께 추천!' } },
   },
 
   14: {
@@ -1033,7 +1030,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
       urgent: { title: '[급양도] {{university}} 원룸 보증금 협의 가능!', body: '🔥 이사 일정 때문에 급양도합니다!\n\n■ {{university}} 후문 도보 5분\n■ 보증금/월세 협의 가능\n■ 즉시 입주 가능\n\n⏰ 빨리 연락주시면 조건 맞춰드립니다!' },
     },
     popularTags: ['원룸', '양도', '자취방', '풀옵션', '직거래', '월세', '보증금', '신축'],
-    seasonalHints: { '6-7': { titleSuffix: '(방학 양도)', bodyHint: '방학 기간 양도합니다.' }, '2-3': { titleSuffix: '(새학기 입주 가능)', bodyHint: '새학기 시작 전 입주 가능합니다.' } },
   },
 
   22: {
@@ -1071,7 +1067,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
         tags: ['단기임대', '여름방학', '2개월'], location: '{{university}} 정문 근처' },
     ],
     popularTags: ['단기임대', '방학', '인턴', '연구', '월세', '풀옵션', '즉시입주', '자취방'],
-    seasonalHints: { '6-7': { titleSuffix: '(여름방학)', bodyHint: '여름방학 기간 임대합니다.' }, '12-1': { titleSuffix: '(겨울방학)', bodyHint: '겨울방학 기간 임대합니다.' } },
   },
 
   25: {
@@ -1097,7 +1092,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
         tags: ['학원', '조교', '아르바이트'], location: '{{university}} 근처' },
     ],
     popularTags: ['아르바이트', '알바', '카페', '편의점', '주말', '단기', '시급', '학생'],
-    seasonalHints: { '6-7': { bodyHint: '방학 기간 알바 모집합니다.' }, '12-1': { bodyHint: '겨울방학 단기 알바 모집합니다.' } },
   },
 
   32: {
@@ -1158,7 +1152,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
         tags: ['축제', '스태프', '단기알바'], location: '{{university}} 축제 부스' },
     ],
     popularTags: ['구인', '모집', '스태프', '단기', '이벤트', '축제', '주말', '학생'],
-    seasonalHints: { '5,9': { bodyHint: '축제 시즌 스태프를 모집합니다.' } },
   },
 
   36: {
@@ -1184,7 +1177,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
         tags: ['코딩테스트', '스터디', '알고리즘'], location: '{{university}} 스터디카페' },
     ],
     popularTags: ['스터디', '팀원모집', 'TOEIC', '코딩', '자격증', '시험', '함께', '모집중'],
-    seasonalHints: { '2-3': { bodyHint: '새학기 스터디를 시작합니다!' }, '4,10': { bodyHint: '시험 대비 스터디입니다.' } },
   },
 
   42: {
@@ -1195,7 +1187,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
         tags: ['밴드', '동아리', '음악'], location: '{{university}} 동아리방' },
     ],
     popularTags: ['동아리', '모집', '밴드', '운동', '봉사', '학술', '여행', '신입부원'],
-    seasonalHints: { '2-3': { titleSuffix: '(신학기 모집)', bodyHint: '새학기 신입부원을 모집합니다!' } },
   },
 
   43: {
@@ -1258,7 +1249,6 @@ export const categoryExampleSets: Record<number, CategoryExampleSet> = {
         tags: ['이사', '운송', '트럭'], location: '{{university}} 근처' },
     ],
     popularTags: ['이사', '운송', '도움', '트럭', '자취', '소형이사', '원룸', '당일'],
-    seasonalHints: { '2-3': { bodyHint: '새학기 이사 도와드립니다!' }, '6-7': { bodyHint: '방학 이사 예약 받습니다.' } },
   },
 
   52: {
