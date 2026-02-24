@@ -1250,7 +1250,11 @@ function WritePageContent() {
                 <SheetHeader className="pb-0.5">
                   <SheetTitle className="rounded-lg border-4 border-white px-3 py-1.5 text-center text-xl font-bold text-white">미리보기 화면입니다 — 하단의 버튼을 눌러, 수정 또는 최종 등록 해주세요</SheetTitle>
                 </SheetHeader>
-                <div className="space-y-1 overflow-y-auto px-4 pb-2" style={{ maxHeight: 'calc(85vh - 100px)' }}>
+                {/* 게시 위치 브레드크럼 */}
+                <p className="mx-4 rounded-lg border-4 border-white px-3 py-1.5 text-center text-xl font-bold text-white">
+                  글쓰기 위치 : {selectedUni?.name || '대학'} <span className="text-white/60">›</span> {selectedMajor ? <><span className="cat-icon">{selectedMajor.icon} </span>{selectedMajor.name}</> : '대분류'}{selectedMinor && <> <span className="text-white/60">›</span> {selectedMinor.name}</>}
+                </p>
+                <div className="space-y-1 overflow-y-auto px-4 pb-2" style={{ maxHeight: 'calc(85vh - 120px)' }}>
                   {/* 이미지 미리보기 */}
                   {images.length > 0 && (
                     <div className="flex gap-1 overflow-x-auto scrollbar-hide">

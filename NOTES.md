@@ -1309,6 +1309,15 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 #### 4. 미리보기 본문 글자 색상
 - `text-base text-amber-600 dark:text-amber-400` (노랑 계열, 전체 표시)
 
+### 30. 미리보기 브레드크럼 접두어 추가 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+- 미리보기 Sheet 브레드크럼에 "글쓰기 위치 : " 접두어 추가
+- Before: `서울대학교 › 주거 › 룸메이트`
+- After: `글쓰기 위치 : 서울대학교 › 주거 › 룸메이트`
+- 사용자가 게시 위치를 즉시 파악할 수 있도록 안내 문구 명시
+
 ### Mock Auth PDCA Gap Analysis v4.0 결과 (2026-02-24)
 
 **Overall Match Rate: 99%** (4회 연속 동일)
@@ -1413,5 +1422,6 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - 글쓰기 카테고리 뷰 pre-selection: `id={major-group-N}` + `ring-2 ring-orange-300 bg-orange-50` + "선택됨" 라벨
 - CategorySummary 브레드크럼: 일반 페이지와 완전 동일 스타일 (text-base, text-orange-400, 풀네임, "모든 대학" 포함)
 - 등록 흐름 패턴: 등록 버튼 → `handlePreviewBeforeSubmit`(validate) → 미리보기 Sheet → "최종 등록!" → `handleSubmit`(실제 등록)
-- 미리보기 Sheet 하단 패턴: 2버튼 ("수정할래요" + "최종 등록!") + 바깥 터치/스와이프 유지
+- 미리보기 Sheet 하단 패턴: 2버튼 ("수정" + "최종 등록!") + 바깥 터치/스와이프 유지
 - 미리보기 본문: `text-base text-amber-600 dark:text-amber-400` — 노랑 계열로 눈에 띄게, 전체 표시 (line-clamp 없음)
+- 미리보기 브레드크럼 접두어: `글쓰기 위치 : {대학} › {대분류} › {소분류}` — 게시 위치 즉시 파악용
