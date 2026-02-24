@@ -353,6 +353,17 @@ function WritePageContent() {
     document.title = isEditMode ? '글 수정 | 캠퍼스리스트' : '글쓰기 | 캠퍼스리스트';
   }, [isEditMode]);
 
+  // pre-selected 대분류 자동 스크롤
+  useEffect(() => {
+    if (majorId && step !== 'form') {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`major-group-${majorId}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [step, majorId]);
+
   // 자동 임시저장 (1초 디바운스, 수정 모드에서는 비활성)
   const saveDraft = useCallback(() => {
     if (isEditMode) return;
@@ -672,10 +683,11 @@ function WritePageContent() {
                 <p className="mb-2 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
                 <div className="columns-2 gap-4">
                   {allGroups.map(({ major, minors }) => (
-                    <div key={major.id} className="mb-3 break-inside-avoid">
+                    <div key={major.id} id={`major-group-${major.id}`} className={`mb-3 break-inside-avoid ${majorId === major.id ? 'rounded-lg bg-orange-50 ring-2 ring-orange-300 p-2 dark:bg-orange-950/30 dark:ring-orange-700' : ''}`}>
                       <div className="flex items-center gap-1.5 py-1.5">
                         <span className="cat-icon text-lg">{major.icon}</span>
-                        <span className="text-lg font-bold">{major.name}</span>
+                        <span className={`text-lg font-bold ${majorId === major.id ? 'text-orange-500' : ''}`}>{major.name}</span>
+                        {majorId === major.id && <span className="ml-auto text-xs font-medium text-orange-500">선택됨</span>}
                       </div>
                       <div className="flex flex-wrap gap-1 pb-1">
                         {minors.map(minor => (
@@ -716,10 +728,11 @@ function WritePageContent() {
               {/* open 카테고리 목록 */}
               <div className="columns-2 gap-4">
                 {openGroups.map(({ major, minors }) => (
-                  <div key={major.id} className="mb-3 break-inside-avoid">
+                  <div key={major.id} id={`major-group-${major.id}`} className={`mb-3 break-inside-avoid ${majorId === major.id ? 'rounded-lg bg-orange-50 ring-2 ring-orange-300 p-2 dark:bg-orange-950/30 dark:ring-orange-700' : ''}`}>
                     <div className="flex items-center gap-1.5 py-1.5">
                       <span className="cat-icon text-lg">{major.icon}</span>
-                      <span className="text-lg font-bold">{major.name}</span>
+                      <span className={`text-lg font-bold ${majorId === major.id ? 'text-orange-500' : ''}`}>{major.name}</span>
+                      {majorId === major.id && <span className="ml-auto text-xs font-medium text-orange-500">선택됨</span>}
                     </div>
                     <div className="flex flex-wrap gap-1 pb-1">
                       {minors.map(minor => (

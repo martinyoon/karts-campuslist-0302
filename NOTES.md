@@ -90,7 +90,8 @@ interface User {
 | `ca2ae6b` | refactor: 5차 UI/UX 종합 개선 — 사이드바 색상 통일, 접근성, 조회수, hover |
 | `98ccd5c` | refactor: 6차 UI 통일성 개선 — 검색 아이콘, 로고 반응, 카테고리 레이아웃, 브레드크럼 |
 | `29f51cc` | feat: 카테고리 페이지에 CategoryGrid 유지 — 대분류 네비게이션 일관성 |
-| (현재) | refactor: 7차 UI/UX 개선 — 햄버거 메뉴, 브레드크럼, 대학 전환, 소분류 Badge |
+| `49a856e` | refactor: 7차 UI/UX 개선 — 햄버거 메뉴, 브레드크럼, 대학 전환, 소분류 Badge |
+| (현재) | refactor: 8차 UI/UX 개선 — 글쓰기 카테고리 pre-selection + 브레드크럼 스타일 통일 |
 
 ---
 
@@ -737,6 +738,10 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
        5. 브레드크럼 크기+색상 개선 (text-base, 전체 오렌지 톤, 현재 페이지 font-semibold)
        6. 대학 전환 시 카테고리 컨텍스트 유지 (UniversityTabs + Header sidebar)
        7. 소분류 Badge 가시성 개선 (text-sm, 두꺼운 테두리+굵은 글씨 활성, 오렌지 톤)
+[완료] 8차 UI/UX 개선 — 글쓰기 카테고리 pre-selection + 브레드크럼 스타일 통일
+       1. 글쓰기 카테고리 뷰에서 pre-selected 대분류 시각적 강조 (오렌지 ring + 배경 + "선택됨")
+       2. pre-selected 대분류 자동 스크롤 (useEffect + scrollIntoView)
+       3. CategorySummary 브레드크럼 스타일 통일 (blue→orange, text-lg→text-base, 풀네임)
 ```
 
 ### 15. 7차 UI/UX 개선 — 햄버거 메뉴 + 브레드크럼 + 대학 전환 + 소분류 Badge (8개 파일 수정)
@@ -815,6 +820,71 @@ const currentCatSlug = pathParts[1] && majorCategories.some(c => c.slug === path
 - 비활성: `border-orange-400 text-orange-600 dark:text-orange-300`
 - 정렬 옵션(최신순 등)은 기존 블루 스타일 유지
 
+### 16. 8차 UI/UX 개선 — 글쓰기 카테고리 pre-selection + 브레드크럼 스타일 통일 (2개 파일 수정)
+
+#### 수정 파일 목록 (2개)
+
+| # | 수정 내용 | 파일 | 유형 |
+|---|----------|------|------|
+| 1 | **카테고리 뷰 pre-selected 대분류 강조** | `app/write/page.tsx` | UX |
+| 2 | **pre-selected 대분류 자동 스크롤** | `app/write/page.tsx` | UX |
+| 3 | **CategorySummary 브레드크럼 스타일 통일** | `components/write/CategorySummary.tsx` | 디자인 통일 |
+
+#### 1. 글쓰기 카테고리 뷰 — pre-selected 대분류 시각적 강조
+
+**파일**: `app/write/page.tsx`
+
+브레드크럼 "모든 대학 › 한예종 › 주거"에서 글쓰기 클릭 시, `getWriteUrl()`이 `/write?uni=karts&major=housing`을 생성하고 글쓰기 페이지에서 대학교+대분류를 자동 설정하는 기능은 이미 구현되어 있었으나, 카테고리 선택 뷰에서 pre-selected 대분류가 **시각적으로 구분되지 않는** 문제.
+
+**해결**: 캠퍼스 회원 뷰 + 비캠퍼스 회원 뷰 양쪽에 동일 적용
+
+```tsx
+<div
+  id={`major-group-${major.id}`}
+  className={`mb-3 break-inside-avoid ${
+    majorId === major.id
+      ? 'rounded-lg bg-orange-50 ring-2 ring-orange-300 p-2 dark:bg-orange-950/30 dark:ring-orange-700'
+      : ''
+  }`}
+>
+  <span className={`text-lg font-bold ${majorId === major.id ? 'text-orange-500' : ''}`}>
+    {major.name}
+  </span>
+  {majorId === major.id && <span className="ml-auto text-xs font-medium text-orange-500">선택됨</span>}
+```
+
+#### 2. pre-selected 대분류 자동 스크롤
+
+```tsx
+useEffect(() => {
+  if (majorId && step !== 'form') {
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`major-group-${majorId}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+    return () => clearTimeout(timer);
+  }
+}, [step, majorId]);
+```
+
+#### 3. CategorySummary 브레드크럼 스타일 통일
+
+**파일**: `components/write/CategorySummary.tsx`
+
+글쓰기 폼 상단의 카테고리 요약 브레드크럼이 일반 페이지와 불일치.
+
+| 항목 | Before (블루) | After (오렌지 통일) |
+|------|-------------|-------------------|
+| 글자 크기 | `text-lg` | `text-base` |
+| 글자 색상 | `text-blue-600 dark:text-blue-400` | `text-orange-400` |
+| 구분자 | `text-blue-400/50` | `text-orange-300` |
+| 배경 | `bg-blue-500/10 rounded-lg` | 없음 |
+| 대학명 | 축약형 ("고려대") | 풀네임 ("고려대학교") |
+| "모든 대학" | 없음 | 추가 |
+| 마지막 항목 | `font-bold` | `font-semibold` |
+| 변경 버튼 | `text-blue-500` | `text-orange-400 hover:text-orange-300` |
+| aria-label | 없음 | `브레드크럼` 추가 |
+
 ---
 
 ## 다음 할 일 (TODO)
@@ -892,3 +962,6 @@ const currentCatSlug = pathParts[1] && majorCategories.some(c => c.slug === path
 - 대학 전환 카테고리 유지: UniversityTabs + Header sidebar에서 pathname의 카테고리 slug 추출하여 링크에 반영
 - 소분류 Badge: `text-sm px-3 py-1`, 활성=`border-2 border-orange-500 font-bold`, 비활성=`border-orange-400 text-orange-600`
 - 정렬 Badge: 기존 블루 스타일 유지 (`bg-blue-600 text-white` 활성, `outline hover:bg-muted` 비활성)
+- `getWriteUrl()` — pathname에서 uni/major/minor 추출하여 `/write?uni=&major=&minor=` 생성 (Header에서 사용)
+- 글쓰기 카테고리 뷰 pre-selection: `id={major-group-N}` + `ring-2 ring-orange-300 bg-orange-50` + "선택됨" 라벨
+- CategorySummary 브레드크럼: 일반 페이지와 완전 동일 스타일 (text-base, text-orange-400, 풀네임, "모든 대학" 포함)
