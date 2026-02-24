@@ -75,22 +75,22 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
       {/* 브레드크럼 */}
       <div className="border-b border-border px-4 py-2">
-        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground hover:underline">모든 대학</Link>
-          <span>›</span>
-          <Link href={`/${uniSlug}`} className="hover:text-foreground hover:underline">{university.name}</Link>
-          <span>›</span>
+        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
+          <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
+          <span className="text-orange-300">›</span>
+          <Link href={`/${uniSlug}`} className="text-orange-400 hover:text-orange-300 hover:underline">{university.name}</Link>
+          <span className="text-orange-300">›</span>
           {activeMinor ? (
-            <Link href={buildUrl({ minor: '' })} className="hover:text-foreground hover:underline">
+            <Link href={buildUrl({ minor: '' })} className="text-orange-400 hover:text-orange-300 hover:underline">
               <span className="cat-icon">{category.icon} </span>{category.name}
             </Link>
           ) : (
-            <span className="font-medium text-foreground"><span className="cat-icon">{category.icon} </span>{category.name}</span>
+            <span className="font-semibold text-orange-400"><span className="cat-icon">{category.icon} </span>{category.name}</span>
           )}
           {activeMinor && (
             <>
-              <span>›</span>
-              <span className="font-medium text-foreground">{activeMinor.name}</span>
+              <span className="text-orange-300">›</span>
+              <span className="font-semibold text-orange-400">{activeMinor.name}</span>
             </>
           )}
         </nav>
@@ -103,8 +103,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">
         <Link href={buildUrl({ minor: '' })}>
           <Badge
-            variant={!minorSlug ? 'default' : 'outline'}
-            className={`shrink-0 cursor-pointer ${!minorSlug ? 'bg-blue-600 text-white' : 'hover:bg-muted'}`}
+            variant="outline"
+            className={`shrink-0 cursor-pointer text-sm px-3 py-1 ${!minorSlug ? 'border-2 border-orange-500 text-orange-600 font-bold dark:text-orange-300' : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'}`}
           >
             전체보기
           </Badge>
@@ -112,8 +112,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         {minors.map(minor => (
           <Link key={minor.slug} href={buildUrl({ minor: minor.slug })}>
             <Badge
-              variant={minorSlug === minor.slug ? 'default' : 'outline'}
-              className={`shrink-0 cursor-pointer ${minorSlug === minor.slug ? 'bg-blue-600 text-white' : 'hover:bg-muted'}`}
+              variant="outline"
+              className={`shrink-0 cursor-pointer text-sm px-3 py-1 ${minorSlug === minor.slug ? 'border-2 border-orange-500 text-orange-600 font-bold dark:text-orange-300' : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'}`}
             >
               <span className="cat-icon">{minor.icon} </span>{minor.name}
             </Badge>

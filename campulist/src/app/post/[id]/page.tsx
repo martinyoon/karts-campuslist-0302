@@ -79,16 +79,16 @@ export default async function PostDetailPage({ params }: Props) {
 
       {/* 게시글 내용 */}
       <div className="px-4 py-4">
-        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground hover:underline">모든 대학</Link>
-          <span>›</span>
-          <Link href={`/${post.university.slug}`} className="hover:text-foreground hover:underline">{post.university.name}</Link>
-          <span>›</span>
-          <Link href={`/${post.university.slug}/${post.categoryMajor.slug}`} className="hover:text-foreground hover:underline">
+        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
+          <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
+          <span className="text-orange-300">›</span>
+          <Link href={`/${post.university.slug}`} className="text-orange-400 hover:text-orange-300 hover:underline">{post.university.name}</Link>
+          <span className="text-orange-300">›</span>
+          <Link href={`/${post.university.slug}/${post.categoryMajor.slug}`} className="text-orange-400 hover:text-orange-300 hover:underline">
             <span className="cat-icon">{post.categoryMajor.icon} </span>{post.categoryMajor.name}
           </Link>
-          <span>›</span>
-          <span className="font-medium text-foreground">{post.categoryMinor.name}</span>
+          <span className="text-orange-300">›</span>
+          <span className="font-semibold text-orange-400">{post.categoryMinor.name}</span>
         </nav>
 
         <div className="mt-2 flex items-center gap-2">

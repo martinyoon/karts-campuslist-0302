@@ -86,7 +86,11 @@ interface User {
 | `793cdae` | refactor: 디자인 통일성 개선 9건 (타이포/활성상태/Toast/Sheet 등) |
 | `597dc4e` | fix: Header 데스크톱 카테고리 네비 제거 (CategoryGrid와 중복 해소) |
 | `8052896` | refactor: 3차 UI/UX 종합 검토 8건 (버그 수정, Sheet 전환, 접근성) |
-| (현재) | refactor: 4차 UI 통일성 개선 — 아이콘 라벨, 활성 색상, 네비 일관성 |
+| `016fda0` | refactor: 4차 UI 통일성 개선 — 아이콘 라벨, 활성 색상, 네비 일관성 |
+| `ca2ae6b` | refactor: 5차 UI/UX 종합 개선 — 사이드바 색상 통일, 접근성, 조회수, hover |
+| `98ccd5c` | refactor: 6차 UI 통일성 개선 — 검색 아이콘, 로고 반응, 카테고리 레이아웃, 브레드크럼 |
+| `29f51cc` | feat: 카테고리 페이지에 CategoryGrid 유지 — 대분류 네비게이션 일관성 |
+| (현재) | refactor: 7차 UI/UX 개선 — 햄버거 메뉴, 브레드크럼, 대학 전환, 소분류 Badge |
 
 ---
 
@@ -725,7 +729,91 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
        2. 활성 스타일: border-blue-500 bg-blue-500/10 + text-blue-500
        3. all/[category] 페이지에 CategoryGrid 추가 (브레드크럼↔소분류 사이)
        4. [university]/[category] 페이지에 CategoryGrid 추가 (universitySlug 전달)
+[완료] 7차 UI/UX 개선 — 햄버거 메뉴, 브레드크럼, 대학 전환, 소분류 Badge
+       1. 햄버거 메뉴 항상 표시 (md:hidden 제거) + "메뉴" 라벨 + 아이콘 28x28 확대
+       2. 햄버거 클릭 오렌지 피드백 (menuHighlight 분리 상태 + 30ms 딜레이)
+       3. 로고 서브타이틀 변경 → "Campu(s)+LIST+.COM=CAMPuLIST.COM"
+       4. Sheet 닫기 버튼 확대 (size-4→size-6, p-1, rounded-md)
+       5. 브레드크럼 크기+색상 개선 (text-base, 전체 오렌지 톤, 현재 페이지 font-semibold)
+       6. 대학 전환 시 카테고리 컨텍스트 유지 (UniversityTabs + Header sidebar)
+       7. 소분류 Badge 가시성 개선 (text-sm, 두꺼운 테두리+굵은 글씨 활성, 오렌지 톤)
 ```
+
+### 15. 7차 UI/UX 개선 — 햄버거 메뉴 + 브레드크럼 + 대학 전환 + 소분류 Badge (8개 파일 수정)
+
+#### 수정 파일 목록 (8개)
+
+| # | 수정 내용 | 파일 | 유형 |
+|---|----------|------|------|
+| 1 | **햄버거 메뉴 항상 표시 + 오렌지 피드백** | `components/layout/Header.tsx` | UX |
+| 2 | **로고 서브타이틀 변경** | `components/layout/Header.tsx` | 디자인 |
+| 3 | **Sheet 닫기 버튼 확대** | `components/ui/sheet.tsx` | UX |
+| 4 | **브레드크럼 크기+색상 (오렌지)** | `app/page.tsx` 외 4개 | 시인성 |
+| 5 | **대학 전환 시 카테고리 유지** | `components/post/UniversityTabs.tsx` | 네비게이션 |
+| 6 | **대학 전환 시 카테고리 유지** | `components/layout/Header.tsx` | 네비게이션 |
+| 7 | **소분류 Badge 가시성 개선** | `app/[university]/[category]/page.tsx` | 시인성 |
+| 8 | **소분류 Badge 가시성 개선** | `app/all/[category]/page.tsx` | 시인성 |
+
+#### 1. 햄버거 메뉴 항상 표시 + 오렌지 클릭 피드백
+
+**파일**: `components/layout/Header.tsx`
+
+- `md:hidden` 제거 → 데스크톱에서도 항상 표시
+- `<Button>` → `<button>` 변경 (shadcn 스타일 충돌 방지)
+- "메뉴" 라벨 추가 (다른 아이콘과 동일 패턴)
+- 아이콘 20x20 → 28x28, strokeWidth 2 → 2.5 (시인성)
+- `menuHighlight` 상태 분리: 클릭 시 즉시 오렌지 → 30ms 후 Sheet 열림
+- `SheetTrigger` 제거 → 수동 `handleMenuClick` + `handleSheetChange`
+
+#### 2. 로고 서브타이틀 변경
+
+`Campulist.com` → `Campu(s)+LIST+.COM=CAMPuLIST.COM` (데스크톱 전용 `hidden md:block`)
+
+#### 3. Sheet 닫기 버튼 확대
+
+**파일**: `components/ui/sheet.tsx`
+
+- XIcon `size-4` → `size-6`
+- `p-1` 패딩 추가 (터치 타겟 확대)
+- `rounded-xs` → `rounded-md`
+
+#### 4. 브레드크럼 크기+색상 (오렌지 톤 통일)
+
+**파일**: 5개 페이지
+
+- 글자 크기: `text-sm` → `text-base`
+- 링크: `text-orange-400 hover:text-orange-300 hover:underline`
+- 현재 페이지: `font-semibold text-orange-400`
+- 구분자 `›`: `text-orange-300`
+- 전체 오렌지 톤으로 통일, 현재 위치만 굵은 글씨로 구분
+
+#### 5-6. 대학 전환 시 카테고리 컨텍스트 유지
+
+**파일**: `UniversityTabs.tsx`, `Header.tsx`
+
+**문제**: `/한예종/housing`에서 서울대 클릭 → `/서울대`로 이동 (카테고리 사라짐)
+**해결**: pathname에서 카테고리 slug 추출하여 대학 링크에 반영
+
+```tsx
+const pathParts = pathname.split('/').filter(Boolean);
+const currentCatSlug = pathParts[1] && majorCategories.some(c => c.slug === pathParts[1])
+  ? pathParts[1] : null;
+
+// 대학 탭: /${uni.slug}/${currentCatSlug}${qs}
+// 모든 대학 탭: /all/${currentCatSlug}${qs}
+```
+
+- UniversityTabs: searchParams(minor, sort)도 유지
+- Header sidebar: 대분류만 유지 (searchParams 제외)
+
+#### 7-8. 소분류 Badge 가시성 개선
+
+**파일**: `[university]/[category]/page.tsx`, `all/[category]/page.tsx`
+
+- 글자 크기: `text-xs` → `text-sm` + `px-3 py-1` (패딩 확대)
+- 활성: `bg-orange-400 text-white` → `border-2 border-orange-500 text-orange-600 font-bold` (배경 없이 두꺼운 테두리+굵은 글씨)
+- 비활성: `border-orange-400 text-orange-600 dark:text-orange-300`
+- 정렬 옵션(최신순 등)은 기존 블루 스타일 유지
 
 ---
 
@@ -795,6 +883,12 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
 - 로고(캠퍼스리스트) 활성 색상: `isHome ? 'text-orange-400' : 'text-muted-foreground'` — 다른 아이콘과 동일 패턴
 - CategoryGrid — flex 수평 스크롤 레이아웃, `min-w-[4.5rem] flex-1`로 반응형 크기, `overflow-x-auto scrollbar-hide`
 - CategoryGrid `activeSlug` — 카테고리 페이지에서 현재 선택된 대분류 하이라이트 (border-blue-500 bg-blue-500/10)
-- 브레드크럼 통일 패턴: `text-sm text-muted-foreground` + `hover:text-foreground hover:underline` + 루트 "모든 대학 ›"
+- 브레드크럼 통일 패턴: `text-base` + 전체 오렌지 톤 (`text-orange-400`, 현재 페이지 `font-semibold`), 구분자 `text-orange-300`
 - 배너 통일 패턴: `bg-blue-950/30 px-4 py-4` + `h1 text-xl font-bold text-blue-400`
 - PopularPostsSection 순위 색상: 1위 yellow-500, 2위 gray-400, 3위 amber-600, 4위이후 orange-500
+- 햄버거 메뉴: `<button>` (not `<Button>`), `menuHighlight`/`menuOpen` 분리 상태, 30ms 딜레이
+- 로고 서브타이틀: `Campu(s)+LIST+.COM=CAMPuLIST.COM` (데스크톱 전용)
+- Sheet 닫기 버튼: `size-6 p-1 rounded-md` (확대됨)
+- 대학 전환 카테고리 유지: UniversityTabs + Header sidebar에서 pathname의 카테고리 slug 추출하여 링크에 반영
+- 소분류 Badge: `text-sm px-3 py-1`, 활성=`border-2 border-orange-500 font-bold`, 비활성=`border-orange-400 text-orange-600`
+- 정렬 Badge: 기존 블루 스타일 유지 (`bg-blue-600 text-white` 활성, `outline hover:bg-muted` 비활성)

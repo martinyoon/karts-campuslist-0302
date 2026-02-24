@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import ThemeToggle from '@/components/ThemeToggle';
 import IconToggle from '@/components/IconToggle';
 import { universities } from '@/data/universities';
@@ -19,6 +19,17 @@ export default function Header() {
   const searchParams = useSearchParams();
   const writeHref = getWriteUrl(pathname, searchParams.toString());
   const [unreadCount, setUnreadCount] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuHighlight, setMenuHighlight] = useState(false);
+
+  const handleMenuClick = () => {
+    setMenuHighlight(true);
+    setTimeout(() => setMenuOpen(true), 30);
+  };
+  const handleSheetChange = (open: boolean) => {
+    setMenuOpen(open);
+    if (!open) setMenuHighlight(false);
+  };
 
   useEffect(() => {
     const update = () => setUnreadCount(user ? getMyUnreadTotal(user.id) : 0);
@@ -27,27 +38,30 @@ export default function Header() {
     return () => window.removeEventListener('camtalkUpdate', update);
   }, [user]);
 
-  // 현재 pathname에서 대학 slug 추출
+  // 현재 pathname에서 대학 slug, 카테고리 slug 추출
   const currentUniSlug = universities.find(u => pathname.startsWith(`/${u.slug}`))?.slug;
+  const pathParts = pathname.split('/').filter(Boolean);
+  const secondSegment = pathParts[1];
+  const currentCatSlug = secondSegment && majorCategories.some(c => c.slug === secondSegment)
+    ? secondSegment : null;
   const isHome = pathname === '/' || universities.some(u => pathname === `/${u.slug}`);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
         {/* 모바일 메뉴 */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="메뉴 열기">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
-                </Button>
-              </SheetTrigger>
+            <button type="button" onClick={handleMenuClick} className={`flex h-auto flex-col items-center gap-0.5 px-2 py-1 transition-colors duration-100 ${menuHighlight ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="메뉴 열기">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
+              <span className="text-xs font-medium">메뉴</span>
+            </button>
+            <Sheet open={menuOpen} onOpenChange={handleSheetChange}>
               <SheetContent side="left" className="w-72">
                 <nav className="mt-8 flex flex-col gap-4">
                   <p className="text-sm font-semibold text-muted-foreground">대학교</p>
                   {universities.map(uni => {
                     const isActive = pathname.startsWith(`/${uni.slug}`);
                     return (
-                      <Link key={uni.slug} href={`/${uni.slug}`} className={`text-base ${isActive ? 'font-semibold text-orange-400' : 'hover:text-orange-400'}`}>
+                      <Link key={uni.slug} href={currentCatSlug ? `/${uni.slug}/${currentCatSlug}` : `/${uni.slug}`} className={`text-base ${isActive ? 'font-semibold text-orange-400' : 'hover:text-orange-400'}`}>
                         {uni.name}
                       </Link>
                     );
@@ -70,7 +84,7 @@ export default function Header() {
             {/* 로고 */}
             <Link href="/" className="flex shrink-0 flex-col leading-tight">
               <span className={`text-xl font-bold ${isHome ? 'text-orange-400' : 'text-muted-foreground'}`}>캠퍼스리스트</span>
-              <span className="hidden text-xs text-muted-foreground md:block">Campulist.com</span>
+              <span className="hidden text-xs text-muted-foreground md:block">Campu(s)+LIST+.COM=CAMPuLIST.COM</span>
             </Link>
 
             {/* 우측 버튼 */}
