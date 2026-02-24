@@ -39,22 +39,26 @@ interface WriteDraft {
 
 type WriteStep = 'major' | 'minor' | 'form';
 
-const MEMBER_TYPE_SHORT: Record<MemberType, string> = {
-  undergraduate: '학부생/예술사(한예종)',
-  graduate: '대학원생/전문사(한예종)',
-  professor: '교수',
-  staff: '교직원',
-  alumni: '졸업생',
-  merchant: '비지니스 회원',
-  general: '일반인 회원',
-};
+function getMemberTypeShort(memberType: MemberType, universityId: number): string {
+  const isKarts = universityId === 5;
+  const map: Record<MemberType, string> = {
+    undergraduate: isKarts ? '예술사' : '학부생',
+    graduate: isKarts ? '전문사' : '대학원생',
+    professor: '교수',
+    staff: '교직원',
+    alumni: '졸업생',
+    merchant: '비지니스 회원',
+    general: '일반인 회원',
+  };
+  return map[memberType] || '';
+}
 
 function fillTemplate(template: string, user: User, targetUniversityId: number): string {
   const targetUni = universities.find(u => u.id === targetUniversityId);
   const targetShort = targetUni?.name.replace('대학교', '대') || '대학';
   const userUni = universities.find(u => u.id === user.universityId);
   const userShort = userUni?.name.replace('대학교', '대') || '대학';
-  const typeLabel = MEMBER_TYPE_SHORT[user.memberType] || '';
+  const typeLabel = getMemberTypeShort(user.memberType, user.universityId);
   const dept = user.department || '본인학과';
 
   return template
@@ -327,7 +331,7 @@ function WritePageContent() {
       if (!title) {
         const uni = universities.find(u => u.id === user.universityId);
         const uniShort = uni ? uni.name.replace('대학교', '대') : '';
-        const typeLabel = MEMBER_TYPE_SHORT[user.memberType] || '';
+        const typeLabel = getMemberTypeShort(user.memberType, user.universityId);
         setTitle(`[${uniShort}][${typeLabel}] `);
       }
     }
@@ -409,14 +413,14 @@ function WritePageContent() {
   const fillTitleExample = () => {
     if (!user || exExamples.length === 0) return;
     const uniShort = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '';
-    const prefixOnly = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}] `;
+    const prefixOnly = `[${uniShort}][${getMemberTypeShort(user.memberType, user.universityId)}] `;
     if (title.trim() && title.trim() !== prefixOnly.trim()) {
       setConfirmAction('title');
       return;
     }
     const ex = exExamples[0];
     const ft = fillTemplate(ex.title, user, user.universityId);
-    const pfx = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
+    const pfx = `[${uniShort}][${getMemberTypeShort(user.memberType, user.universityId)}]`;
     setTitle(ft.startsWith(pfx) ? ft : `${pfx} ${ft}`);
   };
 
@@ -448,7 +452,7 @@ function WritePageContent() {
         const ex = exExamples[0];
         const ft = fillTemplate(ex.title, user, user.universityId);
         const uniS = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '대학';
-        const pfx = `[${uniS}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
+        const pfx = `[${uniS}][${getMemberTypeShort(user.memberType, user.universityId)}]`;
         setTitle(ft.startsWith(pfx) ? ft : `${pfx} ${ft}`);
         break;
       }
@@ -482,7 +486,7 @@ function WritePageContent() {
 
     const filledTitle = fillTemplate(ex.title, user, user.universityId);
     const uniShort2 = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '대학';
-    const prefix = `[${uniShort2}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
+    const prefix = `[${uniShort2}][${getMemberTypeShort(user.memberType, user.universityId)}]`;
     setTitle(filledTitle.startsWith(prefix) ? filledTitle : `${prefix} ${filledTitle}`);
     if (ex.price) {
       setPrice(ex.price);
@@ -563,7 +567,7 @@ function WritePageContent() {
     if (!detail || !user) return;
 
     const uniShort = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '';
-    const typeLabel = MEMBER_TYPE_SHORT[user.memberType] || '';
+    const typeLabel = getMemberTypeShort(user.memberType, user.universityId);
     const prefix = `[${uniShort}][${typeLabel}] `;
     const rawTitle = detail.title.replace(/^\[.*?\]\[.*?\]\s*/, '');
     setTitle(prefix + rawTitle + ' — 제목을 내 것으로 고쳐주세요!');
