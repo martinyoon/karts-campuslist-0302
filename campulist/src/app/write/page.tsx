@@ -1247,8 +1247,8 @@ function WritePageContent() {
                       {priceNegotiable && <Badge variant="secondary" className="text-xs">협의가능</Badge>}
                     </div>
                   )}
-                  {/* 본문 (최대 4줄) */}
-                  <div className="line-clamp-4 whitespace-pre-wrap text-xs text-muted-foreground leading-relaxed">
+                  {/* 본문 */}
+                  <div className="whitespace-pre-wrap text-base text-amber-600 leading-relaxed dark:text-amber-400">
                     {body.trim() || '(내용 없음)'}
                   </div>
                   {/* 태그 + 장소 (1줄로 합침) */}

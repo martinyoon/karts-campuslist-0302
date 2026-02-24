@@ -1229,6 +1229,73 @@ handleChangeCategory() // 변경됨: minorId도 초기화
 Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96% → mock-auth v2: 99%
 ```
 
+### 23. 미리보기 버튼 이동 + 등록 버튼 옆 배치 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+- 미리보기 버튼을 원래 위치(본문 아래 흐린 회색)에서 제거
+- 등록 버튼 옆에 `flex gap-2`로 나란히 배치
+- 미리보기: `border-2 border-blue-600 text-blue-600` (outline 스타일)
+- 등록하기: `bg-blue-600 text-white` (solid 스타일)
+
+### 24. 미리보기/등록 버튼 동일 크기 C안 적용 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+- 두 버튼 모두 `flex-1` → 동일 50:50 크기
+- 두 버튼 모두 `py-3 text-base font-bold` → 동일 높이/폰트
+- 미리보기: `bg-blue-100 text-blue-700` (밝은 파란 배경) + 👀 이모지
+- 등록하기: `bg-blue-600 text-white` (진한 파란 배경) + ✏️ 이모지
+- 다크모드: `dark:bg-blue-900/40 dark:text-blue-300`
+
+### 25. 미리보기 Sheet 닫기/수정 2버튼 추가 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+- 미리보기 Sheet에 명시적 닫기 버튼이 없던 문제 해결
+- 하단에 2버튼 가로 배치: "수정할래요" + "확인했어요"
+- 수정할래요: `bg-blue-100 text-blue-700` + `window.scrollTo({ top: 0 })` (상단 이동)
+- 확인했어요: `bg-blue-600 text-white` (Sheet 닫기)
+- 바깥 터치/스와이프 닫기도 그대로 유지
+
+### 26. 미리보기 Sheet 한 화면 압축 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+- 이미지: `h-48 w-48` → `h-28 w-28` (-80px)
+- 제목: `text-lg` → `text-base leading-tight`
+- 가격: `text-xl` → `text-lg`
+- 태그+장소: 2줄 분리 → 1줄 합침, `text-[10px]`
+- 작성자: 2줄(이름+학교) → 1줄 가로, 아바타 `h-8` → `h-6`
+- 간격: `space-y-1.5 pb-3` → `space-y-1 pb-2`
+- 버튼: 스크롤 영역 밖 하단 고정
+- 콘텐츠 영역: `overflow-y-auto` + `maxHeight: calc(85vh - 100px)`
+
+### 27. 미리보기 본문 전체 표시 + 글자 크기/색상 개선 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+- `line-clamp-4` 제거 → 본문 전체 표시 (스크롤로 확인)
+- 글자 크기: `text-xs` → `text-base` (12px → 16px, 실제 게시글과 동일)
+- 글자 색상: `text-muted-foreground` → `text-amber-600 dark:text-amber-400` (노랑/주황 계열로 눈에 띄게)
+
+### Mock Auth PDCA Gap Analysis v4.0 결과 (2026-02-24)
+
+**Overall Match Rate: 99%** (4회 연속 동일)
+
+| 카테고리 | 점수 |
+|---------|:----:|
+| Feature Match | 100% |
+| Data Model Match | 97% |
+| UI/Screen Match | 100% |
+| Architecture | 100% |
+| Convention | 100% |
+| **Overall** | **99%** |
+
+- 이전 4개 Gap (G-01, G-02, G-05, G-06) 모두 해결 상태 유지
+- 신규 Gap: 0건
+- 1%: `RegisteredUser`/`SignupData` 추가 필드 (허용 범위)
+
 ---
 
 ## 다음 할 일 (TODO)
@@ -1315,3 +1382,6 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - `getWriteUrl()` — pathname에서 uni/major/minor 추출하여 `/write?uni=&major=&minor=` 생성 (Header에서 사용)
 - 글쓰기 카테고리 뷰 pre-selection: `id={major-group-N}` + `ring-2 ring-orange-300 bg-orange-50` + "선택됨" 라벨
 - CategorySummary 브레드크럼: 일반 페이지와 완전 동일 스타일 (text-base, text-orange-400, 풀네임, "모든 대학" 포함)
+- 미리보기/등록 버튼 패턴: `flex gap-2` + 둘 다 `flex-1 py-3 font-bold` → 동일 크기, 색상 단계 구분 (밝은파란 vs 진한파란)
+- 미리보기 Sheet 닫기 패턴: 2버튼 ("수정할래요" + "확인했어요") + 바깥 터치/스와이프 유지
+- 미리보기 본문: `text-base text-amber-600 dark:text-amber-400` — 노랑 계열로 눈에 띄게, 전체 표시 (line-clamp 없음)
