@@ -428,7 +428,9 @@ function WritePageContent() {
       return;
     }
     const ex = applyTone(exExamples[0], selectedTone);
-    setTitle(fillTemplate(ex.title, user, universityId));
+    const ft = fillTemplate(ex.title, user, universityId);
+    const pfx = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
+    setTitle(ft.startsWith(pfx) ? ft : `${pfx} ${ft}`);
   };
 
   const fillPriceExample = () => {
@@ -457,7 +459,10 @@ function WritePageContent() {
     switch (confirmAction) {
       case 'title': {
         const ex = applyTone(exExamples[0], selectedTone);
-        setTitle(fillTemplate(ex.title, user, universityId));
+        const ft = fillTemplate(ex.title, user, universityId);
+        const uniS = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '대학';
+        const pfx = `[${uniS}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
+        setTitle(ft.startsWith(pfx) ? ft : `${pfx} ${ft}`);
         break;
       }
       case 'price': {
@@ -489,7 +494,10 @@ function WritePageContent() {
     const raw = exExamples[idx % exExamples.length];
     const ex = applyTone(raw, selectedTone);
 
-    setTitle(fillTemplate(ex.title, user, universityId));
+    const filledTitle = fillTemplate(ex.title, user, universityId);
+    const uniShort2 = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '대학';
+    const prefix = `[${uniShort2}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
+    setTitle(filledTitle.startsWith(prefix) ? filledTitle : `${prefix} ${filledTitle}`);
     if (raw.price) {
       setPrice(raw.price);
       setPriceNegotiable(raw.negotiable);
@@ -785,14 +793,10 @@ function WritePageContent() {
       {step === 'form' && (
         <div className="px-4 py-2">
           <div className="space-y-2.5">
-            {/* 완성도 점수 프로그레스 바 */}
-            {/* 간격 압축: p-3 → p-1.5 */}
-            <div className="rounded-lg border border-border bg-muted/30 p-1.5">
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">{scoreLabel} {completionScore}점</span>
-                <span className="text-xs text-muted-foreground">{completionScore}/100</span>
-              </div>
-              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
+            {/* 완성도 점수 — 1줄 압축 */}
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2 py-1.5">
+              <span className="shrink-0 text-sm font-bold">{scoreLabel} {completionScore}점</span>
+              <div className="h-2 w-20 shrink-0 overflow-hidden rounded-full bg-muted">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     completionScore >= 90 ? 'bg-green-500' : completionScore >= 70 ? 'bg-blue-500' : completionScore >= 40 ? 'bg-yellow-500' : 'bg-gray-400'
@@ -800,7 +804,7 @@ function WritePageContent() {
                   style={{ width: `${completionScore}%` }}
                 />
               </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">{nextHint}</p>
+              <span className="truncate text-sm text-muted-foreground">{nextHint}</span>
             </div>
 
             {/* 예시 채우기 영역: 간격 압축: space-y-2.5 → space-y-1.5, p-3 → p-1.5 */}
@@ -829,33 +833,32 @@ function WritePageContent() {
                   ))}
                 </div>
 
-                {/* 예시로 채우기 버튼 */}
-                {/* 간격 압축: py-2.5 → py-1.5 */}
-                <button
-                  type="button"
-                  onClick={fillRandomExample}
-                  disabled={isSpinning}
-                  className="flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
-                >
-                  {isSpinning ? (
-                    <>
-                      <span className="animate-spin">✨</span>
-                      <span ref={spinnerRef} className="truncate max-w-[200px]">샘플 고르는 중...</span>
-                    </>
-                  ) : (
-                    '샘플 글로 채워보기 · 누를 때마다 랜덤!'
-                  )}
-                </button>
-
-                {/* 다른 사람들 글 가져오기 버튼 */}
-                <button
-                  type="button"
-                  onClick={fetchOtherPosts}
-                  disabled={loadingOthers}
-                  className="flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
-                >
-                  {loadingOthers ? '불러오는 중...' : '다른 사람 글 가져와서 고치기'}
-                </button>
+                {/* 예시 채우기 + 다른 글 가져오기 — 1줄 가로 배치 */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={fillRandomExample}
+                    disabled={isSpinning}
+                    className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
+                  >
+                    {isSpinning ? (
+                      <>
+                        <span className="animate-spin">✨</span>
+                        <span ref={spinnerRef} className="truncate max-w-[200px]">샘플 고르는 중...</span>
+                      </>
+                    ) : (
+                      '샘플 채우기 · 랜덤!'
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={fetchOtherPosts}
+                    disabled={loadingOthers}
+                    className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
+                  >
+                    {loadingOthers ? '불러오는 중...' : '다른 글 가져와 고치기'}
+                  </button>
+                </div>
               </div>
             )}
 
