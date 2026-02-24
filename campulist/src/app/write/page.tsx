@@ -421,14 +421,14 @@ function WritePageContent() {
 
   const fillTitleExample = () => {
     if (!user || exExamples.length === 0) return;
-    const uniShort = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '';
+    const uniShort = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '';
     const prefixOnly = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}] `;
     if (title.trim() && title.trim() !== prefixOnly.trim()) {
       setConfirmAction('title');
       return;
     }
     const ex = applyTone(exExamples[0], selectedTone);
-    const ft = fillTemplate(ex.title, user, universityId);
+    const ft = fillTemplate(ex.title, user, user.universityId);
     const pfx = `[${uniShort}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
     setTitle(ft.startsWith(pfx) ? ft : `${pfx} ${ft}`);
   };
@@ -451,7 +451,7 @@ function WritePageContent() {
       return;
     }
     const ex = applyTone(exExamples[0], selectedTone);
-    setBody(fillTemplate(ex.body, user, universityId));
+    setBody(fillTemplate(ex.body, user, user.universityId));
   };
 
   const handleConfirmAction = () => {
@@ -459,8 +459,8 @@ function WritePageContent() {
     switch (confirmAction) {
       case 'title': {
         const ex = applyTone(exExamples[0], selectedTone);
-        const ft = fillTemplate(ex.title, user, universityId);
-        const uniS = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '대학';
+        const ft = fillTemplate(ex.title, user, user.universityId);
+        const uniS = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '대학';
         const pfx = `[${uniS}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
         setTitle(ft.startsWith(pfx) ? ft : `${pfx} ${ft}`);
         break;
@@ -473,7 +473,7 @@ function WritePageContent() {
       }
       case 'body': {
         const ex = applyTone(exExamples[0], selectedTone);
-        setBody(fillTemplate(ex.body, user, universityId));
+        setBody(fillTemplate(ex.body, user, user.universityId));
         break;
       }
       case 'delete': {
@@ -494,20 +494,20 @@ function WritePageContent() {
     const raw = exExamples[idx % exExamples.length];
     const ex = applyTone(raw, selectedTone);
 
-    const filledTitle = fillTemplate(ex.title, user, universityId);
-    const uniShort2 = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '대학';
+    const filledTitle = fillTemplate(ex.title, user, user.universityId);
+    const uniShort2 = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '대학';
     const prefix = `[${uniShort2}][${MEMBER_TYPE_SHORT[user.memberType]}]`;
     setTitle(filledTitle.startsWith(prefix) ? filledTitle : `${prefix} ${filledTitle}`);
     if (raw.price) {
       setPrice(raw.price);
       setPriceNegotiable(raw.negotiable);
     }
-    setBody(fillTemplate(ex.body, user, universityId));
+    setBody(fillTemplate(ex.body, user, user.universityId));
     if (raw.tags.length > 0) {
-      setTags(raw.tags.slice(0, 5).map(t => fillTemplate(t, user, universityId)));
+      setTags(raw.tags.slice(0, 5).map(t => fillTemplate(t, user, user.universityId)));
     }
     if (raw.location) {
-      setLocation(fillTemplate(raw.location, user, universityId));
+      setLocation(fillTemplate(raw.location, user, user.universityId));
     }
 
     toast('샘플로 채워졌어요!');
@@ -536,7 +536,7 @@ function WritePageContent() {
     spinIntervalRef.current = setInterval(() => {
       if (spinnerRef.current) {
         const randEx = exExamples[Math.floor(Math.random() * exExamples.length)];
-        spinnerRef.current.textContent = fillTemplate(randEx.title, capturedUser, universityId).slice(0, 30) + '...';
+        spinnerRef.current.textContent = fillTemplate(randEx.title, capturedUser, capturedUser.universityId).slice(0, 30) + '...';
       }
       count++;
       if (count > 10) {
@@ -576,7 +576,7 @@ function WritePageContent() {
     const detail = await getPostDetail(postId);
     if (!detail || !user) return;
 
-    const uniShort = universities.find(u => u.id === universityId)?.name.replace('대학교', '대') || '';
+    const uniShort = universities.find(u => u.id === user.universityId)?.name.replace('대학교', '대') || '';
     const typeLabel = MEMBER_TYPE_SHORT[user.memberType] || '';
     const prefix = `[${uniShort}][${typeLabel}] `;
     const rawTitle = detail.title.replace(/^\[.*?\]\[.*?\]\s*/, '');
@@ -729,7 +729,7 @@ function WritePageContent() {
               )}
             </>
           ) : (
-            <span className="font-semibold text-orange-400">{isEditMode ? '글 수정' : '✏️ 글쓰기'}</span>
+            <span className="font-semibold text-orange-400">{isEditMode ? '글 수정' : '카테고리 선택'}</span>
           )}
         </nav>
       </div>

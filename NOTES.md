@@ -95,7 +95,9 @@ interface User {
 | `1f4fe28` | refactor: 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화 |
 | `848d8ce` | refactor: 수직 간격 대폭 압축 — 25개 파일 40~60% 수직 공간 축소 + NOTES.md 업데이트 |
 | `2924d29` | feat: 글쓰기 UI 개선 8건 — 문체/샘플 버튼 디자인 + 랜덤 알고리즘 + "다른 사람 글 가져오기" 기능 |
-| (현재) | feat: 글쓰기 "다른 사람 글 가져오기" 개선 3건 — 인기순 정렬 + 경고 문구 + 목록 이동 |
+| `0daaead` | feat: 글쓰기 "다른 사람 글 가져오기" 개선 3건 — 인기순 정렬 + 경고 문구 + 목록 이동 |
+| `264f1a7` | fix+refactor: 글쓰기 UI 개선 4건 — 문체 prefix 버그 수정 + 완성도/버튼 1줄 압축 |
+| (현재) | fix+refactor: 글쓰기 버그 수정 + UI 압축 3건 — prefix 대학 버그 + 완성도 글자 + 브레드크럼 |
 
 ---
 
@@ -1160,6 +1162,48 @@ handleChangeCategory() // 변경됨: minorId도 초기화
 - **이유**: 방금 쓴 글이 목록에 정상적으로 노출되는지 사용자가 직접 확인 가능
 - 목록은 기본 최신순 정렬이므로 방금 쓴 글이 최상단에 표시
 - slug 조회 실패 시 기존처럼 상세 페이지로 fallback
+
+### 21. 글쓰기 UI 개선 4건 — 문체 prefix 버그 수정 + 완성도/버튼 1줄 압축 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+#### 1. 친근/급매/유머 문체 — 제목 prefix 누락 버그 수정
+- **원인**: `applyTone()`이 `tones[tone].title`로 덮어쓰는데, tones 데이터에 `{{prefix}}`가 없음
+- **수정**: `fillSmartExamples`, `fillTitleExample`, `handleConfirmAction` 3곳에서 `fillTemplate()` 결과에 prefix 없으면 `startsWith`로 감지하여 강제 추가
+- "깔끔" 문체는 원본에 `{{prefix}}`가 있어 정상이었음
+
+#### 2. 완성도 점수 3줄 → 1줄 압축
+- Before: 라벨+점수 / 프로그레스 바 / 힌트 (3줄)
+- After: `flex items-center gap-2`로 한 줄 배치 (라벨+점수 + 짧은 바 + 힌트)
+- 글자 크기: `text-xs` → `text-sm font-bold` (가독성 개선)
+- 프로그레스 바: `w-full h-2` → `w-20 h-2`
+- `60/100` 텍스트 제거
+
+#### 3. 샘플/다른글 버튼 2줄 → 1줄 가로 배치
+- Before: `w-full` 세로 2줄
+- After: `flex gap-2` + `flex-1` 가로 50:50 배치
+- 버튼 이름 축약: `샘플 채우기 · 랜덤!` / `다른 글 가져와 고치기`
+
+#### 4. 완성도 영역 글자 크기 확대
+- 라벨: `text-xs font-medium` → `text-sm font-bold`
+- 힌트: `text-xs` → `text-sm`
+- 패딩: `py-1` → `py-1.5`
+
+### 22. 글쓰기 버그 수정 + UI 개선 3건 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+#### 1. 다른 학교 카테고리에서 글쓰기 시 prefix 대학 이름 버그 수정
+- **원인**: prefix 생성 시 `universityId`(URL 파라미터 기반 상태값)를 사용 → 다른 학교 이름이 들어감
+- **수정**: 9곳에서 `universityId` → `user.universityId`(사용자 소속)로 변경
+- 영향 함수: `fillTitleExample`, `fillBodyExample`, `handleConfirmAction`, `fillSmartExamples`, `fillFromOtherPost`, spinner animation
+
+#### 2. 완성도 점수 글자 크기 추가 확대
+- 라벨: `text-sm font-bold`, 힌트: `text-sm`, 바: `h-2 w-20`
+
+#### 3. 브레드크럼 "✏️ 글쓰기" → "카테고리 선택" 수정
+- 대분류 미선택 시 `모든 대학 › KAIST › ✏️ 글쓰기` → `모든 대학 › KAIST › 카테고리 선택`
+- "글쓰기"는 페이지 이름이지 경로가 아니므로 브레드크럼에 부적절
 
 ### Mock Auth PDCA Gap Analysis v2.0 결과 (2026-02-24 확인)
 
