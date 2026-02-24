@@ -24,7 +24,7 @@ export default async function HomePage() {
       {/* 브레드크럼 — 간격 압축: py-2 → py-1 */}
       <div className="border-b border-border px-4 py-1">
         <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
-          <span className="font-semibold text-orange-400">모든 대학</span>
+          <span className="font-semibold text-orange-400">모든 대학 · 전체보기</span>
           <span className="text-orange-300">›</span>
         </nav>
       </div>

@@ -81,10 +81,14 @@ export default async function AllCategoryPage({ params, searchParams }: Props) {
                 <span className="cat-icon">{category.icon} </span>{category.name}
               </Link>
               <span className="text-orange-300">›</span>
-              <span className="font-semibold text-orange-400">{activeMinor.name}</span>
+              <span className="font-semibold text-orange-400">{activeMinor.name} · 전체보기</span>
+              <span className="text-orange-300">›</span>
             </>
           ) : (
-            <span className="font-semibold text-orange-400"><span className="cat-icon">{category.icon} </span>{category.name} · 전체보기</span>
+            <>
+              <span className="font-semibold text-orange-400"><span className="cat-icon">{category.icon} </span>{category.name} · 전체보기</span>
+              <span className="text-orange-300">›</span>
+            </>
           )}
         </nav>
       </div>
