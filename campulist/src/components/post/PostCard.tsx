@@ -73,6 +73,7 @@ export default function PostCard({ post }: PostCardProps) {
               {post.likeCount}
             </span>
           )}
+          {post.viewCount > 0 && <span>조회 {post.viewCount}</span>}
           {isOwner && (
             <button
               onClick={handleEdit}

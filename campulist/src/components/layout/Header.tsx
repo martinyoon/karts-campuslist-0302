@@ -57,7 +57,7 @@ export default function Header() {
                   {universities.map(uni => {
                     const isActive = pathname.startsWith(`/${uni.slug}`);
                     return (
-                      <Link key={uni.slug} href={`/${uni.slug}`} className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'hover:text-blue-500'}`}>
+                      <Link key={uni.slug} href={`/${uni.slug}`} className={`text-base ${isActive ? 'font-semibold text-orange-400' : 'hover:text-orange-400'}`}>
                         {uni.name}
                       </Link>
                     );
@@ -68,7 +68,7 @@ export default function Header() {
                     const catHref = currentUniSlug ? `/${currentUniSlug}/${cat.slug}` : `/all/${cat.slug}`;
                     const isActive = pathname.startsWith(catHref);
                     return (
-                      <Link key={cat.slug} href={catHref} className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'hover:text-blue-500'}`}>
+                      <Link key={cat.slug} href={catHref} className={`text-base ${isActive ? 'font-semibold text-orange-400' : 'hover:text-orange-400'}`}>
                         <span className="cat-icon">{cat.icon} </span>{cat.name}
                       </Link>
                     );
@@ -95,9 +95,9 @@ export default function Header() {
             </form>
 
             {/* 모바일: 돋보기 버튼 */}
-            <Link href="/search" className={`ml-auto flex h-auto flex-col items-center gap-0 px-2 py-1 md:hidden ${pathname.startsWith('/search') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="검색">
+            <Link href="/search" className={`ml-auto flex h-auto flex-col items-center gap-0.5 px-2 py-1 md:hidden ${pathname.startsWith('/search') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="검색">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-              <span className="text-[10px] leading-tight">검색</span>
+              <span className="text-xs font-medium">검색</span>
             </Link>
 
             {/* 우측 버튼 */}
@@ -108,28 +108,22 @@ export default function Header() {
               </span>
               {user ? (
                 <>
-                  <Link href={writeHref}>
-                    <Button variant="ghost" className={`flex h-auto flex-col items-center gap-0 px-2 py-1 ${pathname.startsWith('/write') ? 'text-orange-400' : 'text-muted-foreground'}`}>
-                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
-                      <span className="text-[10px] leading-tight">글쓰기</span>
-                    </Button>
+                  <Link href={writeHref} className={`flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/write') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="글쓰기">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
+                      <span className="text-xs font-medium">글쓰기</span>
                   </Link>
-                  <Link href="/camtalk" className="relative">
-                    <Button variant="ghost" className={`flex h-auto flex-col items-center gap-0 px-2 py-1 ${pathname.startsWith('/camtalk') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="캠톡">
+                  <Link href="/camtalk" className={`relative flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/camtalk') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="캠톡">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                      <span className="text-[10px] leading-tight">캠톡</span>
-                    </Button>
+                      <span className="text-xs font-medium">캠톡</span>
                     {unreadCount > 0 && (
                       <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
                   </Link>
-                  <Link href="/my">
-                    <Button variant="ghost" className={`flex h-auto flex-col items-center gap-0 px-2 py-1 ${pathname.startsWith('/my') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="마이페이지">
+                  <Link href="/my" className={`flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/my') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="마이페이지">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M20 21a8 8 0 1 0-16 0" /></svg>
-                      <span className="text-[10px] leading-tight">MY</span>
-                    </Button>
+                      <span className="text-xs font-medium">MY</span>
                   </Link>
                 </>
               ) : (

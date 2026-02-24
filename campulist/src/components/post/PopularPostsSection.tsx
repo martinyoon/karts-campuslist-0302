@@ -48,7 +48,7 @@ export default function PopularPostsSection({ posts }: Props) {
                 className="w-60 shrink-0 rounded-xl border border-border p-3.5 transition-colors hover:bg-muted"
               >
                 <div className="flex items-center gap-1.5">
-                  <span className="text-base font-bold text-orange-500">{index + 1}</span>
+                  <span className={`text-base font-bold ${index === 0 ? 'text-yellow-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-amber-600' : 'text-orange-500'}`}>{index + 1}</span>
                   <span className="text-sm text-blue-500">{post.categoryMinor.name}</span>
                 </div>
                 <h3 className="mt-1 truncate text-sm font-medium">{post.title}</h3>
