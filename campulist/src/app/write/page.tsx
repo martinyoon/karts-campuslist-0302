@@ -1287,16 +1287,16 @@ function WritePageContent() {
                 <button
                   type="button"
                   onClick={() => setShowPreview(true)}
-                  className="shrink-0 rounded-lg border-2 border-blue-600 px-4 py-3 text-base font-bold text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950"
+                  className="flex-1 rounded-lg bg-blue-100 py-3 text-base font-bold text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                 >
                   👀 미리보기
                 </button>
                 <Button
                   onClick={handleSubmit}
                   disabled={!title || !minorId || submitting}
-                  className="flex-1 bg-blue-600 py-3 text-base hover:bg-blue-700"
+                  className="flex-1 bg-blue-600 py-3 text-base font-bold hover:bg-blue-700"
                 >
-                  {submitting ? '처리 중...' : isEditMode ? '수정하기' : '등록하기'}
+                  {submitting ? '처리 중...' : isEditMode ? '✏️ 수정하기' : '✏️ 등록하기'}
                 </Button>
               </div>
               {/* 간격 압축: mt-2 → mt-1 */}

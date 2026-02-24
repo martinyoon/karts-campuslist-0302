@@ -1,6 +1,6 @@
 # mock-auth Analysis Report
 
-> **Analysis Type**: Gap Analysis (Check Phase -- Re-check v3.0)
+> **Analysis Type**: Gap Analysis (Check Phase -- Re-check v4.0)
 >
 > **Project**: campulist
 > **Version**: Phase A
@@ -15,40 +15,38 @@
 
 ### 1.1 Analysis Purpose
 
-Post-restructuring verification (v3.0). The `write/page.tsx` underwent a MAJOR restructuring in 9th UI/UX improvement (commit 1f4fe28), changing from old category selection UI to a new browsing-identical layout (WriteUniversityTabs, banner, breadcrumb, WriteCategoryGrid, minor badges, form). Additionally, the chat system was refactored from `chat/` routes to `camtalk/` routes, and `data/chats.ts` was removed entirely.
+Full re-verification (v4.0) of the mock-auth feature. Since v3.0 (same day), the `write/page.tsx` has undergone additional UI iterations, growing from 1267 to 1370 lines. The `my/page.tsx` also grew from ~499 to 518 lines. This v4.0 analysis performs a complete item-by-item check of every design specification against the current implementation, with updated line references.
 
-This v3.0 analysis focuses on:
-1. Whether the write/page.tsx restructuring preserved all mock-auth integration points
-2. Whether CURRENT_USER_ID is still fully removed
-3. Whether AuthGuard still wraps write page correctly
-4. Verification that all other files remain correct after systemic changes
-5. Documenting the chat-to-camtalk migration impact on auth integration
+This v4.0 analysis verifies:
+1. All design-specified files created and modified correctly
+2. All auth integration points preserved after continued write/page.tsx iterations
+3. CURRENT_USER_ID remains fully eliminated
+4. All edge cases covered
+5. Architecture and convention compliance maintained
+6. Line number accuracy for all code references
 
 ### 1.2 Analysis Scope
 
 - **Design Document**: `docs/02-design/features/mock-auth.design.md`
 - **Plan Document**: `docs/01-plan/features/mock-auth.plan.md`
-- **New Files**: `src/lib/auth.ts` (273 lines), `src/contexts/AuthContext.tsx` (92 lines), `src/components/auth/AuthGuard.tsx` (33 lines)
-- **Modified Files**: `src/lib/constants.ts`, `src/app/layout.tsx`, `src/app/auth/page.tsx`, `src/app/my/page.tsx`, `src/app/write/page.tsx` (MAJOR RESTRUCTURE), `src/app/camtalk/page.tsx` (was `chat/page.tsx`), `src/app/camtalk/[id]/page.tsx` (was `chat/[id]/page.tsx`), `src/components/post/PostStatusControl.tsx`, `src/components/post/PostBottomAction.tsx`, `src/components/user/UserChatButton.tsx`, `src/components/layout/Header.tsx`, `src/lib/api.ts`
-- **Removed Files**: `src/data/chats.ts` (chat system migrated to camtalk)
+- **New Files (3)**: `src/lib/auth.ts` (273 lines), `src/contexts/AuthContext.tsx` (92 lines), `src/components/auth/AuthGuard.tsx` (33 lines)
+- **Modified Files (11)**: `src/lib/constants.ts`, `src/app/layout.tsx`, `src/app/auth/page.tsx` (300 lines), `src/app/my/page.tsx` (518 lines), `src/app/write/page.tsx` (1370 lines), `src/app/camtalk/page.tsx` (107 lines), `src/app/camtalk/[id]/page.tsx` (494 lines), `src/components/post/PostStatusControl.tsx` (88 lines), `src/components/post/PostBottomAction.tsx` (146 lines), `src/components/user/UserChatButton.tsx` (43 lines), `src/components/layout/Header.tsx` (132 lines)
+- **Removed Files**: `src/data/chats.ts` (chat system migrated to camtalk -- still absent)
 - **Analysis Date**: 2026-02-24
 
-### 1.3 Structural Changes Since v2.0
+### 1.3 Changes Since v3.0
 
 | Change | Description | Auth Impact |
 |--------|-------------|-------------|
-| write/page.tsx restructured | New layout: WriteUniversityTabs, banner, breadcrumb, WriteCategoryGrid, minor badges, form | Auth integration points preserved |
-| chat/ -> camtalk/ migration | Routes renamed, new camtalk lib | AuthGuard and useAuth re-applied |
-| data/chats.ts removed | Chat system replaced by camtalk lib | CURRENT_USER_ID source file gone |
-| auth.ts expanded | mockUpdateProfile, mockDeleteAccount added | Beyond design scope (enhancement) |
-| AuthContext expanded | deleteAccount, updateProfile added | Beyond design scope (enhancement) |
-| CHAT_OVERRIDES removed | constants.ts no longer has this key | Previous G-05 gap source eliminated |
+| write/page.tsx continued iteration | 1267 -> 1370 lines (+103 lines, additional UI refinements) | Auth points preserved at shifted line numbers |
+| my/page.tsx minor updates | ~499 -> 518 lines | Auth points preserved |
+| All other auth files | No changes detected | Stable |
 
 ---
 
 ## 2. Overall Scores
 
-| Category | Score | v2.0 Score | Delta | Status |
+| Category | Score | v3.0 Score | Delta | Status |
 |----------|:-----:|:----------:|:-----:|:------:|
 | Feature Match | 100% | 100% | 0% | [PASS] |
 | Data Model Match | 97% | 97% | 0% | [PASS] |
@@ -59,146 +57,45 @@ This v3.0 analysis focuses on:
 
 ---
 
-## 3. Focus Area: write/page.tsx Restructuring Verification
+## 3. Full Design-Implementation Comparison
 
-### 3.1 AuthGuard Wrapping (CRITICAL)
-
-**Design Requirement**: `write/page.tsx` must be wrapped with `AuthGuard`.
-
-**v3.0 Verification**:
-
-`campulist/src/app/write/page.tsx` lines 1260-1266:
-
-```typescript
-export default function WritePage() {
-  return (
-    <AuthGuard>
-      <WritePageContent />
-    </AuthGuard>
-  );
-}
-```
-
-Import at line 13:
-```typescript
-import AuthGuard from '@/components/auth/AuthGuard';
-```
-
-**Result**: PRESERVED -- AuthGuard wrapping intact after restructuring.
-
-### 3.2 useAuth() Hook Usage
-
-**Design Requirement**: `useAuth()` hook used for getting current user.
-
-**v3.0 Verification**:
-
-`campulist/src/app/write/page.tsx` line 12:
-```typescript
-import { useAuth } from '@/contexts/AuthContext';
-```
-
-Line 96 (inside WritePageContent function):
-```typescript
-const { user } = useAuth();
-```
-
-The `user` object is used extensively throughout the restructured component:
-- Line 143: `const isCampusMember = user ? CAMPUS_MEMBER_TYPES.includes(user.memberType) : true;`
-- Line 226: campus access check `user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)`
-- Line 233: ownership verification `post.authorId === user.id`
-- Line 343: `useEffect` dependency `[user]`
-- Line 347-358: user university defaults and title prefix
-- Line 405: campus category check on minor select
-- Lines 441-470: example fill functions check `!user`
-- Line 593: postAccess permission check
-- Line 1110: email autofill `user?.email`
-- Line 1182-1187: preview author info display
-
-**Result**: PRESERVED -- useAuth() hook used correctly, `user` referenced throughout.
-
-### 3.3 authorId Passed to createPost (G-01 Original Fix)
-
-**Design Requirement**: `authorId: user!.id` passed to `createPost()`.
-
-**v3.0 Verification**:
-
-`campulist/src/app/write/page.tsx` line 635:
-```typescript
-const post = createPost({ ...postData, authorId: user!.id, tags, images });
-```
-
-The `createPost` import at line 14:
-```typescript
-import { createPost, getPostForEdit, updatePost, deletePost } from '@/lib/api';
-```
-
-`campulist/src/lib/api.ts` lines 269-288 confirm `createPost` accepts `authorId: string` and uses `input.authorId`:
-```typescript
-export function createPost(input: {
-  title: string;
-  body: string;
-  authorId: string;
-  ...
-}): Post {
-  ...
-  const post: Post = {
-    ...
-    authorId: input.authorId,
-    ...
-  };
-```
-
-**Result**: PRESERVED -- authorId parameter flow fully intact.
-
-### 3.4 CURRENT_USER_ID Not Reintroduced
-
-Grep for `CURRENT_USER_ID` across `campulist/src/` returns **0 matches**.
-
-The restructured `write/page.tsx` does not import or reference `CURRENT_USER_ID` anywhere in its 1267 lines.
-
-**Result**: CONFIRMED -- No regression.
-
----
-
-## 4. Full Design-Implementation Comparison (Updated for v3.0)
-
-### 4.1 Files Created (Design: 3 files)
+### 3.1 Files Created (Design: 3 files)
 
 | Design Spec | Implementation File | Lines | Status | Notes |
 |-------------|---------------------|:-----:|:------:|-------|
 | `src/lib/auth.ts` | `campulist/src/lib/auth.ts` | 273 | Match+ | 5 design functions + 2 enhancements (mockUpdateProfile, mockDeleteAccount) |
 | `src/contexts/AuthContext.tsx` | `campulist/src/contexts/AuthContext.tsx` | 92 | Match+ | Provider + Hook + 2 enhancements (updateProfile, deleteAccount) |
-| `src/components/auth/AuthGuard.tsx` | `campulist/src/components/auth/AuthGuard.tsx` | 33 | Match | Redirect + spinner, unchanged |
+| `src/components/auth/AuthGuard.tsx` | `campulist/src/components/auth/AuthGuard.tsx` | 33 | Match | Redirect + spinner, unchanged since v1.0 |
 
-### 4.2 Files Modified (Design: 10 files -- Updated paths)
+### 3.2 Files Modified (Design: 10 files -- Updated line references)
 
 | Design Spec | Implementation File | Status | Notes |
 |-------------|---------------------|:------:|-------|
-| `constants.ts` - STORAGE_KEYS | L15-16: CURRENT_USER, REGISTERED_USERS | Match | Both keys present. PROFILE_OVERRIDES added (enhancement) |
+| `constants.ts` - STORAGE_KEYS | L15: CURRENT_USER, L16: REGISTERED_USERS | Match | Both keys present. PROFILE_OVERRIDES at L19 (enhancement) |
 | `layout.tsx` - AuthProvider | L32: `<AuthProvider>` wrapping | Match | Inside ThemeProvider |
-| `auth/page.tsx` - login/signup | 278 lines, full form + redirect | Match | Enhanced with memberType, university selector |
-| `my/page.tsx` - useAuth + AuthGuard | L494-499: AuthGuard wrapper, L44: useAuth | Match | Enhanced with profile edit, delete account |
-| `write/page.tsx` - useAuth + AuthGuard | L1260-1266: AuthGuard, L96: useAuth, L635: authorId | Match | MAJOR restructure preserved all auth points |
-| `chat/page.tsx` -> `camtalk/page.tsx` | L99-104: AuthGuard wrapper | Match | Route renamed; auth integration re-applied |
-| `chat/[id]/page.tsx` -> `camtalk/[id]/page.tsx` | L40-45: AuthGuard, L51: useAuth | Match | Route renamed; auth integration re-applied |
+| `auth/page.tsx` - login/signup | 300 lines, full form + redirect | Match | Enhanced with memberType, university selector |
+| `my/page.tsx` - useAuth + AuthGuard | L511-517: AuthGuard wrapper, L44: useAuth | Match | Enhanced with profile edit, delete account |
+| `write/page.tsx` - useAuth + AuthGuard | L1363-1369: AuthGuard, L78: useAuth, L660: authorId | Match | Continued iteration; all auth points preserved |
+| `chat/page.tsx` -> `camtalk/page.tsx` | L101-106: AuthGuard wrapper, L16: useAuth | Match | Route renamed; auth integration correct |
+| `chat/[id]/page.tsx` -> `camtalk/[id]/page.tsx` | L40-45: AuthGuard, L51: useAuth | Match | Route renamed; auth integration correct |
 | `PostStatusControl.tsx` - useAuth | L21: `useAuth()` for ownership check | Match | Unchanged |
 | `PostBottomAction.tsx` - useAuth | L31: `useAuth()` for ownership check | Match | Enhanced with camtalk integration |
 | `UserChatButton.tsx` - useAuth | L15: `useAuth()` for identity | Match | Enhanced with camtalk integration |
 | `Header.tsx` - login/logout UI | L100-126: conditional rendering | Match | Enhanced with camtalk unread count |
 
-### 4.3 auth.ts Functions
+### 3.3 auth.ts Functions (Design: 5 functions)
 
 | Design Function | Implementation | Line | Status |
 |-----------------|----------------|:----:|:------:|
 | `mockLogin(email, password)` | Searches mockUsers + localStorage, returns AuthResult | L102-130 | Match |
-| `mockSignup(data)` | Email + nickname duplicate check, creates user | L134-186 | Match |
+| `mockSignup(data)` | Email + nickname duplicate check, creates user, auto-login | L134-186 | Match |
 | `mockLogout()` | Removes CURRENT_USER from localStorage | L255-257 | Match |
 | `getCurrentUserId()` | Reads from localStorage | L95-98 | Match |
-| `getFullUser(userId)` | Searches mockUsers then localStorage, returns User | L58-91 | Match |
+| `getFullUser(userId)` | Searches mockUsers then localStorage, returns User or null | L58-91 | Match |
 | `mockUpdateProfile(userId, data)` | Profile override for mock/registered users | L197-251 | Enhancement |
-| `mockDeleteAccount(userId)` | Removes user + clears localStorage | L261-272 | Enhancement |
+| `mockDeleteAccount(userId)` | Removes user + clears localStorage | L261-273 | Enhancement |
 
-### 4.4 AuthContextType Interface
+### 3.4 AuthContextType Interface (Design: 5 fields)
 
 | Design Field | Implementation | Line | Status |
 |--------------|----------------|:----:|:------:|
@@ -210,7 +107,7 @@ The restructured `write/page.tsx` does not import or reference `CURRENT_USER_ID`
 | `deleteAccount: () => void` | AuthContext.tsx | L15 | Enhancement |
 | `updateProfile: (data) => { success, error? }` | AuthContext.tsx | L16 | Enhancement |
 
-### 4.5 AuthGuard Behavior
+### 3.5 AuthGuard Behavior (Design: 3 states)
 
 | Design Spec | Implementation | Line | Status |
 |-------------|----------------|:----:|:------:|
@@ -218,14 +115,14 @@ The restructured `write/page.tsx` does not import or reference `CURRENT_USER_ID`
 | `user === null` -> `router.push('/auth')` | useEffect redirect | L15-18 | Match |
 | `user` exists -> render children | `<>{children}</>` | L31 | Match |
 
-### 4.6 Header UI Branching
+### 3.6 Header UI Branching (Design: 2 states)
 
 | Design Spec | Implementation | Line | Status |
 |-------------|----------------|:----:|:------:|
-| Logged in: [write] [camtalk] [my] | All three rendered | L100-118 | Match |
-| Not logged in: [login] | Single login button | L120-125 | Match |
+| Logged in: [write] [camtalk] [my] | All three rendered with icons | L100-119 | Match |
+| Not logged in: [login button] | Single login button | L120-126 | Match |
 
-### 4.7 auth/page.tsx Behavior
+### 3.7 auth/page.tsx Behavior (Design: 6 specs)
 
 | Design Spec | Implementation | Line | Status |
 |-------------|----------------|:----:|:------:|
@@ -234,19 +131,29 @@ The restructured `write/page.tsx` does not import or reference `CURRENT_USER_ID`
 | Signup success -> auto-login + push('/') | Implemented | L78-80 | Match |
 | Signup fail -> toast error | Implemented | L81-83 | Match |
 | Already logged in -> redirect home | useEffect redirect | L51-55 | Match |
-| Social login -> text notice | "coming soon" text (simplified from toast) | L271-274 | Match |
+| Social login -> notice | "coming soon" static text | L293-295 | Match |
 
-### 4.8 my/page.tsx Behavior
+### 3.8 my/page.tsx Behavior (Design: 3 specs)
 
 | Design Spec | Implementation | Line | Status |
 |-------------|----------------|:----:|:------:|
-| AuthGuard wrapping | AuthGuard wrapper | L494-499 | Match |
+| AuthGuard wrapping | AuthGuard wrapper | L511-517 | Match |
 | `useAuth().user` for data | `const { user, logout, deleteAccount, updateProfile } = useAuth()` | L44 | Match |
-| Logout button -> `logout()` | Logout confirmation Sheet -> `logout()` | L443 | Match |
+| Logout button -> `logout()` | Logout confirmation Sheet -> `logout()` | L459 | Match |
+
+### 3.9 write/page.tsx Auth Points (Design: 3 specs -- Critical verification)
+
+| Design Spec | Implementation | Line | Status |
+|-------------|----------------|:----:|:------:|
+| AuthGuard wrapping | `<AuthGuard><WritePageContent /></AuthGuard>` | L1363-1369 | Match |
+| `useAuth()` for current user | `const { user } = useAuth()` | L78 | Match |
+| `authorId: user!.id` in createPost | `createPost({ ...postData, authorId: user!.id, tags, images })` | L660 | Match |
+
+The `user` object is referenced **52 times** throughout write/page.tsx (L78, L125, L208, L212, L215, L325, L329, L331, L334, L336, L340, L387, L423-507, L531-580, L618, L660, L1173, L1271, L1274), demonstrating thorough auth integration.
 
 ---
 
-## 5. Edge Case Verification (Updated for v3.0)
+## 4. Edge Case Verification
 
 | Edge Case (from Design) | Implementation | Status |
 |--------------------------|----------------|:------:|
@@ -254,43 +161,43 @@ The restructured `write/page.tsx` does not import or reference `CURRENT_USER_ID`
 | Mock users (u1-u11) login with '1234' | auth.ts L112: checks `MOCK_PASSWORD = '1234'` | Match |
 | Duplicate email signup -> error | auth.ts L145-151: checks mockUsers + registered | Match |
 | Duplicate nickname signup -> error | auth.ts L154-159: checks mockUsers + registered | Match |
-| Unauthenticated /write -> /auth | write/page.tsx L1260-1266: AuthGuard wrapper | Match |
-| Unauthenticated /my -> /auth | my/page.tsx L494-499: AuthGuard wrapper | Match |
-| Unauthenticated /camtalk -> /auth | camtalk/page.tsx L99-104: AuthGuard wrapper | Match |
+| Unauthenticated /write -> /auth | write/page.tsx L1363-1369: AuthGuard wrapper | Match |
+| Unauthenticated /my -> /auth | my/page.tsx L511-517: AuthGuard wrapper | Match |
+| Unauthenticated /camtalk -> /auth | camtalk/page.tsx L101-106: AuthGuard wrapper | Match |
 | Unauthenticated /camtalk/[id] -> /auth | camtalk/[id]/page.tsx L40-45: AuthGuard wrapper | Match |
-| Unauthenticated post view -> read-only | UserChatButton L18: returns null if no currentUser | Match |
+| Unauthenticated post view -> read-only | UserChatButton.tsx L18: returns null if no currentUser | Match |
 | Already logged in at /auth -> redirect home | auth/page.tsx L51-55 | Match |
-| New user writes post -> uses new user ID | write/page.tsx L635: `authorId: user!.id` | Match |
+| New user writes post -> uses new user ID | write/page.tsx L660: `authorId: user!.id` | Match |
+
+All 11 edge cases from the design document are correctly handled.
 
 ---
 
-## 6. CURRENT_USER_ID Removal -- Complete (Confirmed v3.0)
+## 5. CURRENT_USER_ID Removal -- Complete (Confirmed v4.0)
 
-| Verification | v2.0 Result | v3.0 Result |
+| Verification | v3.0 Result | v4.0 Result |
 |-------------|-------------|-------------|
 | `grep -r "CURRENT_USER_ID" campulist/src/` | 0 matches | **0 matches** |
-| `grep -r "import.*CURRENT_USER_ID" campulist/src/` | 0 matches | **0 matches** |
-| `data/chats.ts` exists | Yes (export removed) | **File deleted entirely** |
-| Mock data `'u1'` strings | In chat messages | In `data/users.ts` and `data/posts.ts` only (correct -- data, not identity logic) |
+| `grep -ri "current_user_id" campulist/src/` (case-insensitive) | Not checked | **0 matches** (only `getCurrentUserId` function name) |
+| `grep -r "CHAT_OVERRIDES" campulist/src/` | 0 matches | **0 matches** |
+| `data/chats.ts` exists | File deleted | **Still absent** |
 
-The `data/chats.ts` file was entirely removed as part of the chat-to-camtalk migration. This eliminates the original source of the G-02 gap permanently.
+The `getCurrentUserId` function in `auth.ts` L95 is the auth function (correct), not the old hardcoded constant.
 
 ---
 
-## 7. chat/ to camtalk/ Migration -- Auth Impact
+## 6. chat/ to camtalk/ Migration -- Auth Stable
 
-The design document references `chat/page.tsx` and `chat/[id]/page.tsx`. These routes have been renamed to `camtalk/page.tsx` and `camtalk/[id]/page.tsx`. All auth integration points have been correctly re-applied.
-
-| Design Route | New Route | useAuth | AuthGuard | Status |
-|-------------|-----------|:-------:|:---------:|:------:|
-| `src/app/chat/page.tsx` | `src/app/camtalk/page.tsx` | L16 | L99-104 | Match |
+| Design Route | Current Route | useAuth | AuthGuard | Status |
+|-------------|--------------|:-------:|:---------:|:------:|
+| `src/app/chat/page.tsx` | `src/app/camtalk/page.tsx` | L16 | L101-106 | Match |
 | `src/app/chat/[id]/page.tsx` | `src/app/camtalk/[id]/page.tsx` | L51 | L40-45 | Match |
 
-Note: The camtalk detail page now wraps the entire exported component with AuthGuard (L40-45), which is an improvement over the design spec that only required `useAuth()`. Both pages are fully protected.
+The old `src/app/chat/` directory no longer exists (confirmed via glob).
 
 ---
 
-## 8. Supabase Migration Compatibility (Updated)
+## 7. Supabase Migration Compatibility
 
 | Interface | Phase A (Current) | Phase B (Supabase) | Compatible |
 |-----------|-------------------|---------------------|:----------:|
@@ -303,13 +210,13 @@ Note: The camtalk detail page now wraps the entire exported component with AuthG
 | `useAuth().deleteAccount()` | mockDeleteAccount() -> localStorage | `supabase.auth.admin.deleteUser()` | Yes |
 | `AuthGuard` | checks `useAuth().user` | Same pattern | Yes |
 
-The `useAuth()` interface remains clean for Supabase migration. The two new methods (updateProfile, deleteAccount) follow the same pattern and will need only internal implementation changes.
+All 8 interfaces remain clean for Supabase migration.
 
 ---
 
-## 9. Architecture Compliance (Starter Level)
+## 8. Architecture Compliance (Starter Level)
 
-### 9.1 Layer Structure
+### 8.1 Layer Structure
 
 | Layer | Files | Status |
 |-------|-------|:------:|
@@ -318,7 +225,7 @@ The `useAuth()` interface remains clean for Supabase migration. The two new meth
 | Lib/Infrastructure | auth.ts, constants.ts, api.ts, camtalk.ts | Correct |
 | Data | users.ts, posts.ts | Correct |
 
-### 9.2 Dependency Direction
+### 8.2 Dependency Direction
 
 | File | Layer | Imports From | Status |
 |------|-------|-------------|:------:|
@@ -334,42 +241,41 @@ The `useAuth()` interface remains clean for Supabase migration. The two new meth
 | PostBottomAction.tsx | Presentation | contexts/AuthContext, lib/camtalk | Correct |
 | UserChatButton.tsx | Presentation | contexts/AuthContext, lib/camtalk | Correct |
 
-No dependency violations found.
-
-Architecture Score: **100%**
+No dependency violations found. Architecture Score: **100%**
 
 ---
 
-## 10. Convention Compliance
+## 9. Convention Compliance
 
-### 10.1 Naming Convention
+### 9.1 Naming Convention
 
 | Category | Convention | Compliance | Violations |
 |----------|-----------|:----------:|------------|
-| Components | PascalCase | 100% | None |
-| Functions | camelCase | 100% | None |
-| Constants | UPPER_SNAKE_CASE | 100% | None |
-| Files (component) | PascalCase.tsx | 100% | None |
-| Files (utility) | camelCase.ts | 100% | None |
-| Interfaces | PascalCase | 100% | None |
+| Components | PascalCase | 100% | None (AuthGuard, AuthProvider, WritePageContent, MyPageContent, CamTalkContent, CamTalkDetailContent) |
+| Functions | camelCase | 100% | None (mockLogin, mockSignup, mockLogout, getCurrentUserId, getFullUser, mockUpdateProfile, mockDeleteAccount) |
+| Constants | UPPER_SNAKE_CASE | 100% | None (STORAGE_KEYS, MOCK_PASSWORD, LIMITS, CAMPUS_MEMBER_TYPES) |
+| Files (component) | PascalCase.tsx | 100% | None (AuthGuard.tsx, AuthContext.tsx, Header.tsx, PostStatusControl.tsx, PostBottomAction.tsx, UserChatButton.tsx) |
+| Files (utility) | camelCase.ts | 100% | None (auth.ts, constants.ts, api.ts, camtalk.ts, types.ts) |
+| Interfaces | PascalCase | 100% | None (AuthContextType, RegisteredUser, AuthResult, SignupData, ProfileUpdateData) |
 
-### 10.2 Import Order
+### 9.2 Import Order
 
-All files follow the convention:
+All 14 auth-related files follow the convention:
 1. External libraries (react, next)
 2. Internal absolute imports (@/...)
 3. Type imports (import type)
 
-Checked files (13 total): auth.ts, AuthContext.tsx, AuthGuard.tsx, layout.tsx, auth/page.tsx, my/page.tsx, write/page.tsx, camtalk/page.tsx, camtalk/[id]/page.tsx, PostStatusControl.tsx, PostBottomAction.tsx, UserChatButton.tsx, Header.tsx.
+Checked files: auth.ts, AuthContext.tsx, AuthGuard.tsx, layout.tsx, auth/page.tsx, my/page.tsx, write/page.tsx, camtalk/page.tsx, camtalk/[id]/page.tsx, PostStatusControl.tsx, PostBottomAction.tsx, UserChatButton.tsx, Header.tsx, api.ts (createPost).
 
 No violations found.
 
-### 10.3 Storage Key Convention
+### 9.3 Storage Key Convention
 
 All localStorage access uses `STORAGE_KEYS.*` constants:
-- `STORAGE_KEYS.CURRENT_USER` (auth.ts, AuthContext.tsx)
-- `STORAGE_KEYS.REGISTERED_USERS` (auth.ts)
-- `STORAGE_KEYS.PROFILE_OVERRIDES` (auth.ts)
+- `STORAGE_KEYS.CURRENT_USER` (auth.ts L97, L113, L123, L183; AuthContext.tsx via getCurrentUserId)
+- `STORAGE_KEYS.REGISTERED_USERS` (auth.ts L46, L53)
+- `STORAGE_KEYS.PROFILE_OVERRIDES` (auth.ts L226, L235)
+- `STORAGE_KEYS.SHOW_ICONS` (auth.ts L268 -- exclusion in deleteAccount)
 - `STORAGE_KEYS.WRITE_DRAFT` (write/page.tsx)
 - `STORAGE_KEYS.LIKED_POSTS` (my/page.tsx)
 
@@ -379,7 +285,7 @@ Convention Score: **100%**
 
 ---
 
-## 11. Implementation Enhancements (Design X, Implementation O)
+## 10. Implementation Enhancements (Design X, Implementation O)
 
 These are positive additions not specified in the design but improving quality:
 
@@ -389,23 +295,23 @@ These are positive additions not specified in the design but improving quality:
 | E-02 | Email case-insensitive comparison | auth.ts L103, L110, L120 | `toLowerCase()` on all email comparisons |
 | E-03 | Input trimming | auth.ts L136-137 | Trims whitespace on signup data |
 | E-04 | `.ac.kr` email auto-verification | auth.ts L82-83 | Users with `.ac.kr` emails get `isVerified: true` |
-| E-05 | Social login "coming soon" text | auth/page.tsx L271-274 | Static text notice |
+| E-05 | Social login "coming soon" text | auth/page.tsx L293-295 | Static text notice |
 | E-06 | Password minimum length check | auth.ts L142 | Requires 4+ characters |
 | E-07 | Profile update function | auth.ts L197-251 | `mockUpdateProfile()` with nickname duplicate check |
-| E-08 | Account deletion function | auth.ts L261-272 | `mockDeleteAccount()` with full cleanup |
+| E-08 | Account deletion function | auth.ts L261-273 | `mockDeleteAccount()` with full cleanup |
 | E-09 | AuthContext expanded interface | AuthContext.tsx L15-16 | `deleteAccount` and `updateProfile` methods added |
-| E-10 | Profile edit UI in my/page | my/page.tsx L339-429 | Full profile edit Sheet with nickname/department/campus/memberType |
-| E-11 | Account deletion UI in my/page | my/page.tsx L452-488 | Confirmation-based deletion with typed confirmation |
-| E-12 | Logout confirmation Sheet | my/page.tsx L432-449 | Sheet-based confirmation instead of direct logout |
+| E-10 | Profile edit UI in my/page | my/page.tsx L349-443 | Full profile edit Sheet with nickname/department/campus/memberType |
+| E-11 | Account deletion UI in my/page | my/page.tsx L467-505 | Confirmation-based deletion with typed confirmation |
+| E-12 | Logout confirmation Sheet | my/page.tsx L445-465 | Sheet-based confirmation instead of direct logout |
 | E-13 | MemberType in signup | auth/page.tsx L14-25 | 7 member types with campus/external categorization |
 | E-14 | University auto-detection | auth/page.tsx L40-43 | Email domain to university matching |
-| E-15 | Campus selection in signup | auth/page.tsx L219-246 | Multi-campus university support |
-| E-16 | User title prefix in write | write/page.tsx L51-64, L346-358 | Auto-prefix with university and member type |
-| E-17 | Campus member type restrictions | write/page.tsx L143, L224-227, L591-597 | postAccess-based category restrictions |
+| E-15 | Campus selection in signup | auth/page.tsx L233-265 | Multi-campus university support |
+| E-16 | User title prefix in write | write/page.tsx L52-58, L329-340 | Auto-prefix with university and member type |
+| E-17 | Campus member type restrictions | write/page.tsx L125, L208, L387, L618 | postAccess-based category restrictions |
 
 ---
 
-## 12. Minor Design Differences (Acceptable)
+## 11. Minor Design Differences (Acceptable)
 
 | Item | Design | Implementation | Impact |
 |------|--------|----------------|--------|
@@ -418,7 +324,7 @@ These are positive additions not specified in the design but improving quality:
 
 ---
 
-## 13. Design Completion Checklist (Updated v3.0)
+## 12. Design Completion Checklist
 
 | Checklist Item (from Design doc) | Status | Evidence |
 |----------------------------------|:------:|----------|
@@ -426,68 +332,71 @@ These are positive additions not specified in the design but improving quality:
 | Signup -> auto login -> home | Done | auth/page.tsx L73-80 |
 | Mock users (u1-u11) can log in | Done | auth.ts L112, MOCK_PASSWORD = '1234' |
 | Logout -> /auth redirect | Done | AuthContext.tsx L54-58 |
-| /write, /my redirect when not logged in | Done | Both use AuthGuard wrapper |
-| /camtalk redirect when not logged in | Done | Both camtalk pages use AuthGuard |
+| /write, /my redirect when not logged in | Done | Both use AuthGuard wrapper (write L1363-1369, my L511-517) |
+| /camtalk redirect when not logged in | Done | Both camtalk pages use AuthGuard (page L101-106, [id] L40-45) |
 | Header login/logout branching | Done | Header.tsx L100-126 |
-| CURRENT_USER_ID fully removed | Done | 0 grep matches in src/; data/chats.ts deleted |
+| CURRENT_USER_ID fully removed | Done | 0 grep matches in src/; data/chats.ts deleted; no regressions |
 | npm run build succeeds | Not verified | Requires build execution |
 | Existing features working | Not verified | Requires manual testing |
 
 ---
 
-## 14. Match Rate Summary
+## 13. Match Rate Summary
 
 ```
 Overall Match Rate: 99%
 
-  Feature Match:         100%  (All design requirements met, write/page.tsx auth preserved)
+  Feature Match:         100%  (All 7 FRs from plan implemented; all design specs met)
   Data Model Match:       97%  (RegisteredUser/SignupData have extra fields -- acceptable)
-  UI/Screen Match:       100%  (Header branching, AuthGuard spinner, auth page, all pages)
-  Architecture:          100%  (Starter level, correct layering, no violations)
+  UI/Screen Match:       100%  (Header branching, AuthGuard spinner, auth page, all protected pages)
+  Architecture:          100%  (Starter level, correct layering, no dependency violations)
   Convention:            100%  (All naming/import/storage conventions followed)
 
-  Previously identified gaps (v1.0): 4 (all resolved in v2.0, confirmed in v3.0)
-    G-01 [Critical] createPost authorId -- RESOLVED (write/page.tsx L635: user!.id)
+  Previously identified gaps (v1.0): 4 (all resolved in v2.0, confirmed across v3.0 and v4.0)
+    G-01 [Critical] createPost authorId -- RESOLVED (write/page.tsx L660: user!.id)
     G-02 [Low]      CURRENT_USER_ID export -- RESOLVED (data/chats.ts deleted entirely)
     G-05 [Low]      Hardcoded storage key -- RESOLVED (CHAT_OVERRIDES removed, camtalk uses own lib)
-    G-06 [Medium]   /chat AuthGuard -- RESOLVED (camtalk/page.tsx L99-104: AuthGuard)
+    G-06 [Medium]   /chat AuthGuard -- RESOLVED (camtalk/page.tsx L101-106: AuthGuard)
 
-  New gaps (v3.0): 0
-  Enhancements (v3.0): 17 items (all positive additions)
-  Structural changes verified: 3 (write restructure, chat->camtalk, chats.ts removal)
+  New gaps (v4.0): 0
+  Enhancements: 17 items (all positive additions)
+  Stability: 4 consecutive checks (v1.0 -> v4.0), all gaps resolved since v2.0
 ```
 
 ---
 
-## 15. Conclusion
+## 14. Conclusion
 
-The mock-auth feature implementation remains **99% aligned** with the design document after the major write/page.tsx restructuring (9th UI/UX improvement) and the chat-to-camtalk migration. All mock-auth integration points have been correctly preserved:
+The mock-auth feature implementation remains **99% aligned** with the design document. This is the 4th consecutive check (v1.0 through v4.0) and the 3rd consecutive check confirming all original gaps are resolved with no regressions.
 
-**write/page.tsx Restructuring (Primary Concern)**:
-- AuthGuard wrapping at L1260-1266: INTACT
-- `useAuth()` hook at L96: INTACT
-- `authorId: user!.id` at L635: INTACT
+**Key Verification Points (v4.0 updated line references)**:
+
+write/page.tsx (1370 lines, +103 from v3.0):
+- AuthGuard wrapping at L1363-1369: INTACT
+- `useAuth()` hook at L78: INTACT
+- `authorId: user!.id` at L660: INTACT
+- `user` referenced 52 times throughout: INTACT
 - No CURRENT_USER_ID reintroduction: CONFIRMED
 
-**chat-to-camtalk Migration**:
-- `camtalk/page.tsx` has AuthGuard at L99-104: CORRECT
-- `camtalk/[id]/page.tsx` has AuthGuard at L40-45 and useAuth at L51: CORRECT
-- `data/chats.ts` deleted entirely, eliminating the original CURRENT_USER_ID source: CONFIRMED
+my/page.tsx (518 lines):
+- AuthGuard wrapping at L511-517: INTACT
+- `useAuth()` at L44 with `{ user, logout, deleteAccount, updateProfile }`: INTACT
 
-**Implementation Enhancements Since v2.0**:
-- auth.ts expanded from 172 to 273 lines with mockUpdateProfile and mockDeleteAccount
-- AuthContext expanded from 71 to 92 lines with updateProfile and deleteAccount methods
-- auth/page.tsx expanded from 153 to 278 lines with memberType selection and university auto-detection
-- my/page.tsx expanded with profile edit, account deletion, and logout confirmation Sheets
-- write/page.tsx expanded from ~450 to 1267 lines with full 9th UI/UX improvement features
+camtalk/page.tsx and camtalk/[id]/page.tsx:
+- AuthGuard at L101-106 and L40-45 respectively: INTACT
+- Old `chat/` routes no longer exist: CONFIRMED
 
-The 1% gap remains from the `RegisteredUser` and `SignupData` interfaces having extra fields not in the design specification, which are acceptable forward-compatible enhancements.
+All other auth-integrated files (Header.tsx, PostStatusControl.tsx, PostBottomAction.tsx, UserChatButton.tsx):
+- All `useAuth()` hooks in correct positions: INTACT
+- No changes detected from v3.0: STABLE
 
-The feature continues to be ready for the **Report phase** (`/pdca report mock-auth`).
+The 1% gap remains from the `RegisteredUser` and `SignupData` interfaces having extra fields not in the design specification, which are acceptable forward-compatible enhancements that improve UX.
+
+The feature is ready for the **Report phase** (`/pdca report mock-auth`).
 
 ---
 
-## 16. Design Document Update Recommendations
+## 15. Design Document Update Recommendations
 
 The following items in `mock-auth.design.md` could be updated to match current implementation:
 
@@ -510,3 +419,4 @@ These are all implementation-ahead-of-design enhancements. No design-specified f
 | 1.0 | 2026-02-21 | Initial gap analysis -- 4 gaps found (96%) | Claude (gap-detector) |
 | 2.0 | 2026-02-21 | Re-check after Act -- all gaps resolved (99%) | Claude (gap-detector) |
 | 3.0 | 2026-02-24 | Post-restructuring verification -- write/page.tsx major restructure + chat-to-camtalk migration confirmed (99%) | Claude (gap-detector) |
+| 4.0 | 2026-02-24 | Full re-verification -- write/page.tsx continued iteration (1267->1370 lines), updated all line references, 0 new gaps (99%) | Claude (gap-detector) |
