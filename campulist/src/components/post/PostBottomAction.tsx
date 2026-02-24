@@ -33,10 +33,20 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
   const [open, setOpen] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [customMsg, setCustomMsg] = useState('');
+  const [hasExistingRoom, setHasExistingRoom] = useState(false);
 
   useEffect(() => {
     setIsOwner(!!user && author.id === user.id);
   }, [author.id, user]);
+
+  useEffect(() => {
+    if (!user || isOwner) return;
+    setHasExistingRoom(!!findRoomByUser(author.id, user.id));
+
+    const update = () => setHasExistingRoom(!!findRoomByUser(author.id, user.id));
+    window.addEventListener('camtalkUpdate', update);
+    return () => window.removeEventListener('camtalkUpdate', update);
+  }, [author.id, user, isOwner]);
 
   // 본인 게시글: 끌어올리기 버튼
   if (isOwner) {
@@ -92,7 +102,7 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
   return (
     <>
       <Button onClick={handleChat} className="bg-blue-600 px-8 text-white hover:bg-blue-700">
-        캠톡하기
+        {hasExistingRoom ? '캠톡으로 문의 다시 하기' : '캠톡하기'}
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>

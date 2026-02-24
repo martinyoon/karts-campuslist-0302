@@ -65,7 +65,8 @@ export default async function UniversityPage({ params, searchParams }: Props) {
         <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
           <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
           <span className="text-orange-300">›</span>
-          <span className="font-semibold text-orange-400">{university.name}</span>
+          <span className="font-semibold text-orange-400">{university.name} · 전체보기</span>
+          <span className="text-orange-300">›</span>
         </nav>
       </div>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { findRoomByUser, startCamTalk } from '@/lib/camtalk';
@@ -13,6 +14,16 @@ interface UserChatButtonProps {
 export default function UserChatButton({ user: profileUser }: UserChatButtonProps) {
   const router = useRouter();
   const { user: currentUser } = useAuth();
+  const [hasExistingRoom, setHasExistingRoom] = useState(false);
+
+  useEffect(() => {
+    if (!currentUser || profileUser.id === currentUser.id) return;
+    setHasExistingRoom(!!findRoomByUser(profileUser.id, currentUser.id));
+
+    const update = () => setHasExistingRoom(!!findRoomByUser(profileUser.id, currentUser.id));
+    window.addEventListener('camtalkUpdate', update);
+    return () => window.removeEventListener('camtalkUpdate', update);
+  }, [profileUser.id, currentUser]);
 
   // 본인이면 표시하지 않음
   if (!currentUser || profileUser.id === currentUser.id) return null;
@@ -36,7 +47,7 @@ export default function UserChatButton({ user: profileUser }: UserChatButtonProp
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-1.5">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
-      캠톡하기
+      {hasExistingRoom ? '캠톡으로 문의 다시 하기' : '캠톡하기'}
     </Button>
   );
 }
