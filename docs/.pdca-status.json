@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-24T11:50:29.982Z",
+  "lastUpdated": "2026-02-24T12:13:11.883Z",
   "activeFeatures": [
     "02-design",
     "data",
@@ -91,9 +91,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:12:14.928Z",
-        "lastUpdated": "2026-02-24T11:40:49.702Z"
+        "lastUpdated": "2026-02-24T12:13:11.883Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/post/PostStatusControl.tsx"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/post/PostBottomAction.tsx"
     },
     "[university]": {
       "phase": "do",
@@ -364,7 +364,7 @@
   "session": {
     "startedAt": "2026-02-20T06:05:02.769Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-24T11:50:29.982Z"
+    "lastActivity": "2026-02-24T12:13:11.883Z"
   },
   "history": [
     {
@@ -8717,6 +8717,24 @@
     {
       "timestamp": "2026-02-24T11:50:29.982Z",
       "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:02:44.647Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:07:54.329Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:13:11.883Z",
+      "feature": "post",
       "phase": "do",
       "action": "updated"
     }

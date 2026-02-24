@@ -12,8 +12,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { UserSummary } from '@/lib/types';
 
 const QUICK_MESSAGES = [
+  '관심 있습니다. 연락 부탁 드립니다',
   '구매 의사가 있습니다. 거래 가능한가요?',
-  '가격 네고 가능한가요?',
   '직거래 장소와 시간이 어떻게 되나요?',
 ];
 
@@ -115,7 +115,7 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
             {!showInput ? (
               <button
                 onClick={() => setShowInput(true)}
-                className="w-full rounded-lg border border-dashed border-border px-4 py-2 text-center text-sm text-muted-foreground transition-colors hover:border-blue-500/50 hover:text-foreground" /* 간격 압축: py-3 → py-2 */
+                className="w-full rounded-lg border-2 border-blue-500 px-4 py-2 text-center text-base font-bold text-blue-600 transition-colors hover:bg-blue-500/5"
               >
                 직접 입력하기
               </button>
