@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getPosts, getUniversityBySlug } from '@/lib/api';
 import { getCategoryBySlug, getMinorCategories } from '@/data/categories';
 import UniversityTabs from '@/components/post/UniversityTabs';
+import CategoryGrid from '@/components/post/CategoryGrid';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/badge';
@@ -94,6 +95,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           )}
         </nav>
       </div>
+
+      {/* 카테고리 바로가기 */}
+      <CategoryGrid universitySlug={uniSlug} activeSlug={catSlug} />
 
       {/* 소분류 필터 */}
       <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">

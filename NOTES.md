@@ -719,6 +719,12 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
        7. 게시글 상세 페이지 브레드크럼에 "모든 대학 ›" 루트 추가
        8. 전체 브레드크럼 스타일 통일 (text-sm text-muted-foreground)
        9. 전체 배너 크기 통일 (py-4, h1 text-xl font-bold)
+[완료] GitHub 푸시 완료 (98ccd5c)
+[완료] CategoryGrid 카테고리 페이지 유지 — 대분류 네비게이션 일관성
+       1. CategoryGrid에 activeSlug prop 추가 (선택된 카테고리 하이라이트)
+       2. 활성 스타일: border-blue-500 bg-blue-500/10 + text-blue-500
+       3. all/[category] 페이지에 CategoryGrid 추가 (브레드크럼↔소분류 사이)
+       4. [university]/[category] 페이지에 CategoryGrid 추가 (universitySlug 전달)
 ```
 
 ---
@@ -788,6 +794,7 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
 - textarea 포커스 패턴: `border-input` + `focus-visible:border-ring` + `focus-visible:ring-ring/50` (Input과 동일)
 - 로고(캠퍼스리스트) 활성 색상: `isHome ? 'text-orange-400' : 'text-muted-foreground'` — 다른 아이콘과 동일 패턴
 - CategoryGrid — flex 수평 스크롤 레이아웃, `min-w-[4.5rem] flex-1`로 반응형 크기, `overflow-x-auto scrollbar-hide`
+- CategoryGrid `activeSlug` — 카테고리 페이지에서 현재 선택된 대분류 하이라이트 (border-blue-500 bg-blue-500/10)
 - 브레드크럼 통일 패턴: `text-sm text-muted-foreground` + `hover:text-foreground hover:underline` + 루트 "모든 대학 ›"
 - 배너 통일 패턴: `bg-blue-950/30 px-4 py-4` + `h1 text-xl font-bold text-blue-400`
 - PopularPostsSection 순위 색상: 1위 yellow-500, 2위 gray-400, 3위 amber-600, 4위이후 orange-500
