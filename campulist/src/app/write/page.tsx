@@ -554,7 +554,7 @@ function WritePageContent() {
 
     const posts = await getPosts({
       categoryMinorSlug: minor.slug,
-      sortBy: 'latest',
+      sortBy: 'popular',
       limit: 20,
     });
     const filtered = posts.filter(p => p.author.id !== user.id).slice(0, 10);
@@ -572,9 +572,9 @@ function WritePageContent() {
     const typeLabel = MEMBER_TYPE_SHORT[user.memberType] || '';
     const prefix = `[${uniShort}][${typeLabel}] `;
     const rawTitle = detail.title.replace(/^\[.*?\]\[.*?\]\s*/, '');
-    setTitle(prefix + rawTitle);
+    setTitle(prefix + rawTitle + ' — 제목을 내 것으로 고쳐주세요!');
 
-    setBody(detail.body);
+    setBody(detail.body + '\n\n— 다른 사람의 글입니다. 내용을 내 것으로 고쳐주세요!');
     if (detail.price !== null) {
       setPrice(String(detail.price));
       setPriceNegotiable(detail.priceNegotiable);
@@ -583,7 +583,7 @@ function WritePageContent() {
       setTags(detail.tags.slice(0, 5));
     }
     if (detail.locationDetail) {
-      setLocation(detail.locationDetail);
+      setLocation(detail.locationDetail + ' — 장소를 내 것으로 고쳐주세요!');
     }
 
     setShowOtherPosts(false);
@@ -652,7 +652,16 @@ function WritePageContent() {
       const post = createPost({ ...postData, authorId: user!.id, tags, images });
       clearDraft();
       toast('게시글이 등록되었습니다!');
-      router.push(`/post/${post.id}`);
+      // 카테고리 목록으로 이동 (내 글이 최상단에 보이는지 확인 가능)
+      const uni = universities.find(u => u.id === universityId);
+      const major = categories.find(c => c.id === majorId);
+      const minor = categories.find(c => c.id === minorId);
+      if (uni && major) {
+        const minorQuery = minor ? `?minor=${minor.slug}` : '';
+        router.push(`/${uni.slug}/${major.slug}${minorQuery}`);
+      } else {
+        router.push(`/post/${post.id}`);
+      }
     }
   };
 
