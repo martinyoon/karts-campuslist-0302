@@ -99,7 +99,7 @@ export default async function AllCategoryPage({ params, searchParams }: Props) {
         <Link href={buildUrl({ minor: '' })}>
           <Badge
             variant="outline"
-            className={`shrink-0 cursor-pointer text-sm px-3 py-1 ${!minorSlug ? 'border-2 border-orange-500 text-orange-600 font-bold dark:text-orange-300' : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'}`}
+            className={`shrink-0 cursor-pointer text-sm px-3 py-1 border-2 ${!minorSlug ? 'border-blue-600 text-blue-700 font-extrabold bg-blue-100 shadow-sm dark:border-blue-400 dark:text-blue-300 dark:bg-blue-900' : 'border-blue-300 text-blue-400 font-medium hover:bg-blue-50 dark:border-blue-700 dark:text-blue-500 dark:hover:bg-blue-950'}`}
           >
             전체보기
           </Badge>

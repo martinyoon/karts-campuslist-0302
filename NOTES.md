@@ -1409,6 +1409,33 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - 신규 Gap: 0건
 - 1%: `RegisteredUser`/`SignupData` 추가 필드 (허용 범위)
 
+### 35. 게시글 상세 이미지 1/3 축소 (2026-02-25)
+
+#### 변경 (`ImageGallery.tsx`)
+- 이미지 컨테이너: `aspect-[4/3] w-full` → `w-1/3 aspect-video ml-4 mt-2 rounded-xl`
+- 가로세로 모두 약 1/3로 축소 (375px 기준: 343×257px → 115×65px)
+- 네비게이션 버튼: `h-8 w-8` → `h-5 w-5`, SVG 12px → 8px
+- 인디케이터 점 제거 (공간 부족), 카운터만 유지 (`text-[10px]`)
+- 빈 이미지 상태 SVG: 48px → 16px
+
+### 36. 수정하기/삭제 버튼 개선 (2026-02-25)
+
+#### 변경 (`PostStatusControl.tsx`)
+- 커스텀 `<button>` + SVG 아이콘 → `<Button variant="destructive">` 통일
+- 아이콘 제거, 텍스트만 표시
+- 두 버튼 동일 크기: `flex-1`
+- 글씨 크기 `text-base` (16px), 높이 `py-3 h-auto`
+- 삭제 확인 Sheet 내부 버튼과 동일한 Button 컴포넌트 스타일 통일
+
+### 37. 전체보기 버튼 소분류와 구분 강화 (2026-02-25)
+
+#### 변경 (`all/[category]/page.tsx`, `[university]/[category]/page.tsx`)
+- 전체보기 버튼 색상: 주황 → 파랑 (`border-blue-*`, `text-blue-*`)으로 소분류(주황)와 색깔 구분
+- 항상 `border-2` 유지 (선택/미선택 테두리 두께 동일 → 수직 정렬 유지)
+- 선택 시: `border-blue-600 text-blue-700 font-extrabold bg-blue-100 shadow-sm`
+- 미선택 시: `border-blue-300 text-blue-400 font-medium` (연한 파랑)
+- 글씨 크기/버튼 크기는 소분류와 동일 (`text-sm px-3 py-1`)
+
 ---
 
 ## 다음 할 일 (TODO)
