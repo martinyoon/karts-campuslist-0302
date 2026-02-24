@@ -698,6 +698,27 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
        6. BottomNav 활성 색상 blue→orange (시인성 개선)
        7. Header 활성 색상 orange 통일 (pathname 기반)
        8. 모바일 검색 동작 통일 (인라인→/search 페이지 이동)
+[완료] 5차 UI/UX 종합 개선 — 사이드바 색상 통일 + 접근성 + 조회수 + hover 효과
+       1. 사이드바 메뉴 활성 색상 blue-500→orange-400 통일
+       2. 글쓰기 Link aria-label="글쓰기" 추가
+       3. 글쓰기 아이콘 크기 30x30→24x24 조정
+       4. Header 아이콘 라벨 text-[10px]→text-xs font-medium 통일
+       5. Header 아이콘 gap-0→gap-0.5 통일
+       6. IconToggle/ThemeToggle aria-label + gap/라벨 통일
+       7. PostCard 조회수(viewCount) 표시 추가
+       8. CategoryGrid hover:scale-105 효과 추가
+       9. PopularPostsSection TOP 3 순위 배지 색상 차별화 (금/은/동)
+[완료] GitHub 푸시 완료 (ca2ae6b)
+[완료] 6차 UI 통일성 개선 — 검색 아이콘 + 로고 반응 + 카테고리 레이아웃 + 브레드크럼 통일
+       1. 검색: 데스크톱 검색 입력폼 제거, 검색 아이콘만 항상 표시
+       2. 로고(캠퍼스리스트) 활성 색상 반응 추가 (홈=orange-400, 그외=muted-foreground)
+       3. CategoryGrid grid→flex 수평 스크롤 (1열 항상 표시)
+       4. CategoryGrid 반응형 크기 (min-w-[4.5rem] flex-1, sm: 확대)
+       5. 홈 페이지 브레드크럼 "모든 대학 ›" 추가
+       6. 대학+카테고리 페이지 브레드크럼에 "모든 대학 ›" 루트 추가
+       7. 게시글 상세 페이지 브레드크럼에 "모든 대학 ›" 루트 추가
+       8. 전체 브레드크럼 스타일 통일 (text-sm text-muted-foreground)
+       9. 전체 배너 크기 통일 (py-4, h1 text-xl font-bold)
 ```
 
 ---
@@ -748,9 +769,9 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
 - `isCampusBlocked()` — write/page.tsx useEffect 내 인라인 헬퍼, URL/드래프트/수정 3곳에서 사용
 - `getCategoryGroups()` — 인자 없이 호출 (boardType 파라미터 제거됨)
 - `app/ad/` 라우트는 완전 삭제됨 (리다이렉트 없음, 404 반환)
-- Header `showMobileSearch` 제거됨 — 모바일 검색은 `/search` 페이지로 이동 (하단 바와 동일)
+- Header `showMobileSearch` 제거됨 — 검색은 `/search` 페이지 아이콘으로 통일 (데스크톱 검색 입력폼도 제거)
 - Header/BottomNav 활성 색상 `text-orange-400` 통일 — pathname 기반 활성/비활성 전환
-- Header 아이콘 레이아웃: `flex flex-col items-center gap-0 px-2 py-1` + `text-[10px]` 라벨
+- Header 아이콘 레이아웃: `flex h-auto flex-col items-center gap-0.5 px-2 py-1` + `text-xs font-medium` 라벨
 - Header `currentUniSlug` — pathname에서 대학 slug 추출하여 카테고리 URL에 반영
 - CategoryGrid — `'use client'` 제거, Sheet/useState 없는 순수 서버 컴포넌트로 변환
 - `navigator.share()` — iOS/Android 네이티브 공유 시트, 미지원 브라우저는 클립보드 폴백
@@ -765,3 +786,8 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
 - 커스텀 오버레이 → Sheet 전환 원칙: 모든 바텀시트/모달을 shadcn Sheet로 통일 (포커스 트랩, Escape, 접근성)
 - Header 접근성: 모든 아이콘 버튼에 aria-label 적용 완료 (검색, 메뉴, 캠톡, 마이페이지)
 - textarea 포커스 패턴: `border-input` + `focus-visible:border-ring` + `focus-visible:ring-ring/50` (Input과 동일)
+- 로고(캠퍼스리스트) 활성 색상: `isHome ? 'text-orange-400' : 'text-muted-foreground'` — 다른 아이콘과 동일 패턴
+- CategoryGrid — flex 수평 스크롤 레이아웃, `min-w-[4.5rem] flex-1`로 반응형 크기, `overflow-x-auto scrollbar-hide`
+- 브레드크럼 통일 패턴: `text-sm text-muted-foreground` + `hover:text-foreground hover:underline` + 루트 "모든 대학 ›"
+- 배너 통일 패턴: `bg-blue-950/30 px-4 py-4` + `h1 text-xl font-bold text-blue-400`
+- PopularPostsSection 순위 색상: 1위 yellow-500, 2위 gray-400, 3위 amber-600, 4위이후 orange-500

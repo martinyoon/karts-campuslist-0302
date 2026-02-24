@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import ThemeToggle from '@/components/ThemeToggle';
 import IconToggle from '@/components/IconToggle';
@@ -15,12 +14,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getWriteUrl } from '@/lib/writeUrl';
 
 export default function Header() {
-  const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const writeHref = getWriteUrl(pathname, searchParams.toString());
-  const [searchQuery, setSearchQuery] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -30,16 +27,9 @@ export default function Header() {
     return () => window.removeEventListener('camtalkUpdate', update);
   }, [user]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = searchQuery.trim();
-    if (q) {
-      router.push(`/search?q=${encodeURIComponent(q)}`);
-    }
-  };
-
   // 현재 pathname에서 대학 slug 추출
   const currentUniSlug = universities.find(u => pathname.startsWith(`/${u.slug}`))?.slug;
+  const isHome = pathname === '/' || universities.some(u => pathname === `/${u.slug}`);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
@@ -79,29 +69,16 @@ export default function Header() {
 
             {/* 로고 */}
             <Link href="/" className="flex shrink-0 flex-col leading-tight">
-              <span className="text-xl font-bold text-blue-500">캠퍼스리스트</span>
+              <span className={`text-xl font-bold ${isHome ? 'text-orange-400' : 'text-muted-foreground'}`}>캠퍼스리스트</span>
               <span className="hidden text-xs text-muted-foreground md:block">Campulist.com</span>
             </Link>
 
-            {/* 데스크톱: 검색 */}
-            <form onSubmit={handleSearch} className="hidden flex-1 md:block">
-              <Input
-                type="search"
-                placeholder="검색어를 입력하세요"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="max-w-xs"
-              />
-            </form>
-
-            {/* 모바일: 돋보기 버튼 */}
-            <Link href="/search" className={`ml-auto flex h-auto flex-col items-center gap-0.5 px-2 py-1 md:hidden ${pathname.startsWith('/search') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="검색">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-              <span className="text-xs font-medium">검색</span>
-            </Link>
-
             {/* 우측 버튼 */}
-            <div className="flex items-center gap-1 md:ml-auto">
+            <div className="ml-auto flex items-center gap-1">
+              <Link href="/search" className={`flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/search') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="검색">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                <span className="text-xs font-medium">검색</span>
+              </Link>
               <span className="hidden md:flex md:items-center md:gap-1">
                 <IconToggle />
                 <ThemeToggle />

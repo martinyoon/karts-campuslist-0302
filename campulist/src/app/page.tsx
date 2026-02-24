@@ -21,6 +21,14 @@ export default async function HomePage() {
         <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">전체 캠퍼스 통합 · All Universities</p>
       </div>
 
+      {/* 브레드크럼 */}
+      <div className="border-b border-border px-4 py-2">
+        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">모든 대학</span>
+          <span>›</span>
+        </nav>
+      </div>
+
       {/* 카테고리 바로가기 */}
       <CategoryGrid />
 

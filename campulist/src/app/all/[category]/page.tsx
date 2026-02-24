@@ -63,39 +63,31 @@ export default async function AllCategoryPage({ params, searchParams }: Props) {
     <div>
       <UniversityTabs />
 
-      {/* 모든 대학 컨텍스트 */}
-      <div className="bg-blue-950/30 px-4 py-2 dark:bg-blue-950/40">
-        <p className="text-sm">
-          <span className="font-bold text-blue-400 dark:text-blue-300">모든 대학</span>
-          <span className="ml-1.5 text-blue-500/70 dark:text-blue-400/70">전체 캠퍼스 통합</span>
-        </p>
+      {/* 모든 대학 정보 배너 */}
+      <div className="bg-blue-950/30 px-4 py-4 dark:bg-blue-950/40">
+        <h1 className="text-xl font-bold text-blue-400 dark:text-blue-300">모든 대학</h1>
+        <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">전체 캠퍼스 통합 · All Universities</p>
       </div>
 
-      {/* 카테고리 헤더 */}
-      <div className="border-b border-border px-4 py-4">
-        <nav className="flex items-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 text-lg text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
-          <Link href="/" className="font-semibold hover:text-amber-500 hover:underline">
-            모든 대학
-          </Link>
-          <span className="font-normal text-amber-400/50">›</span>
+      {/* 브레드크럼 */}
+      <div className="border-b border-border px-4 py-2">
+        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-foreground hover:underline">모든 대학</Link>
+          <span>›</span>
           {activeMinor ? (
-            <Link href={buildUrl({ minor: '' })} className="font-semibold hover:text-amber-500 hover:underline">
+            <Link href={buildUrl({ minor: '' })} className="hover:text-foreground hover:underline">
               <span className="cat-icon">{category.icon} </span>{category.name}
             </Link>
           ) : (
-            <span className="font-bold"><span className="cat-icon">{category.icon} </span>{category.name}</span>
+            <span className="font-medium text-foreground"><span className="cat-icon">{category.icon} </span>{category.name}</span>
           )}
           {activeMinor && (
             <>
-              <span className="font-normal text-amber-400/50">›</span>
-              <span className="font-bold">{activeMinor.name}</span>
+              <span>›</span>
+              <span className="font-medium text-foreground">{activeMinor.name}</span>
             </>
           )}
         </nav>
-        <div className="mt-1 flex items-center gap-2">
-          <h1 className="text-xl font-bold"><span className="cat-icon">{category.icon} </span>{category.name}</h1>
-          <span className="text-sm text-muted-foreground">{posts.length}건</span>
-        </div>
       </div>
 
       {/* 소분류 필터 */}
