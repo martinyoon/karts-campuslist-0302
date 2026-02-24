@@ -1279,6 +1279,17 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - 글자 크기: `text-xs` → `text-base` (12px → 16px, 실제 게시글과 동일)
 - 글자 색상: `text-muted-foreground` → `text-amber-600 dark:text-amber-400` (노랑/주황 계열로 눈에 띄게)
 
+### 28. 등록 → 미리보기 → 최종 등록 흐름 변경 (2026-02-24)
+
+**파일**: `campulist/src/app/write/page.tsx`
+
+- **Before**: 등록 버튼 누르면 바로 게시글 등록
+- **After**: 등록 버튼 → validate → 미리보기 Sheet → "최종 등록!" 버튼으로 실제 등록
+- `handlePreviewBeforeSubmit()` 함수 추가: validate 통과 시 미리보기 Sheet 열기
+- 미리보기 Sheet "확인했어요" → "최종 등록!" / "최종 수정!" 텍스트 변경 + `handleSubmit()` 호출
+- 별도 미리보기 버튼 제거 (등록이 미리보기를 여므로 불필요)
+- 하단 버튼: 2버튼(미리보기+등록) → 1버튼(등록) `w-full`로 단순화
+
 ### Mock Auth PDCA Gap Analysis v4.0 결과 (2026-02-24)
 
 **Overall Match Rate: 99%** (4회 연속 동일)
@@ -1382,6 +1393,6 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - `getWriteUrl()` — pathname에서 uni/major/minor 추출하여 `/write?uni=&major=&minor=` 생성 (Header에서 사용)
 - 글쓰기 카테고리 뷰 pre-selection: `id={major-group-N}` + `ring-2 ring-orange-300 bg-orange-50` + "선택됨" 라벨
 - CategorySummary 브레드크럼: 일반 페이지와 완전 동일 스타일 (text-base, text-orange-400, 풀네임, "모든 대학" 포함)
-- 미리보기/등록 버튼 패턴: `flex gap-2` + 둘 다 `flex-1 py-3 font-bold` → 동일 크기, 색상 단계 구분 (밝은파란 vs 진한파란)
-- 미리보기 Sheet 닫기 패턴: 2버튼 ("수정할래요" + "확인했어요") + 바깥 터치/스와이프 유지
+- 등록 흐름 패턴: 등록 버튼 → `handlePreviewBeforeSubmit`(validate) → 미리보기 Sheet → "최종 등록!" → `handleSubmit`(실제 등록)
+- 미리보기 Sheet 하단 패턴: 2버튼 ("수정할래요" + "최종 등록!") + 바깥 터치/스와이프 유지
 - 미리보기 본문: `text-base text-amber-600 dark:text-amber-400` — 노랑 계열로 눈에 띄게, 전체 표시 (line-clamp 없음)

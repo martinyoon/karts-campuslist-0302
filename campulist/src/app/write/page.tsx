@@ -609,6 +609,27 @@ function WritePageContent() {
     return errs;
   };
 
+  // 등록 버튼 → validate 후 미리보기 열기
+  const handlePreviewBeforeSubmit = () => {
+    if (submitting) return;
+    if (minorId) {
+      const minor = categories.find(c => c.id === minorId);
+      if (minor?.postAccess === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)) {
+        toast('이 카테고리는 대학 소속 인증 회원만 이용할 수 있습니다.');
+        return;
+      }
+    }
+    const errs = validate();
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      const firstErrorKey = Object.keys(errs)[0];
+      const el = document.getElementById(`field-${firstErrorKey}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    setShowPreview(true);
+  };
+
   const handleSubmit = () => {
     if (submitting) return;
 
@@ -1280,33 +1301,24 @@ function WritePageContent() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setShowPreview(false)}
+                    onClick={() => { setShowPreview(false); handleSubmit(); }}
                     className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-bold text-white transition-colors hover:bg-blue-700"
                   >
-                    확인했어요
+                    {isEditMode ? '최종 수정!' : '최종 등록!'}
                   </button>
                 </div>
               </SheetContent>
             </Sheet>
 
-            {/* 미리보기 + 등록 버튼 */}
+            {/* 등록 버튼 (누르면 미리보기 → 최종 등록) */}
             <div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowPreview(true)}
-                  className="flex-1 rounded-lg bg-blue-100 py-3 text-base font-bold text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
-                >
-                  👀 미리보기
-                </button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!title || !minorId || submitting}
-                  className="flex-1 bg-blue-600 py-3 text-base font-bold hover:bg-blue-700"
-                >
-                  {submitting ? '처리 중...' : isEditMode ? '✏️ 수정하기' : '✏️ 등록하기'}
-                </Button>
-              </div>
+              <Button
+                onClick={handlePreviewBeforeSubmit}
+                disabled={!title || !minorId || submitting}
+                className="w-full bg-blue-600 py-3 text-base font-bold hover:bg-blue-700"
+              >
+                {submitting ? '처리 중...' : isEditMode ? '✏️ 수정하기' : '✏️ 등록하기'}
+              </Button>
               {/* 간격 압축: mt-2 → mt-1 */}
               {(!title || !minorId) && (
                 <p className="mt-1 text-center text-xs text-muted-foreground">
