@@ -1191,15 +1191,6 @@ function WritePageContent() {
               </div>
             </div>
 
-            {/* 미리보기 버튼: 간격 압축: py-2.5 → py-1.5 */}
-            <button
-              type="button"
-              onClick={() => setShowPreview(true)}
-              className="w-full rounded-lg border border-border bg-muted/30 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              👀 미리보기
-            </button>
-
             {/* 다른 사람들 글 가져오기 Sheet */}
             <Sheet open={showOtherPosts} onOpenChange={setShowOtherPosts}>
               <SheetContent side="bottom" className="max-h-[60vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
@@ -1290,15 +1281,24 @@ function WritePageContent() {
               </SheetContent>
             </Sheet>
 
-            {/* 등록 버튼: 간격 압축: py-6 → py-3 */}
+            {/* 미리보기 + 등록 버튼 */}
             <div>
-              <Button
-                onClick={handleSubmit}
-                disabled={!title || !minorId || submitting}
-                className="w-full bg-blue-600 py-3 text-base hover:bg-blue-700"
-              >
-                {submitting ? '처리 중...' : isEditMode ? '수정하기' : '등록하기'}
-              </Button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPreview(true)}
+                  className="shrink-0 rounded-lg border-2 border-blue-600 px-4 py-3 text-base font-bold text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950"
+                >
+                  👀 미리보기
+                </button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!title || !minorId || submitting}
+                  className="flex-1 bg-blue-600 py-3 text-base hover:bg-blue-700"
+                >
+                  {submitting ? '처리 중...' : isEditMode ? '수정하기' : '등록하기'}
+                </Button>
+              </div>
               {/* 간격 압축: mt-2 → mt-1 */}
               {(!title || !minorId) && (
                 <p className="mt-1 text-center text-xs text-muted-foreground">
