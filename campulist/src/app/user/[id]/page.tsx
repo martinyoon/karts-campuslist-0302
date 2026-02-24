@@ -14,7 +14,7 @@ import UserChatButton from '@/components/user/UserChatButton';
 import type { User, MemberType, PostListItem } from '@/lib/types';
 
 const MEMBER_TYPE_LABELS: Record<MemberType, string> = {
-  undergraduate: '🎓 학부생',
+  undergraduate: '🎓 학부생/예술사(한예종)',
   graduate: '📚 대학원생',
   professor: '👨‍🏫 교수',
   staff: '🏢 교직원',

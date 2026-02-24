@@ -12,7 +12,7 @@ import { universities } from '@/data/universities';
 import type { MemberType } from '@/lib/types';
 
 const CAMPUS_MEMBER_TYPES: { value: MemberType; label: string; icon: string }[] = [
-  { value: 'undergraduate', label: '학부생', icon: '🎓' },
+  { value: 'undergraduate', label: '학부생/예술사(한예종)', icon: '🎓' },
   { value: 'graduate', label: '대학원생', icon: '📚' },
   { value: 'professor', label: '교수', icon: '👨‍🏫' },
   { value: 'staff', label: '교직원', icon: '🏢' },
@@ -153,7 +153,6 @@ export default function AuthPage() {
                           : 'border-border text-muted-foreground hover:bg-muted'
                       }`}
                     >
-                      <span className="text-base">{type.icon}</span>
                       {type.label}
                     </button>
                   ))}
@@ -174,7 +173,6 @@ export default function AuthPage() {
                           : 'border-border text-muted-foreground hover:bg-muted'
                       }`}
                     >
-                      <span className="text-base">{type.icon}</span>
                       {type.label}
                     </button>
                   ))}
