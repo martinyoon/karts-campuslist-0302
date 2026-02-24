@@ -91,7 +91,8 @@ interface User {
 | `98ccd5c` | refactor: 6차 UI 통일성 개선 — 검색 아이콘, 로고 반응, 카테고리 레이아웃, 브레드크럼 |
 | `29f51cc` | feat: 카테고리 페이지에 CategoryGrid 유지 — 대분류 네비게이션 일관성 |
 | `49a856e` | refactor: 7차 UI/UX 개선 — 햄버거 메뉴, 브레드크럼, 대학 전환, 소분류 Badge |
-| (현재) | refactor: 8차 UI/UX 개선 — 글쓰기 카테고리 pre-selection + 브레드크럼 스타일 통일 |
+| `b559e1b` | refactor: 8차 UI/UX 개선 — 글쓰기 카테고리 pre-selection + 브레드크럼 스타일 통일 |
+| (현재) | refactor: 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화 |
 
 ---
 
@@ -742,6 +743,14 @@ Header와 동일한 `text-orange-400` 활성 색상으로 상단·하단 통일.
        1. 글쓰기 카테고리 뷰에서 pre-selected 대분류 시각적 강조 (오렌지 ring + 배경 + "선택됨")
        2. pre-selected 대분류 자동 스크롤 (useEffect + scrollIntoView)
        3. CategorySummary 브레드크럼 스타일 통일 (blue→orange, text-lg→text-base, 풀네임)
+[진행] 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화
+       1. WriteUniversityTabs 컴포넌트 생성 (state 기반 대학 탭)
+       2. WriteCategoryGrid 컴포넌트 생성 (state 기반 카테고리 아이콘 그리드)
+       3. 글쓰기 페이지 레이아웃 재구성: UniversityTabs → 배너 → 브레드크럼 → CategoryGrid → 소분류 Badge → 폼
+       4. 라운드 대학 버튼 제거 → 수평 탭 바 (브라우징과 동일)
+       5. 2열 카테고리 텍스트 그리드 제거 → 수평 아이콘 스크롤 (브라우징과 동일)
+       6. 소분류 배지 추가 (오렌지 톤, 잠금 표시, 브라우징과 동일)
+       7. CategorySummary 제거 (상단 브레드크럼으로 대체)
 ```
 
 ### 15. 7차 UI/UX 개선 — 햄버거 메뉴 + 브레드크럼 + 대학 전환 + 소분류 Badge (8개 파일 수정)
@@ -884,6 +893,118 @@ useEffect(() => {
 | 마지막 항목 | `font-bold` | `font-semibold` |
 | 변경 버튼 | `text-blue-500` | `text-orange-400 hover:text-orange-300` |
 | aria-label | 없음 | `브레드크럼` 추가 |
+
+### 17. 9차 UI/UX 개선 — 글쓰기 페이지 레이아웃 브라우징과 완전 동일화 (3개 파일 수정/생성)
+
+**목표**: 글쓰기 페이지를 브라우징 페이지(`/[university]/[category]`)와 완전히 동일한 레이아웃으로 재구성.
+브라우징 시 보던 화면 구성(대학탭, 배너, 브레드크럼, 카테고리 아이콘, 소분류 Badge)을 유지한 상태에서 글쓰기.
+
+#### 수정/생성 파일 목록 (3개)
+
+| # | 파일 | 변경 내용 | 유형 |
+|---|------|----------|------|
+| 1 | `components/write/WriteUniversityTabs.tsx` | **신규** — state 기반 대학 탭 컴포넌트 | 신규 |
+| 2 | `components/write/WriteCategoryGrid.tsx` | **신규** — state 기반 카테고리 아이콘 그리드 | 신규 |
+| 3 | `app/write/page.tsx` | 레이아웃 전면 재구성 | 리팩터링 |
+
+#### Before vs After 레이아웃 비교
+
+**Before (글쓰기 페이지)**:
+```
+타이틀 ("카테고리 선택" / "글쓰기")
+라운드 대학 버튼 (서울대 / 연세대 / 고려대 ...)
+2열 카테고리 텍스트 그리드 (대분류 + 소분류 텍스트 나열)
+→ 소분류 클릭 시 → 글쓰기 폼
+```
+
+**After (브라우징과 동일)**:
+```
+WriteUniversityTabs (수평 대학 탭 바)
+대학 정보 배너 (bg-blue-950/30, 대학명, 지역, 영문명)
+브레드크럼 (모든 대학 › 서울대학교 › 📦 중고마켓 › 전공서적)
+WriteCategoryGrid (수평 아이콘 스크롤, 7개 대분류)
+소분류 Badge (수평 스크롤, 오렌지 톤, 잠금 표시)
+→ 소분류 선택 시 → 글쓰기 폼
+```
+
+#### 1. WriteUniversityTabs 컴포넌트 (신규)
+
+**파일**: `components/write/WriteUniversityTabs.tsx`
+
+UniversityTabs의 state 기반 버전. `<Link>` 대신 `<button>` + `onSelect` 콜백 사용.
+대학 탭 클릭 시 페이지 이동 없이 `setUniversityId()` 호출.
+
+```tsx
+interface Props {
+  selectedId: number;
+  onSelect: (id: number) => void;
+}
+```
+
+- 브라우징 UniversityTabs와 동일한 스타일 (border-b-2, text-blue-500 활성)
+- 우측 그라데이션 fade 효과
+- "모든 대학" 탭은 미포함 (글쓰기는 항상 특정 대학 대상)
+
+#### 2. WriteCategoryGrid 컴포넌트 (신규)
+
+**파일**: `components/write/WriteCategoryGrid.tsx`
+
+CategoryGrid의 state 기반 버전. `<Link>` 대신 `<button>` + `onSelect` 콜백 사용.
+카테고리 아이콘 클릭 시 페이지 이동 없이 `handleMajorSelect()` 호출.
+
+```tsx
+interface Props {
+  activeId: number | null;
+  onSelect: (id: number) => void;
+}
+```
+
+- 브라우징 CategoryGrid와 동일한 스타일 (flex 수평 스크롤, 아이콘 3xl, border 활성)
+- `activeId`로 선택된 대분류 하이라이트
+
+#### 3. write/page.tsx 레이아웃 재구성
+
+**주요 변경 사항**:
+
+| 항목 | Before | After |
+|------|--------|-------|
+| 외부 래퍼 | `<div className="px-4 py-6">` | `<div>` (패딩 없음, 각 섹션이 자체 패딩) |
+| 대학 선택 | 라운드 버튼 5개 | WriteUniversityTabs 수평 탭 |
+| 대학 정보 | 없음 | 배너 (`bg-blue-950/30`, name, region, nameEn) |
+| 브레드크럼 | 폼 안 CategorySummary | 상단 고정 nav (오렌지 톤) |
+| 카테고리 | 2열 텍스트 그리드 (columns-2) | WriteCategoryGrid 아이콘 수평 스크롤 |
+| 소분류 | 카테고리 그리드 내 텍스트 버튼 | Badge 수평 스크롤 (오렌지 톤, 잠금 표시) |
+| 폼 래퍼 | `<div className="mt-6">` | `<div className="px-4 py-4">` |
+
+**추가된 computed values**:
+```tsx
+const selectedUni = universities.find(u => u.id === universityId);
+const selectedMajor = majorId ? majorCategories.find(c => c.id === majorId) ?? null : null;
+const currentMinors = majorId ? getMinorCategories(majorId) : [];
+const selectedMinor = minorId ? currentMinors.find(c => c.id === minorId) ?? null : null;
+const isCampusMember = user ? CAMPUS_MEMBER_TYPES.includes(user.memberType) : true;
+```
+
+**추가된 handler 함수**:
+```tsx
+handleMajorSelect(id)  // 대분류 클릭 → majorId 설정, minorId 초기화
+handleMinorSelect(id)  // 소분류 클릭 → campus 접근 체크 → minorId 설정, form 진입
+handleChangeCategory() // 변경됨: minorId도 초기화
+```
+
+**삭제된 항목**:
+- `import CategorySummary` → `import WriteUniversityTabs, WriteCategoryGrid`
+- `import getCategoryGroups` → `import getMinorCategories, majorCategories`
+- auto-scroll useEffect (major-group DOM 엘리먼트 없음)
+- 2열 카테고리 그리드 전체 (캠퍼스/비캠퍼스 분기)
+- CategorySummary 렌더링 (브레드크럼으로 대체)
+- `showLocked` state (더 이상 사용 안 함)
+
+**소분류 Badge 접근 제어**:
+- campus 전용 소분류: `🔒` 아이콘 + `border-border text-muted-foreground/50 cursor-not-allowed`
+- open 소분류: `border-orange-400 text-orange-600` (브라우징과 동일)
+- 선택된 소분류: `border-2 border-orange-500 text-orange-600 font-bold` (브라우징과 동일)
+- 비캠퍼스 회원이 campus 소분류 클릭 시 토스트 안내
 
 ---
 

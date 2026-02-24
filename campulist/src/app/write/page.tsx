@@ -16,10 +16,11 @@ import { getPostImages } from '@/data/posts';
 import { LIMITS } from '@/lib/constants';
 import type { PostStatus, MemberType } from '@/lib/types';
 import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
-import CategorySummary from '@/components/write/CategorySummary';
+import WriteUniversityTabs from '@/components/write/WriteUniversityTabs';
+import WriteCategoryGrid from '@/components/write/WriteCategoryGrid';
 import { categoryExamples, categoryExampleSets } from '@/data/categoryExamples';
 import type { ToneType } from '@/data/categoryExamples';
-import { getCategoryBySlug, getCategoryGroups, categories } from '@/data/categories';
+import { getCategoryBySlug, getMinorCategories, majorCategories, categories } from '@/data/categories';
 import type { User } from '@/lib/types';
 
 interface WriteDraft {
@@ -133,6 +134,13 @@ function WritePageContent() {
   const season = getCurrentSeason();
   const seasonHint = exSet?.seasonalHints?.[season];
   const seasonLabel = SEASON_LABELS[season];
+
+  // 현재 선택된 대학/카테고리 정보
+  const selectedUni = universities.find(u => u.id === universityId);
+  const selectedMajor = majorId ? majorCategories.find(c => c.id === majorId) ?? null : null;
+  const currentMinors = majorId ? getMinorCategories(majorId) : [];
+  const selectedMinor = minorId ? currentMinors.find(c => c.id === minorId) ?? null : null;
+  const isCampusMember = user ? CAMPUS_MEMBER_TYPES.includes(user.memberType) : true;
 
   // 완성도 점수
   const completionScore = useMemo(() => {
@@ -353,17 +361,6 @@ function WritePageContent() {
     document.title = isEditMode ? '글 수정 | 캠퍼스리스트' : '글쓰기 | 캠퍼스리스트';
   }, [isEditMode]);
 
-  // pre-selected 대분류 자동 스크롤
-  useEffect(() => {
-    if (majorId && step !== 'form') {
-      const timer = setTimeout(() => {
-        const el = document.getElementById(`major-group-${majorId}`);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [step, majorId]);
-
   // 자동 임시저장 (1초 디바운스, 수정 모드에서는 비활성)
   const saveDraft = useCallback(() => {
     if (isEditMode) return;
@@ -393,7 +390,25 @@ function WritePageContent() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChangeCategory = () => {
+    setMinorId(null);
     setStep('major');
+  };
+
+  const handleMajorSelect = (id: number) => {
+    setMajorId(id);
+    setMinorId(null);
+    if (step === 'form') setStep('major');
+  };
+
+  const handleMinorSelect = (id: number) => {
+    const minor = categories.find(c => c.id === id);
+    if (minor?.postAccess === 'campus' && user && !CAMPUS_MEMBER_TYPES.includes(user.memberType)) {
+      toast('이 카테고리는 대학 소속 인증 회원만 이용 가능합니다');
+      return;
+    }
+    setMajorId(minor?.parentId ?? majorId);
+    setMinorId(id);
+    setStep('form');
   };
 
   const handleReset = () => {
@@ -630,181 +645,111 @@ function WritePageContent() {
   };
 
   return (
-    <div className="px-4 py-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">
-          {isEditMode ? '글 수정' : step === 'form' ? '글쓰기' : '카테고리 선택'}
-        </h1>
-        <div className="flex items-center gap-2">
-          {lastSaved && (
-            <span className="text-xs text-muted-foreground">
-              임시저장됨
-            </span>
-          )}
-          {draftLoaded && (
-            <button
-              onClick={handleReset}
-              className="text-xs text-muted-foreground hover:text-destructive"
-            >
-              초기화
-            </button>
-          )}
-        </div>
-      </div>
+    <div>
+      {/* 대학 탭 */}
+      <WriteUniversityTabs selectedId={universityId} onSelect={setUniversityId} />
 
-      {/* 대학 선택 (모든 Step에서 표시) */}
-      <div className="mt-4">
-        <label className="mb-1.5 block text-sm font-medium">대학교</label>
-        <div className="flex flex-wrap gap-2">
-          {universities.map(uni => (
-            <button
-              key={uni.id}
-              onClick={() => setUniversityId(uni.id)}
-              className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                universityId === uni.id ? 'border-blue-500 bg-blue-500/10 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              {uni.name.replace('대학교', '대')}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-6">
-        {/* 카테고리 통합 선택 (한 화면) */}
-        {step !== 'form' && (() => {
-          const isCampusMember = user ? CAMPUS_MEMBER_TYPES.includes(user.memberType) : true;
-          const allGroups = getCategoryGroups();
-
-          // 캠퍼스 회원 → 전체 카테고리
-          if (isCampusMember) {
-            return (
-              <div>
-                <p className="mb-2 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
-                <div className="columns-2 gap-4">
-                  {allGroups.map(({ major, minors }) => (
-                    <div key={major.id} id={`major-group-${major.id}`} className={`mb-3 break-inside-avoid ${majorId === major.id ? 'rounded-lg bg-orange-50 ring-2 ring-orange-300 p-2 dark:bg-orange-950/30 dark:ring-orange-700' : ''}`}>
-                      <div className="flex items-center gap-1.5 py-1.5">
-                        <span className="cat-icon text-lg">{major.icon}</span>
-                        <span className={`text-lg font-bold ${majorId === major.id ? 'text-orange-500' : ''}`}>{major.name}</span>
-                        {majorId === major.id && <span className="ml-auto text-xs font-medium text-orange-500">선택됨</span>}
-                      </div>
-                      <div className="flex flex-wrap gap-1 pb-1">
-                        {minors.map(minor => (
-                          <button
-                            key={minor.id}
-                            onClick={() => { setMajorId(major.id); setMinorId(minor.id); setStep('form'); }}
-                            className="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-blue-500/10 hover:text-blue-500"
-                          >
-                            {minor.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          }
-
-          // 비캠퍼스 회원 → 필터 우선 표시
-          const openGroups = allGroups
-            .map(g => ({ major: g.major, minors: g.minors.filter(m => m.postAccess === 'open') }))
-            .filter(g => g.minors.length > 0);
-          const campusGroups = allGroups
-            .map(g => ({ major: g.major, minors: g.minors.filter(m => m.postAccess === 'campus') }))
-            .filter(g => g.minors.length > 0);
-          const campusMinorCount = campusGroups.reduce((sum, g) => sum + g.minors.length, 0);
-
-          return (
-            <div>
-              {/* 안내 배너 */}
-              <div className="mb-3 rounded-lg bg-blue-500/10 px-3 py-2.5 text-sm text-blue-600 dark:text-blue-400">
-                {user?.memberType === 'merchant' ? '🏪 인근상인' : '👤 일반'} 회원님, 아래 카테고리에 글을 작성할 수 있어요
-              </div>
-
-              <p className="mb-2 text-sm text-muted-foreground">소분류를 클릭하면 바로 글쓰기로 이동합니다</p>
-
-              {/* open 카테고리 목록 */}
-              <div className="columns-2 gap-4">
-                {openGroups.map(({ major, minors }) => (
-                  <div key={major.id} id={`major-group-${major.id}`} className={`mb-3 break-inside-avoid ${majorId === major.id ? 'rounded-lg bg-orange-50 ring-2 ring-orange-300 p-2 dark:bg-orange-950/30 dark:ring-orange-700' : ''}`}>
-                    <div className="flex items-center gap-1.5 py-1.5">
-                      <span className="cat-icon text-lg">{major.icon}</span>
-                      <span className={`text-lg font-bold ${majorId === major.id ? 'text-orange-500' : ''}`}>{major.name}</span>
-                      {majorId === major.id && <span className="ml-auto text-xs font-medium text-orange-500">선택됨</span>}
-                    </div>
-                    <div className="flex flex-wrap gap-1 pb-1">
-                      {minors.map(minor => (
-                        <button
-                          key={minor.id}
-                          onClick={() => { setMajorId(major.id); setMinorId(minor.id); setStep('form'); }}
-                          className="rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-blue-500/10 hover:text-blue-500"
-                        >
-                          {minor.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* 캠퍼스 전용 접기/펼치기 */}
-              <div className="mt-4 border-t border-border pt-3">
-                <button
-                  onClick={() => setShowLocked(!showLocked)}
-                  className="flex w-full items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={`transition-transform ${showLocked ? 'rotate-90' : ''}`}>
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  🔒 캠퍼스 인증 회원 전용 ({campusMinorCount}개)
-                </button>
-
-                {showLocked && (
-                  <div className="mt-3 columns-2 gap-4 opacity-50">
-                    {campusGroups.map(({ major, minors }) => (
-                      <div key={major.id} className="mb-3 break-inside-avoid">
-                        <div className="flex items-center gap-1.5 py-1.5">
-                          <span className="cat-icon text-lg">{major.icon}</span>
-                          <span className="text-lg font-bold">{major.name}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 pb-1">
-                          {minors.map(minor => (
-                            <button
-                              key={minor.id}
-                              onClick={() => toast('이 카테고리는 대학 소속 인증 회원만 이용 가능합니다')}
-                              className="cursor-not-allowed rounded-md px-2 py-1 text-sm text-muted-foreground/60"
-                            >
-                              🔒 {minor.name}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                    <p className="mt-1 break-inside-avoid text-xs text-muted-foreground">
-                      학부생·대학원생·교수·교직원·졸업생 인증 시 이용 가능
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* 글쓰기 폼 */}
-        {step === 'form' && (
-          <div className="space-y-5">
-            {/* 선택된 카테고리 요약 */}
-            {majorId && minorId && (
-              <CategorySummary
-                universityId={universityId}
-                majorId={majorId}
-                minorId={minorId}
-                onChangeCategory={handleChangeCategory}
-              />
+      {/* 대학 정보 배너 */}
+      <div className="bg-blue-950/30 px-4 py-4 dark:bg-blue-950/40">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-blue-400 dark:text-blue-300">{selectedUni?.name || '대학교'}</h1>
+            <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{selectedUni?.region} · {selectedUni?.nameEn}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {lastSaved && <span className="text-xs text-blue-400/60">임시저장됨</span>}
+            {draftLoaded && (
+              <button onClick={handleReset} className="text-xs text-blue-400/60 hover:text-blue-300 hover:underline">초기화</button>
             )}
+          </div>
+        </div>
+      </div>
 
+      {/* 브레드크럼 */}
+      <div className="border-b border-border px-4 py-2">
+        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
+          <span className="text-orange-400">모든 대학</span>
+          <span className="text-orange-300">›</span>
+          <span className="text-orange-400">{selectedUni?.name || '대학'}</span>
+          <span className="text-orange-300">›</span>
+          {selectedMajor ? (
+            <>
+              {selectedMinor ? (
+                <button onClick={handleChangeCategory} className="text-orange-400 hover:text-orange-300 hover:underline">
+                  <span className="cat-icon">{selectedMajor.icon} </span>{selectedMajor.name}
+                </button>
+              ) : (
+                <span className="font-semibold text-orange-400">
+                  <span className="cat-icon">{selectedMajor.icon} </span>{selectedMajor.name}
+                </span>
+              )}
+              {selectedMinor && (
+                <>
+                  <span className="text-orange-300">›</span>
+                  <span className="font-semibold text-orange-400">{selectedMinor.name}</span>
+                </>
+              )}
+            </>
+          ) : (
+            <span className="font-semibold text-orange-400">{isEditMode ? '글 수정' : '✏️ 글쓰기'}</span>
+          )}
+        </nav>
+      </div>
+
+      {/* 카테고리 아이콘 그리드 */}
+      <WriteCategoryGrid activeId={majorId} onSelect={handleMajorSelect} />
+
+      {/* 소분류 배지 */}
+      {majorId && (
+        <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">
+          {currentMinors.map(m => {
+            const isLocked = m.postAccess === 'campus' && !isCampusMember;
+            const isActive = minorId === m.id;
+            return (
+              <button key={m.id} onClick={() => handleMinorSelect(m.id)} disabled={isLocked}>
+                <Badge
+                  variant="outline"
+                  className={`shrink-0 cursor-pointer text-sm px-3 py-1 ${
+                    isActive
+                      ? 'border-2 border-orange-500 text-orange-600 font-bold dark:text-orange-300'
+                      : isLocked
+                        ? 'border-border text-muted-foreground/50 cursor-not-allowed'
+                        : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'
+                  }`}
+                >
+                  {isLocked && '🔒 '}<span className="cat-icon">{m.icon} </span>{m.name}
+                </Badge>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 비캠퍼스 회원 안내 */}
+      {majorId && !isCampusMember && currentMinors.some(m => m.postAccess === 'campus') && step !== 'form' && (
+        <div className="px-4 pb-2">
+          <p className="text-xs text-muted-foreground">🔒 표시는 대학 소속 인증 회원 전용 카테고리입니다</p>
+        </div>
+      )}
+
+      {/* 카테고리 미선택 시 안내 */}
+      {!majorId && step !== 'form' && (
+        <div className="px-4 py-8 text-center">
+          <p className="text-muted-foreground">대분류를 선택해주세요</p>
+        </div>
+      )}
+
+      {/* 소분류 미선택 시 안내 */}
+      {majorId && !minorId && step !== 'form' && (
+        <div className="px-4 py-6 text-center">
+          <p className="text-muted-foreground">소분류를 선택하면 글쓰기를 시작합니다</p>
+        </div>
+      )}
+
+      {/* 글쓰기 폼 */}
+      {step === 'form' && (
+        <div className="px-4 py-4">
+          <div className="space-y-5">
             {/* 완성도 점수 프로그레스 바 */}
             <div className="rounded-lg border border-border bg-muted/30 p-3">
               <div className="flex items-center justify-between text-sm">
@@ -1276,8 +1221,8 @@ function WritePageContent() {
               )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* 확인 Sheet (예시 대체 / 삭제 공용) */}
       <Sheet open={!!confirmAction} onOpenChange={open => { if (!open) setConfirmAction(null); }}>
