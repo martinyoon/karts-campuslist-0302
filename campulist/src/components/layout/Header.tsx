@@ -104,9 +104,9 @@ export default function Header() {
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
                       <span className="text-xs font-medium">글쓰기</span>
                   </Link>
-                  <Link href="/camtalk" className={`relative flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/camtalk') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="캠톡">
+                  <Link href="/camtalk" className={`relative flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/camtalk') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="캠퍼스톡">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                      <span className="text-xs font-medium">캠톡</span>
+                      <span className="text-xs font-medium">캠퍼스톡</span>
                     {unreadCount > 0 && (
                       <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
                         {unreadCount > 99 ? '99+' : unreadCount}

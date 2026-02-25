@@ -18,7 +18,7 @@ function CamTalkContent() {
   const [rooms, setRooms] = useState<CamTalkRoom[]>([]);
 
   useEffect(() => {
-    document.title = '캠톡 | 캠퍼스리스트';
+    document.title = '캠퍼스톡 | 캠퍼스리스트';
     if (!userId) return;
     setRooms(getMyRooms(userId));
 
@@ -31,13 +31,13 @@ function CamTalkContent() {
     <div>
       {/* 간격 압축: py-4 → py-2 */}
       <div className="border-b border-border px-4 py-2">
-        <h1 className="text-xl font-bold">캠톡</h1>
+        <h1 className="text-xl font-bold">캠퍼스톡</h1>
       </div>
 
       {rooms.length === 0 ? (
         <EmptyState
-          message="캠톡이 없습니다"
-          sub="관심 있는 게시글에서 캠톡을 시작해보세요."
+          message="캠퍼스톡이 없습니다"
+          sub="관심 있는 게시글에서 캠퍼스톡을 시작해보세요."
           actionLabel="게시글 둘러보기"
           actionHref="/"
         />
@@ -78,7 +78,7 @@ function CamTalkContent() {
                     <p className="truncate text-xs text-blue-500">{postTitle}</p>
                   )}
                   <p className="truncate text-sm text-muted-foreground">
-                    {room.lastMessage || '캠톡을 시작해보세요'}
+                    {room.lastMessage || '캠퍼스톡을 시작해보세요'}
                   </p>
                 </div>
 

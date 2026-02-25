@@ -307,7 +307,7 @@ All gaps are classified as LOW priority and acceptable for Phase A:
 6. **Clear Plan Documentation**
    - campulist.plan.md provided excellent reference
    - Design constraints clear (3rd gen chat system, no buyer/seller asymmetry)
-   - 캠톡 + 캠알림 architecture well-specified
+   - 캠퍼스톡 + 캠알림 architecture well-specified
 
 ### 7.2 Areas for Improvement (Problem)
 
@@ -322,7 +322,7 @@ All gaps are classified as LOW priority and acceptable for Phase A:
    - Creates gap in user expectations
 
 3. **Chat System Version Confusion**
-   - 4 different chat implementations (chat, chat2, 캠톡, 캠알림)
+   - 4 different chat implementations (chat, chat2, 캠퍼스톡, 캠알림)
    - Could have been clearer about deprecation plan
    - Codebase now has technical debt from old systems
 
@@ -350,7 +350,7 @@ All gaps are classified as LOW priority and acceptable for Phase A:
 
 3. **Deprecation & Cleanup Protocol**
    - Document which systems are deprecated (chat, chat2, old notifications)
-   - Mark old code with `/** @deprecated - Use 캠톡 instead */`
+   - Mark old code with `/** @deprecated - Use 캠퍼스톡 instead */`
    - Remove at phase boundary instead of accumulating
 
 4. **Design Doc Automation**

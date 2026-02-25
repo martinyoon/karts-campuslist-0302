@@ -47,7 +47,7 @@ export default function UserChatButton({ user: profileUser }: UserChatButtonProp
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-1.5">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
-      {hasExistingRoom ? '캠톡으로 문의 다시 하기' : '캠톡하기'}
+      {hasExistingRoom ? '캠퍼스톡으로 문의 다시 하기' : '캠퍼스톡하기'}
     </Button>
   );
 }

@@ -132,7 +132,7 @@ function CamTalkDetailContent() {
 
   // 메시지 로드 + 읽음 처리 (roomId와 myId만 의존)
   useEffect(() => {
-    if (partnerNickname) document.title = `${partnerNickname} 캠톡 | 캠퍼스리스트`;
+    if (partnerNickname) document.title = `${partnerNickname} 캠퍼스톡 | 캠퍼스리스트`;
     markRead(roomId, myId);
     setMessages(getMessages(roomId));
   }, [roomId, myId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -145,10 +145,10 @@ function CamTalkDetailContent() {
   if (!room || !partner) {
     return (
       <div className="px-4 py-16 text-center text-muted-foreground">
-        <p className="text-lg font-medium">캠톡을 찾을 수 없습니다</p>
+        <p className="text-lg font-medium">캠퍼스톡을 찾을 수 없습니다</p>
         {/* 간격 압축: mt-4 → mt-2 */}
         <Button variant="outline" className="mt-2" onClick={() => router.push('/camtalk')}>
-          캠톡 목록으로
+          캠퍼스톡 목록으로
         </Button>
       </div>
     );
@@ -230,9 +230,21 @@ function CamTalkDetailContent() {
   };
 
   const savedBank = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('ct_bank_info') || 'null'); }
+    if (!myId) return null;
+    try { return JSON.parse(localStorage.getItem(`ct_bank_info_${myId}`) || 'null'); }
     catch { return null; }
-  }, [bankOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [bankOpen, myId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 기존 글로벌 키 → 사용자별 키 마이그레이션 (1회성)
+  useEffect(() => {
+    if (!myId) return;
+    const oldKey = 'ct_bank_info';
+    const newKey = `ct_bank_info_${myId}`;
+    if (localStorage.getItem(oldKey) && !localStorage.getItem(newKey)) {
+      localStorage.setItem(newKey, localStorage.getItem(oldKey)!);
+      localStorage.removeItem(oldKey);
+    }
+  }, [myId]);
 
   const handleBank = () => {
     const bank = bankNameRef.current?.value || '';
@@ -240,7 +252,9 @@ function CamTalkDetailContent() {
     const holder = bankHolderRef.current?.value?.trim() || '';
     const amount = bankAmountRef.current?.value?.trim() || '';
     if (!bank || !account || !holder) return;
-    try { localStorage.setItem('ct_bank_info', JSON.stringify({ bank, account, holder })); } catch {}
+    if (myId) {
+      try { localStorage.setItem(`ct_bank_info_${myId}`, JSON.stringify({ bank, account, holder })); } catch {}
+    }
     const parts = ['🏦 송금 정보', `은행: ${bank}`, `계좌: ${account}`, `예금주: ${holder}`];
     if (amount) parts.push(`금액: ${amount}원`);
     const newMsg = sendMessage(roomId, myId, parts.join('\n'));

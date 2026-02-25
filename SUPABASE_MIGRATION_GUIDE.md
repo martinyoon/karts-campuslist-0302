@@ -13,7 +13,7 @@
 4. [게시글 CRUD 전환](#4-게시글-crud-전환)
 5. [이미지 업로드 전환](#5-이미지-업로드-전환)
 6. [찜/조회수/검색 전환](#6-찜조회수검색-전환)
-7. [캠톡 실시간 채팅 전환](#7-캠톡-실시간-채팅-전환)
+7. [캠퍼스톡 실시간 채팅 전환](#7-캠퍼스톡-실시간-채팅-전환)
 8. [캠노티 알림 전환](#8-캠노티-알림-전환)
 9. [RLS 보안 정책](#9-rls-보안-정책)
 10. [최종 정리 및 배포](#10-최종-정리-및-배포)
@@ -432,12 +432,12 @@ interface User {
 
 ---
 
-## 7. 캠톡 실시간 채팅 전환
+## 7. 캠퍼스톡 실시간 채팅 전환
 
 ### Claude Code 지시사항
 
 ```
-캠퍼스리스트의 캠톡(1:1 채팅)을 Supabase Realtime으로 전환해줘.
+캠퍼스리스트의 캠퍼스톡(1:1 채팅)을 Supabase Realtime으로 전환해줘.
 
 ### 현재 상태
 - campulist/src/lib/camtalk.ts — localStorage 기반
@@ -646,7 +646,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
 단계 6: 찜/조회수/검색 ───────── 보조 기능들
   │  └─ 테스트: 찜 토글 → 조회수 → 검색 → 최근 본 게시글
   │
-단계 7: 캠톡 Realtime ────────── 실시간 채팅 (가장 복잡)
+단계 7: 캠퍼스톡 Realtime ────────── 실시간 채팅 (가장 복잡)
   │  └─ 테스트: 대화 시작 → 메시지 전송 → 실시간 수신 → 읽음 처리
   │
 단계 8: 캠노티 ──────────────── 알림
@@ -668,7 +668,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
 | ID 형식 변경 | 'p1', 'u1', 'local-xxx' → UUID로 전부 변경 |
 | snake_case 변환 | Supabase는 snake_case, TypeScript는 camelCase — 변환 유틸 필수 |
 | contactMethods | jsonb로 저장, 타입 검증은 클라이언트에서 |
-| 캠톡 방 정규화 | user1_id < user2_id로 항상 정렬하여 중복 방지 |
+| 캠퍼스톡 방 정규화 | user1_id < user2_id로 항상 정렬하여 중복 방지 |
 | 이미지 base64 | localStorage base64 → Supabase Storage URL로 완전 전환 |
 | 드래프트 | localStorage 유지 (오프라인 지원) |
 | 카테고리 예시 | categoryExamples.ts는 DB 불필요, 로컬 파일 유지 |

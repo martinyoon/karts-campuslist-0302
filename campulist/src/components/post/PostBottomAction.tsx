@@ -80,7 +80,7 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
     router.push(`/camtalk/${room.id}`);
   };
 
-  // 타인 게시글: 캠톡하기 버튼
+  // 타인 게시글: 캠퍼스톡하기 버튼
   const handleChat = () => {
     if (!user) {
       toast('로그인이 필요합니다');
@@ -102,13 +102,13 @@ export default function PostBottomAction({ postId, postTitle, postPrice, postThu
   return (
     <>
       <Button onClick={handleChat} className="bg-blue-600 px-8 text-white hover:bg-blue-700">
-        {hasExistingRoom ? '캠톡으로 문의 다시 하기' : '캠톡하기'}
+        {hasExistingRoom ? '캠퍼스톡으로 문의 다시 하기' : '캠퍼스톡하기'}
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="bottom" className="rounded-t-2xl" showCloseButton={false}>
           <SheetHeader className="pb-2">
-            <SheetTitle className="text-lg">캠톡 메시지 선택</SheetTitle>
+            <SheetTitle className="text-lg">캠퍼스톡 메시지 선택</SheetTitle>
           </SheetHeader>
           {/* 간격 압축: space-y-2 → space-y-1, pb-6 → pb-3 */}
           <div className="space-y-1 px-4 pb-3">

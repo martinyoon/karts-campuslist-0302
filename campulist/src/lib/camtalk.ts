@@ -1,6 +1,6 @@
 // ============================================================
-// 캠톡 (CamTalk) — 3세대 채팅 데이터 레이어
-// 핵심 원칙: 사용자1 + 사용자2 사이에는 단 하나의 캠톡만 존재
+// 캠퍼스톡 (CamTalk) — 3세대 채팅 데이터 레이어
+// 핵심 원칙: 사용자1 + 사용자2 사이에는 단 하나의 캠퍼스톡만 존재
 // unread는 유저별 맵, participants는 대칭 구조
 // 게시글 정보는 메시지 링크로만 전달 (방 속성 아님)
 // ============================================================
@@ -64,7 +64,7 @@ function genId(prefix: string): string {
 
 // ─── 공개 함수 ───
 
-/** 내 캠톡 목록 (최신순) */
+/** 내 캠퍼스톡 목록 (최신순) */
 export function getMyRooms(userId: string): CamTalkRoom[] {
   return readRooms()
     .filter(r => r.participants.some(p => p.id === userId))
@@ -75,12 +75,12 @@ export function getMyRooms(userId: string): CamTalkRoom[] {
     });
 }
 
-/** 단일 캠톡 방 조회 */
+/** 단일 캠퍼스톡 방 조회 */
 export function getRoom(roomId: string): CamTalkRoom | null {
   return readRooms().find(r => r.id === roomId) || null;
 }
 
-/** 두 유저 사이 기존 캠톡 찾기 — 유일한 검색 함수 */
+/** 두 유저 사이 기존 캠퍼스톡 찾기 — 유일한 검색 함수 */
 export function findRoomByUser(targetId: string, myId: string): CamTalkRoom | null {
   return readRooms().find(r =>
     r.participants.some(p => p.id === targetId) &&
@@ -89,7 +89,7 @@ export function findRoomByUser(targetId: string, myId: string): CamTalkRoom | nu
 }
 
 /**
- * 캠톡 시작 (방 생성 + 선택적 첫 메시지)
+ * 캠퍼스톡 시작 (방 생성 + 선택적 첫 메시지)
  * 핵심: 같은 두 사용자 사이에 이미 방이 있으면 무조건 기존 방 반환
  * 첫 메시지가 있으면 기존 방에 메시지만 추가
  */
@@ -147,7 +147,7 @@ export function startCamTalk(input: {
     createCamNotif({
       recipientId: input.partner.id,
       type: 'camtalk',
-      title: '새 캠톡이 도착했습니다',
+      title: '새 캠퍼스톡이 도착했습니다',
       body: input.firstMessage.slice(0, 50),
       link: `/camtalk/${room.id}`,
     });
