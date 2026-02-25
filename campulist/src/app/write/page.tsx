@@ -9,22 +9,18 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { universities } from '@/data/universities';
-import { STORAGE_KEYS } from '@/lib/constants';
+import { STORAGE_KEYS, LIMITS } from '@/lib/constants';
 import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { createPost, getPostForEdit, updatePost, deletePost, getPosts, getPostDetail } from '@/lib/api';
-import type { PostListItem } from '@/lib/types';
 import { getPostImages } from '@/data/posts';
-import { LIMITS } from '@/lib/constants';
-import type { PostStatus, MemberType } from '@/lib/types';
+import type { PostListItem, PostStatus, MemberType, User } from '@/lib/types';
 import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
 import UniversityTabs from '@/components/post/UniversityTabs';
 import CategoryGrid from '@/components/post/CategoryGrid';
 import { categoryExamples, categoryExampleSets } from '@/data/categoryExamples';
-
 import { getCategoryBySlug, getMinorCategories, majorCategories, categories } from '@/data/categories';
-import type { User } from '@/lib/types';
 
 interface WriteDraft {
   title: string;

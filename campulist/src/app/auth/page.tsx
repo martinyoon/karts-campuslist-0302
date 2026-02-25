@@ -241,7 +241,7 @@ export default function AuthPage() {
 
         {/* ─── Step 2 캠퍼스: 이메일 인증 + 비밀번호 ─── */}
         {mode === 'signup' && step === 2 && isCampusType && (
-          <div className="space-y-2">
+          <form onSubmit={(e) => { e.preventDefault(); handleCampusEmailNext(); }} className="space-y-2">
             <div className="text-center">
               <h2 className="text-lg font-bold">대학교 이메일 인증</h2>
               <p className="mt-1 text-xs text-muted-foreground">대학교 이메일로 소속을 확인해요</p>
@@ -292,14 +292,13 @@ export default function AuthPage() {
                 이전
               </Button>
               <Button
-                type="button"
-                onClick={handleCampusEmailNext}
+                type="submit"
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
               >
                 다음
               </Button>
             </div>
-          </div>
+          </form>
         )}
 
         {/* ─── Step 2 외부: 전체 가입폼 ─── */}
