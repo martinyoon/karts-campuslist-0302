@@ -26,3 +26,22 @@ export const LIMITS = {
   BODY_MAX_LENGTH: 5000,
   DRAFT_SAVE_DELAY: 1000,
 } as const;
+
+export const SORT_OPTIONS = [
+  { value: 'latest', label: '최신순' },
+  { value: 'price_asc', label: '가격 낮은순' },
+  { value: 'price_desc', label: '가격 높은순' },
+  { value: 'popular', label: '인기순' },
+] as const;
+
+export type SortValue = (typeof SORT_OPTIONS)[number]['value'];
+
+export const MEMBER_TYPE_LABELS: Record<import('./types').MemberType, string> = {
+  undergraduate: '🎓 학부생/예술사(한예종)',
+  graduate: '📚 대학원생/전문사(한예종)',
+  professor: '👨‍🏫 교수',
+  staff: '🏢 교직원',
+  alumni: '🎒 졸업생',
+  merchant: '🏪 비지니스 회원',
+  general: '👤 일반인 회원',
+};

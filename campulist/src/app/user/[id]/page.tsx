@@ -6,22 +6,15 @@ import { getUserPosts } from '@/lib/api';
 import { getFullUser } from '@/lib/auth';
 import { universities } from '@/data/universities';
 import { formatRelativeTime } from '@/lib/format';
+import { MEMBER_TYPE_LABELS } from '@/lib/constants';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import EmptyState from '@/components/ui/EmptyState';
+import VerifiedBadge from '@/components/ui/VerifiedBadge';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import UserChatButton from '@/components/user/UserChatButton';
-import type { User, MemberType, PostListItem } from '@/lib/types';
-
-const MEMBER_TYPE_LABELS: Record<MemberType, string> = {
-  undergraduate: '🎓 학부생/예술사(한예종)',
-  graduate: '📚 대학원생/전문사(한예종)',
-  professor: '👨‍🏫 교수',
-  staff: '🏢 교직원',
-  alumni: '🎒 졸업생',
-  merchant: '🏪 비지니스 회원',
-  general: '👤 일반인 회원',
-};
+import type { User, PostListItem } from '@/lib/types';
 
 export default function UserProfilePage() {
   const params = useParams<{ id: string }>();
@@ -51,14 +44,7 @@ export default function UserProfilePage() {
     );
   }
 
-  if (!user) return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="text-center">
-        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-        <p className="text-sm text-muted-foreground">프로필 로딩 중...</p>
-      </div>
-    </div>
-  );
+  if (!user) return <LoadingSpinner message="프로필 로딩 중..." />;
 
   const university = universities.find(u => u.id === user.universityId);
   const activePosts = posts.filter(p => p.status === 'active');
@@ -77,10 +63,7 @@ export default function UserProfilePage() {
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold">{user.nickname}</h1>
               {user.isVerified && (
-                <Badge variant="secondary" className="gap-0.5 text-xs text-blue-500">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
-                  인증됨
-                </Badge>
+                <VerifiedBadge />
               )}
               {user.role === 'business' && (
                 <Badge variant="outline" className="text-xs text-orange-500 border-orange-500/30">

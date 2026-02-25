@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { PostListItem } from '@/lib/types';
 import { formatPrice, formatRelativeTime } from '@/lib/format';
 import { Badge } from '@/components/ui/badge';
+import VerifiedBadge from '@/components/ui/VerifiedBadge';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface PostCardProps {
@@ -60,10 +61,7 @@ export default function PostCard({ post }: PostCardProps) {
 
         <div className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
           {post.author.isVerified && (
-            <Badge variant="secondary" className="h-5 gap-0.5 px-1.5 text-xs text-blue-500">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
-              인증
-            </Badge>
+            <VerifiedBadge label="인증" compact />
           )}
           <span>{post.university.name}</span>
           <span>{formatRelativeTime(post.createdAt)}</span>

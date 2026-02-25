@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Breadcrumb, { type BreadcrumbSegment } from '@/components/layout/Breadcrumb';
+import UniversityBanner from '@/components/layout/UniversityBanner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,8 +19,8 @@ import { getPostImages } from '@/data/posts';
 import { LIMITS } from '@/lib/constants';
 import type { PostStatus, MemberType } from '@/lib/types';
 import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
-import WriteUniversityTabs from '@/components/write/WriteUniversityTabs';
-import WriteCategoryGrid from '@/components/write/WriteCategoryGrid';
+import UniversityTabs from '@/components/post/UniversityTabs';
+import CategoryGrid from '@/components/post/CategoryGrid';
 import { categoryExamples, categoryExampleSets } from '@/data/categoryExamples';
 
 import { getCategoryBySlug, getMinorCategories, majorCategories, categories } from '@/data/categories';
@@ -693,25 +694,16 @@ function WritePageContent() {
   return (
     <div>
       {/* 대학 탭 */}
-      <WriteUniversityTabs selectedId={universityId} onSelect={setUniversityId} />
+      <UniversityTabs mode="select" selectedId={universityId} onSelect={setUniversityId} />
 
-      {/* 대학 정보 배너 */}
-      {/* 간격 압축: py-4 → py-2 */}
-      <div className="bg-blue-950/30 px-4 py-2 dark:bg-blue-950/40">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-blue-400 dark:text-blue-300">{selectedUni?.name || '대학교'}</h1>
-            <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{selectedUni?.region} · {selectedUni?.nameEn}</p>
-          </div>
-          {/* 간격 압축: gap-2 → gap-1.5 */}
-          <div className="flex items-center gap-1.5">
-            {lastSaved && <span className="text-xs text-blue-400/60">임시저장됨</span>}
-            {draftLoaded && (
-              <button onClick={handleReset} className="text-xs text-blue-400/60 hover:text-blue-300 hover:underline">초기화</button>
-            )}
-          </div>
+      <UniversityBanner name={selectedUni?.name || '대학교'} subtitle={`${selectedUni?.region || ''} · ${selectedUni?.nameEn || ''}`}>
+        <div className="flex items-center gap-1.5">
+          {lastSaved && <span className="text-xs text-blue-400/60">임시저장됨</span>}
+          {draftLoaded && (
+            <button onClick={handleReset} className="text-xs text-blue-400/60 hover:text-blue-300 hover:underline">초기화</button>
+          )}
         </div>
-      </div>
+      </UniversityBanner>
 
       <Breadcrumb segments={(() => {
         const segs: BreadcrumbSegment[] = [
@@ -732,7 +724,7 @@ function WritePageContent() {
       })()} />
 
       {/* 카테고리 아이콘 그리드 */}
-      <WriteCategoryGrid activeId={majorId} onSelect={handleMajorSelect} />
+      <CategoryGrid mode="select" activeId={majorId} onSelect={handleMajorSelect} />
 
       {/* 소분류 배지 */}
       {/* 간격 압축: gap-2 → gap-1.5, py-3 → py-1.5 */}

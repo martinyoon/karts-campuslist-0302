@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import { getPosts } from '@/lib/api';
-import Link from 'next/link';
+import SortBadgeRow from '@/components/post/SortBadgeRow';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
 import RecentSearches from '@/components/search/RecentSearches';
 import PriceFilter from '@/components/search/PriceFilter';
-import { Badge } from '@/components/ui/badge';
 
 interface Props {
   searchParams: Promise<{ q?: string; sort?: string; priceMin?: string; priceMax?: string }>;
@@ -31,13 +30,6 @@ export default async function SearchPage({ searchParams }: Props) {
   const posts = query
     ? await getPosts({ query, sortBy, priceMin, priceMax, limit: 50 })
     : [];
-
-  const sortOptions = [
-    { value: 'latest', label: '최신순' },
-    { value: 'price_asc', label: '가격 낮은순' },
-    { value: 'price_desc', label: '가격 높은순' },
-    { value: 'popular', label: '인기순' },
-  ];
 
   return (
     <div>
@@ -65,25 +57,16 @@ export default async function SearchPage({ searchParams }: Props) {
       {/* 정렬 옵션 + 가격 필터 */}
       {query && posts.length > 0 && (
         <>
-          <div className="flex gap-1.5 overflow-x-auto px-4 py-1.5 scrollbar-hide"> {/* 간격 압축: gap-2 → gap-1.5, py-3 → py-1.5 */}
-            {sortOptions.map(opt => {
-              const params = new URLSearchParams({ q: query, sort: opt.value });
-              if (priceMin !== undefined) params.set('priceMin', String(priceMin));
-              if (priceMax !== undefined) params.set('priceMax', String(priceMax));
-              return (
-                <Link key={opt.value} href={`/search?${params.toString()}`}>
-                  <Badge
-                    variant={sortBy === opt.value ? 'default' : 'outline'}
-                    className={`shrink-0 cursor-pointer ${
-                      sortBy === opt.value ? 'bg-blue-600 text-white' : 'hover:bg-muted'
-                    }`}
-                  >
-                    {opt.label}
-                  </Badge>
-                </Link>
-              );
-            })}
-          </div>
+          <SortBadgeRow
+            sortBy={sortBy}
+            buildHref={s => {
+              const p = new URLSearchParams({ q: query, sort: s });
+              if (priceMin !== undefined) p.set('priceMin', String(priceMin));
+              if (priceMax !== undefined) p.set('priceMax', String(priceMax));
+              return `/search?${p.toString()}`;
+            }}
+            className="py-1.5"
+          />
           <PriceFilter query={query} sort={sortBy} currentMin={priceMin} currentMax={priceMax} />
         </>
       )}

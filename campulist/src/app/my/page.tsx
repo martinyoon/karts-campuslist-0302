@@ -9,26 +9,18 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import EmptyState from '@/components/ui/EmptyState';
+import VerifiedBadge from '@/components/ui/VerifiedBadge';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { getMyPosts, getPostsByIds, getRecentViewedPosts } from '@/lib/api';
 import { formatPrice, formatRelativeTime } from '@/lib/format';
 import type { PostListItem, MemberType } from '@/lib/types';
-import { STORAGE_KEYS } from '@/lib/constants';
+import { STORAGE_KEYS, MEMBER_TYPE_LABELS } from '@/lib/constants';
 import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { universities } from '@/data/universities';
 
 type Tab = 'selling' | 'likes' | 'recent' | 'reviews';
-
-const MEMBER_TYPE_LABELS: Record<MemberType, string> = {
-  undergraduate: '🎓 학부생/예술사(한예종)',
-  graduate: '📚 대학원생/전문사(한예종)',
-  professor: '👨‍🏫 교수',
-  staff: '🏢 교직원',
-  alumni: '🎒 졸업생',
-  merchant: '🏪 비지니스 회원',
-  general: '👤 일반인 회원',
-};
 
 function getLikedPostIds(): string[] {
   try {
@@ -68,14 +60,7 @@ function MyPageContent() {
     setRecentPosts(getRecentViewedPosts());
   }, [user]);
 
-  if (!user) return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="text-center">
-        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-        <p className="text-sm text-muted-foreground">로딩 중...</p>
-      </div>
-    </div>
-  );
+  if (!user) return <LoadingSpinner />;
 
   const university = universities.find(u => u.id === user.universityId);
 
@@ -107,10 +92,7 @@ function MyPageContent() {
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold">{user.nickname}</h1>
               {user.isVerified && (
-                <Badge variant="secondary" className="gap-0.5 text-xs text-blue-500">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
-                  인증됨
-                </Badge>
+                <VerifiedBadge />
               )}
             </div>
             <p className="text-sm text-muted-foreground">

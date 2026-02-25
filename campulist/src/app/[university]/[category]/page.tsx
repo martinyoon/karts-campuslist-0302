@@ -2,13 +2,15 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getPosts, getUniversityBySlug } from '@/lib/api';
+import SortBadgeRow from '@/components/post/SortBadgeRow';
 import { getCategoryBySlug, getMinorCategories } from '@/data/categories';
+import { Badge } from '@/components/ui/badge';
 import UniversityTabs from '@/components/post/UniversityTabs';
 import CategoryGrid from '@/components/post/CategoryGrid';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
-import { Badge } from '@/components/ui/badge';
 import Breadcrumb from '@/components/layout/Breadcrumb';
+import UniversityBanner from '@/components/layout/UniversityBanner';
 
 interface Props {
   params: Promise<{ university: string; category: string }>;
@@ -44,13 +46,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     limit: 30,
   });
 
-  const sortOptions = [
-    { value: 'latest', label: '최신순' },
-    { value: 'price_asc', label: '가격 낮은순' },
-    { value: 'price_desc', label: '가격 높은순' },
-    { value: 'popular', label: '인기순' },
-  ];
-
   const buildUrl = (params: { minor?: string; sort?: string }) => {
     const base = `/${uniSlug}/${catSlug}`;
     const sp = new URLSearchParams();
@@ -68,11 +63,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     <div>
       <UniversityTabs />
 
-      {/* 대학 정보 배너 — 간격 압축: py-4 → py-2 */}
-      <div className="bg-blue-950/30 px-4 py-2 dark:bg-blue-950/40">
-        <h1 className="text-xl font-bold text-blue-400 dark:text-blue-300">{university.name}</h1>
-        <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{university.region} · {university.nameEn}</p>
-      </div>
+      <UniversityBanner name={university.name} subtitle={`${university.region} · ${university.nameEn}`} />
 
       <Breadcrumb
         segments={activeMinor ? [
@@ -105,19 +96,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         ))}
       </div>
 
-      {/* 정렬 옵션 — 간격 압축: pb-3 → pb-1.5, gap-2 → gap-1.5 */}
-      <div className="flex gap-1.5 overflow-x-auto border-b border-border px-4 pb-1.5 scrollbar-hide">
-        {sortOptions.map(opt => (
-          <Link key={opt.value} href={buildUrl({ sort: opt.value })}>
-            <Badge
-              variant={sortBy === opt.value ? 'default' : 'outline'}
-              className={`shrink-0 cursor-pointer ${sortBy === opt.value ? 'bg-blue-600 text-white' : 'hover:bg-muted'}`}
-            >
-              {opt.label}
-            </Badge>
-          </Link>
-        ))}
-      </div>
+      {/* 정렬 옵션 */}
+      <SortBadgeRow sortBy={sortBy} buildHref={s => buildUrl({ sort: s })} />
 
       {/* 게시글 목록 */}
       <PostFeedWithLocal

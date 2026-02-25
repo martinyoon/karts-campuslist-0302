@@ -5,6 +5,7 @@ import PopularPostsSection from '@/components/post/PopularPostsSection';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import { Separator } from '@/components/ui/separator';
 import Breadcrumb from '@/components/layout/Breadcrumb';
+import UniversityBanner from '@/components/layout/UniversityBanner';
 
 export default async function HomePage() {
   const [latestPosts, popularPosts] = await Promise.all([
@@ -16,11 +17,7 @@ export default async function HomePage() {
     <div>
       <UniversityTabs />
 
-      {/* 모든 대학 정보 배너 — 간격 압축: py-4 → py-2 */}
-      <div className="bg-blue-950/30 px-4 py-2 dark:bg-blue-950/40">
-        <h1 className="text-xl font-bold text-blue-400 dark:text-blue-300">모든 대학</h1>
-        <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">전체 캠퍼스 통합 · All Universities</p>
-      </div>
+      <UniversityBanner name="모든 대학" subtitle="전체 캠퍼스 통합 · All Universities" />
 
       <Breadcrumb
         segments={[{ label: '모든 대학', suffix: '· 전체보기' }]}
