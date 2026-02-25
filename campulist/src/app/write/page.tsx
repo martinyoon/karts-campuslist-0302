@@ -1257,7 +1257,7 @@ function WritePageContent() {
                     onClick={() => { setShowPreview(false); handleSubmit(); }}
                     className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-bold text-white transition-colors hover:bg-blue-700"
                   >
-                    {isEditMode ? '최종 수정' : '최종 등록'}
+                    최종 등록
                   </button>
                 </div>
               </SheetContent>
