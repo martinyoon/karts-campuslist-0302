@@ -14,8 +14,8 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
   const [current, setCurrent] = useState(0);
   const userInteractedRef = useRef(false);
   const programmaticScrollRef = useRef(false);
-  const programmaticTimerRef = useRef<ReturnType<typeof setTimeout>>();
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const programmaticTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   // 사용자가 터치/스크롤하면 자동 슬라이드 완전 정지 (재개 없음)
   const handleUserInteraction = useCallback(() => {

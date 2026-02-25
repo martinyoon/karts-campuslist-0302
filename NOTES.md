@@ -97,7 +97,8 @@ interface User {
 | `2924d29` | feat: 글쓰기 UI 개선 8건 — 문체/샘플 버튼 디자인 + 랜덤 알고리즘 + "다른 사람 글 가져오기" 기능 |
 | `0daaead` | feat: 글쓰기 "다른 사람 글 가져오기" 개선 3건 — 인기순 정렬 + 경고 문구 + 목록 이동 |
 | `264f1a7` | fix+refactor: 글쓰기 UI 개선 4건 — 문체 prefix 버그 수정 + 완성도/버튼 1줄 압축 |
-| (현재) | fix+refactor: 글쓰기 버그 수정 + UI 압축 3건 — prefix 대학 버그 + 완성도 글자 + 브레드크럼 |
+| `(이전)` | fix+refactor: 글쓰기 버그 수정 + UI 압축 3건 — prefix 대학 버그 + 완성도 글자 + 브레드크럼 |
+| (현재) | feat: 회원가입 3-Step 분리 — 캠퍼스 이메일 인증 + 외부 회원 플로우 분리 |
 
 ---
 
@@ -1480,7 +1481,10 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 - Supabase 연동 시 snake_case ↔ camelCase 변환 유틸 필요
 - Supabase 연동 상세 지시사항은 `SUPABASE_MIGRATION_GUIDE.md` 참조
 - `PostAccess` = `'campus' | 'open'` — 소분류에만 적용, 대분류에는 undefined
-- `CAMPUS_MEMBER_TYPES` = undergraduate, graduate, professor, staff, alumni — 권한 체크용 유지
+- `CAMPUS_MEMBER_TYPES` = undergraduate, graduate, professor, staff — alumni 삭제됨, icon 필드 제거됨
+- `EXTERNAL_MEMBER_TYPES` = merchant, general — `desc` 필드 추가 (버튼 내 설명 표시)
+- 회원가입 3-Step: 캠퍼스 (유형선택→이메일인증→프로필) / 외부 (유형선택→전체폼), `handleCampusEmailNext`로 Step 2→3 전환
+- `isCampusType` — `CAMPUS_MEMBER_TYPES.some()` 기반 파생 변수, step 분기/검증에 사용
 - `isCampusBlocked()` — write/page.tsx useEffect 내 인라인 헬퍼, URL/드래프트/수정 3곳에서 사용
 - `getCategoryGroups()` — 인자 없이 호출 (boardType 파라미터 제거됨)
 - `app/ad/` 라우트는 완전 삭제됨 (리다이렉트 없음, 404 반환)
@@ -1673,3 +1677,102 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 | `campulist/src/components/post/PostCard.tsx` | 썸네일에 이미지 개수 뱃지 추가 |
 | `campulist/src/lib/types.ts` | `PostListItem`에 `imageCount` 필드 추가 |
 | `campulist/src/data/posts.ts` | `toPostListItem()`에 `imageCount: images.length` 반환 |
+
+---
+
+## 44. 회원가입 2-Step 위저드 구현 (2026-02-25)
+
+회원가입 시 회원유형 선택을 별도 화면(Step 1)으로 분리하는 2-Step 위저드 패턴 적용.
+
+### Step 구조
+- **Step 1**: 회원 유형 선택 (캠퍼스 회원 / 외부 회원)
+- **Step 2**: 가입 폼 (선택한 유형 뱃지 + 변경 버튼 + 닉네임/이메일/비밀번호)
+
+### 주요 변경
+- `step` state 추가 (`1 | 2`)
+- Step 1에 캠퍼스/외부 회원 체크포인트 설명 추가
+- Step 2에 선택된 회원유형 `Badge` + "변경" 버튼 표시
+
+### 수정 파일
+| 파일 | 변경 |
+|------|------|
+| `campulist/src/app/auth/page.tsx` | 2-Step 위저드 전체 구현 |
+
+---
+
+## 45. 회원유형 선택 화면 UI 개선 시리즈 (2026-02-25)
+
+Step 1 회원유형 선택 화면에 대한 연속적인 UI 개선.
+
+### 변경 내역
+
+| 항목 | 변경 |
+|------|------|
+| 아이콘 삭제 | 회원유형 카드에서 이모지 아이콘 제거 |
+| 체크포인트 설명 추가 | 캠퍼스: ✓ 전용 게시판, ✓ 인증 배지 / 외부: ✓ 홍보 게시판 |
+| 졸업생 삭제 | `CAMPUS_MEMBER_TYPES`에서 alumni 제거 |
+| .ac.kr 필수 고지 | 주황색 경고문 "※ 대학교 이메일(.ac.kr)이 필요해요" 추가 |
+| 라벨 단순화 | 학부생/예술사(한예종) → 학부생, 대학원생/전문사(한예종) → 대학원생 |
+| 2x2 그리드 | 교직원을 교수 옆에 배치 (col-span-2 제거) |
+| 문구 수정 | 제목: "회원 유형 선택", 부제 삭제 |
+| 글자 크기 확대 | 제목 `text-2xl`, 섹션명 `text-base font-bold`, 설명 `text-sm` |
+| 문체 친절화 | "~할 수 있어요", "~필요해요" 등 해요체로 변경 |
+| 외부 회원 설명 | 비지니스: "대학교 상가·원룸 업체 사장님" / 일반인: "대학교와 무관한 일반 이용자" |
+| 외부 회원 체크포인트 | "✓ 홍보 게시판을 자유롭게 이용할 수 있어요 (캠퍼스 회원 전용 게시판 제외)" |
+| dead code 제거 | 타입 정의에서 미사용 `icon` 필드 제거 |
+
+---
+
+## 46. 회원가입 3-Step 분리 — 캠퍼스/외부 플로우 분리 (2026-02-25)
+
+캠퍼스 회원과 외부 회원의 가입 절차를 완전히 분리. 캠퍼스 회원은 이메일 인증을 가장 먼저 처리하여 불필요한 폼 작성을 방지.
+
+### 사용자 플로우
+
+**캠퍼스 회원 (3-step)**
+```
+Step 1: 회원 유형 선택
+Step 2: 대학교 이메일(.ac.kr) + 비밀번호 입력
+        → 대학교 자동 감지 (녹색 표시)
+        → 비.ac.kr 시 주황 경고 + "다음" 차단
+Step 3: 닉네임 + 캠퍼스 선택
+        → 인증된 이메일/대학교 읽기 전용 표시 (녹색 박스)
+```
+
+**외부 회원 (2-step)**
+```
+Step 1: 회원 유형 선택
+Step 2: 전체 가입폼 (닉네임 + 이메일 + 비밀번호 + 대학교 선택 + 캠퍼스)
+```
+
+**로그인** — 변경 없음 (이메일 + 비밀번호)
+
+### 주요 구현
+
+| 항목 | 내용 |
+|------|------|
+| step 타입 | `1 \| 2` → `1 \| 2 \| 3` 확장 |
+| `handleCampusEmailNext` | Step 2→3 전환 함수 (.ac.kr + 비밀번호 4자리 검증) |
+| Step 2 분기 | `isCampusType` 여부로 캠퍼스/외부 화면 분기 |
+| Step 3 | 캠퍼스 전용 — 인증된 이메일 읽기 전용 + 닉네임 + 캠퍼스 |
+| 로그인 폼 분리 | `mode === 'login'` 별도 섹션으로 회원가입 step 로직과 독립 |
+| document.title | step별 분기 (이메일 인증 / 회원가입 / 회원 유형 선택) |
+
+### 검증 로직
+
+| 대상 | 검증 |
+|------|------|
+| 이메일 빈값 | `handleSubmit` 최상단에서 로그인/회원가입 공통 검증 |
+| 닉네임 빈값 | 회원가입 시 검증 |
+| 비밀번호 4자리 | 회원가입 + 캠퍼스 Step 2→3 전환 시 이중 검증 |
+| 캠퍼스 .ac.kr | Step 2→3 전환 시 + handleSubmit 방어적 이중 검증 |
+| 외부 대학교 | universityId 필수 검증 |
+
+### Supabase 호환
+- `signup()` 호출은 최종 step에서만 1회 — AuthContext 변경 없음
+- Step 2(캠퍼스)에서 `signUp(email, password)` 자연스럽게 호출 가능 (Phase B)
+
+### 수정 파일
+| 파일 | 변경 |
+|------|------|
+| `campulist/src/app/auth/page.tsx` | 3-Step 플로우 전면 리팩토링 |
