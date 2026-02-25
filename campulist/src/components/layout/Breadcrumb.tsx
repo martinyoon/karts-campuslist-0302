@@ -18,7 +18,7 @@ interface BreadcrumbProps {
 
 export default function Breadcrumb({ segments, showTrailingSeparator = false }: BreadcrumbProps) {
   return (
-    <div className="border-b border-border px-4 py-1">
+    <div className="border-b border-border px-4 py-px">
       <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
         {segments.map((seg, i) => {
           const isLast = i === segments.length - 1;

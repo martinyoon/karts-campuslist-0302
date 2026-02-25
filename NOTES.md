@@ -1558,3 +1558,70 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 
 - `전공서적·교양도서` → `전공서적/교양도서` (가운데점 → 슬래시)
 - `campulist/src/data/categories.ts` 수정
+
+---
+
+## 40. 캠톡 메시지 원칙 기능 (2026-02-25)
+
+**파일:** `campulist/src/app/camtalk/[id]/page.tsx`
+
+### 추가 기능
+- 채팅창에 "📜 메시지 원칙" 빠른 메시지 칩 추가 (약속 잡기/장소 안내/송금 정보와 동일 패턴)
+- 5가지 원칙 체크박스 선택 + 직접 입력 필드
+  - 🤝 정직하고 투명하게 거래해요
+  - ⏰ 시간 약속을 꼭 지켜요
+  - 💬 답변은 빠르게 드릴게요
+  - 🙏 서로 존중하며 대화해요
+  - 📦 상품 상태를 정확히 알려드려요
+- 직접 입력 아래에 5개 예시 문구 (네고 없이 정가 거래 등)
+- 빠른 메시지 칩 순서: 기능 칩 → 안녕하세요?/감사합니다! → 일반 문구
+
+### 채팅 표시 스타일 개선
+- 구조화된 메시지(메시지 원칙, 거래 약속, 만남 장소, 송금 정보 등) 타이틀 `text-base font-bold`, 내용 `text-xs opacity-80`으로 계층 구분
+- `STRUCTURED_PREFIXES` 배열로 모든 구조화 메시지 타입 일괄 처리
+
+---
+
+## 41. 대분류-소분류 시각적 연결 (2026-02-25)
+
+**파일:**
+- `campulist/src/components/post/CategoryGrid.tsx`
+- `campulist/src/app/all/[category]/page.tsx`
+- `campulist/src/app/[university]/[category]/page.tsx`
+
+### CategoryGrid 변경
+- 세로 카드 레이아웃 → 가로 알약형 칩(pill) 스타일로 변경
+  - `flex-col rounded-xl` → `flex items-center rounded-full`
+  - 아이콘 `text-2xl`, 텍스트 `text-lg font-bold`
+- 선택된 대분류 아래에 삼각형(▼) 커넥터 표시
+  - `absolute -bottom-2`, `border-x-[8px] border-t-[8px]` 파란색
+
+### 소분류 컨테이너
+- 테두리 제거, 연한 배경색만 사용 (`bg-blue-50/70 dark:bg-blue-950/30`)
+- 최소 패딩 (`px-2 py-px`)
+- 소분류 뱃지: `text-sm`, 오렌지 계열 색상
+
+---
+
+## 42. 수직 공간 압축 (2026-02-25)
+
+글자 크기 유지, 패딩/마진만 축소 원칙
+
+| 컴포넌트 | 변경 내용 |
+|----------|----------|
+| UniversityBanner | 2줄→1줄 (이름+부제 한 줄), `py-px`, 긴 부제 `truncate` 처리 |
+| Breadcrumb | `py-1` → `py-px` |
+| CategoryGrid 컨테이너 | `pb-1 pt-0.5`, 칩 `py-0.5` |
+| 소분류 컨테이너 | `py-px mb-0.5` |
+| SortBadgeRow | `pb-1.5` → `pb-0.5` |
+
+### 수정 파일 목록
+
+| 파일 | 변경 |
+|------|------|
+| `campulist/src/components/layout/UniversityBanner.tsx` | 1줄 레이아웃 + truncate |
+| `campulist/src/components/layout/Breadcrumb.tsx` | 패딩 축소 |
+| `campulist/src/components/post/CategoryGrid.tsx` | 칩 스타일 + 삼각형 커넥터 |
+| `campulist/src/components/post/SortBadgeRow.tsx` | 패딩 축소 |
+| `campulist/src/app/all/[category]/page.tsx` | 소분류 컨테이너 스타일 |
+| `campulist/src/app/[university]/[category]/page.tsx` | 소분류 컨테이너 스타일 |

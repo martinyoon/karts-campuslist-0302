@@ -26,8 +26,25 @@ function extractAppointment(content: string) {
   return { date: dateMatch[1].trim(), time: timeMatch[1].trim(), location: locMatch?.[1]?.trim(), note: noteMatch?.[1]?.trim() };
 }
 
-/** 메시지 내 /post/xxx 경로를 클릭 가능한 링크로 변환 */
+/** 구조화 메시지 제목 강조 + /post/xxx 링크 변환 */
+const STRUCTURED_PREFIXES = ['📜 메시지 원칙', '📅 거래 약속', '✅ 약속 확정!', '❌ 약속 취소', '🤝 약속 종료', '📍 만남 장소', '🏦 송금 정보'];
+
 function renderContent(content: string) {
+  const isStructured = STRUCTURED_PREFIXES.some(p => content.startsWith(p));
+  if (isStructured) {
+    const [title, ...rest] = content.split('\n');
+    return (
+      <>
+        <span className="text-base font-bold">{title}</span>
+        {rest.length > 0 && (
+          <>
+            {'\n'}
+            <span className="text-xs opacity-80">{rest.join('\n')}</span>
+          </>
+        )}
+      </>
+    );
+  }
   const parts = content.split(/(\/post\/[\w-]+)/g);
   if (parts.length === 1) return content;
   return parts.map((part, i) =>
@@ -56,10 +73,24 @@ function CamTalkDetailContent() {
   const [input, setInput] = useState('');
   const [appointmentOpen, setAppointmentOpen] = useState(false);
   const [canSendApp, setCanSendApp] = useState(false);
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [canSendLoc, setCanSendLoc] = useState(false);
+  const [bankOpen, setBankOpen] = useState(false);
+  const [canSendBank, setCanSendBank] = useState(false);
+  const [principleOpen, setPrincipleOpen] = useState(false);
+  const [selectedPrinciples, setSelectedPrinciples] = useState<string[]>([]);
+  const [principleCustom, setPrincipleCustom] = useState('');
   const appDateRef = useRef<HTMLInputElement>(null);
   const appTimeRef = useRef<HTMLSelectElement>(null);
   const appLocationRef = useRef<HTMLInputElement>(null);
   const appNoteRef = useRef<HTMLInputElement>(null);
+  const locNameRef = useRef<HTMLInputElement>(null);
+  const locDescRef = useRef<HTMLInputElement>(null);
+  const locMemoRef = useRef<HTMLInputElement>(null);
+  const bankNameRef = useRef<HTMLSelectElement>(null);
+  const bankAccountRef = useRef<HTMLInputElement>(null);
+  const bankHolderRef = useRef<HTMLInputElement>(null);
+  const bankAmountRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const checkCanSend = () => {
@@ -174,6 +205,73 @@ function CamTalkDetailContent() {
     setMessages(prev => [...prev, newMsg]);
     setAppointmentOpen(false);
     setCanSendApp(false);
+  };
+
+  const checkCanSendLoc = () => {
+    setCanSendLoc(!!locNameRef.current?.value?.trim());
+  };
+
+  const handleLocation = () => {
+    const name = locNameRef.current?.value?.trim() || '';
+    if (!name) return;
+    const desc = locDescRef.current?.value?.trim() || '';
+    const memo = locMemoRef.current?.value?.trim() || '';
+    const parts = ['📍 만남 장소', `장소: ${name}`];
+    if (desc) parts.push(`설명: ${desc}`);
+    if (memo) parts.push(`참고: ${memo}`);
+    const newMsg = sendMessage(roomId, myId, parts.join('\n'));
+    setMessages(prev => [...prev, newMsg]);
+    setLocationOpen(false);
+    setCanSendLoc(false);
+  };
+
+  const checkCanSendBank = () => {
+    setCanSendBank(!!(bankNameRef.current?.value && bankAccountRef.current?.value?.trim() && bankHolderRef.current?.value?.trim()));
+  };
+
+  const savedBank = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('ct_bank_info') || 'null'); }
+    catch { return null; }
+  }, [bankOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleBank = () => {
+    const bank = bankNameRef.current?.value || '';
+    const account = bankAccountRef.current?.value?.trim() || '';
+    const holder = bankHolderRef.current?.value?.trim() || '';
+    const amount = bankAmountRef.current?.value?.trim() || '';
+    if (!bank || !account || !holder) return;
+    try { localStorage.setItem('ct_bank_info', JSON.stringify({ bank, account, holder })); } catch {}
+    const parts = ['🏦 송금 정보', `은행: ${bank}`, `계좌: ${account}`, `예금주: ${holder}`];
+    if (amount) parts.push(`금액: ${amount}원`);
+    const newMsg = sendMessage(roomId, myId, parts.join('\n'));
+    setMessages(prev => [...prev, newMsg]);
+    setBankOpen(false);
+    setCanSendBank(false);
+  };
+
+  const principles = [
+    { emoji: '🤝', text: '정직하고 투명하게 거래해요' },
+    { emoji: '⏰', text: '시간 약속을 꼭 지켜요' },
+    { emoji: '💬', text: '답변은 빠르게 드릴게요' },
+    { emoji: '🙏', text: '서로 존중하며 대화해요' },
+    { emoji: '📦', text: '상품 상태를 정확히 알려드려요' },
+  ];
+
+  const togglePrinciple = (text: string) => {
+    setSelectedPrinciples(prev => prev.includes(text) ? prev.filter(x => x !== text) : [...prev, text]);
+  };
+
+  const handlePrinciple = () => {
+    const custom = principleCustom.trim();
+    if (selectedPrinciples.length === 0 && !custom) return;
+    const parts = ['📜 메시지 원칙'];
+    selectedPrinciples.forEach(p => parts.push(`✅ ${p}`));
+    if (custom) parts.push(`💡 ${custom}`);
+    const newMsg = sendMessage(roomId, myId, parts.join('\n'));
+    setMessages(prev => [...prev, newMsg]);
+    setPrincipleOpen(false);
+    setSelectedPrinciples([]);
+    setPrincipleCustom('');
   };
 
   return (
@@ -320,25 +418,12 @@ function CamTalkDetailContent() {
         </div>
       </div>
 
-      {/* 메시지 입력 */}
-      {/* 간격 압축: py-3 → py-1.5 */}
+      {/* 메시지 입력 + 빠른 메시지 */}
       <div className="border-t border-border px-4 py-1.5">
-        {/* 간격 압축: gap-2 → gap-1.5 */}
         <form
           onSubmit={e => { e.preventDefault(); handleSend(); }}
           className="flex items-center gap-1.5"
         >
-          <button
-            type="button"
-            onClick={() => setAppointmentOpen(true)}
-            className="shrink-0 text-muted-foreground hover:text-foreground"
-            aria-label="약속 잡기"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <path d="M16 2v4M8 2v4M3 10h18" />
-            </svg>
-          </button>
           <Input
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -349,15 +434,56 @@ function CamTalkDetailContent() {
           <Button
             type="submit"
             disabled={!input.trim()}
-            className="bg-blue-600 px-4 hover:bg-blue-700"
+            className="bg-orange-500 px-4 hover:bg-orange-600"
           >
             전송
           </Button>
         </form>
+        {/* 빠른 메시지 칩 */}
+        <div className="flex gap-2 overflow-x-auto pt-1.5 scrollbar-hide">
+          <button
+            type="button"
+            onClick={() => setAppointmentOpen(true)}
+            className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
+          >
+            📅 약속 잡기
+          </button>
+          <button
+            type="button"
+            onClick={() => setLocationOpen(true)}
+            className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
+          >
+            📍 장소 안내
+          </button>
+          <button
+            type="button"
+            onClick={() => { setBankOpen(true); if (savedBank?.bank && savedBank?.account && savedBank?.holder) setCanSendBank(true); }}
+            className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
+          >
+            🏦 송금 정보
+          </button>
+          <button
+            type="button"
+            onClick={() => setPrincipleOpen(true)}
+            className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
+          >
+            📜 메시지 원칙
+          </button>
+          {['안녕하세요?', '감사합니다!', '아직 판매중인가요?', '직거래 장소 어디가 편하세요?', '오늘 거래 가능하신가요?'].map(msg => (
+            <button
+              key={msg}
+              type="button"
+              onClick={() => setInput(msg)}
+              className="shrink-0 rounded-full border border-orange-400/40 px-3 py-1 text-sm text-orange-600 transition-colors hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-950"
+            >
+              {msg}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 약속 잡기 Sheet */}
-      <Sheet open={appointmentOpen} onOpenChange={setAppointmentOpen}>
+      <Sheet open={appointmentOpen} onOpenChange={(open) => { setAppointmentOpen(open); if (!open) setCanSendApp(false); }}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
           <SheetHeader className="pb-2">
             <SheetTitle className="text-lg">거래 약속 잡기</SheetTitle>
@@ -481,13 +607,219 @@ function CamTalkDetailContent() {
               type="button"
               onClick={handleAppointment}
               disabled={!canSendApp}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-orange-500 hover:bg-orange-600"
             >
               약속 보내기
             </Button>
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* 장소 안내 Sheet */}
+      <Sheet open={locationOpen} onOpenChange={(open) => { setLocationOpen(open); if (!open) setCanSendLoc(false); }}>
+        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-lg">만남 장소 안내</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 px-4 pb-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium">장소명</label>
+              <input
+                ref={locNameRef}
+                onChange={checkCanSendLoc}
+                onInput={checkCanSendLoc}
+                placeholder="예: 중앙도서관 앞"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {['중앙도서관 앞', '정문 앞', '학생회관 1층', '기숙사 로비', '카페'].map(place => (
+                  <button
+                    key={place}
+                    type="button"
+                    onClick={() => { if (locNameRef.current) { locNameRef.current.value = univPrefix ? `${univPrefix} ${place}` : place; setCanSendLoc(true); } }}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {place}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">상세 설명 (선택)</label>
+              <input
+                ref={locDescRef}
+                placeholder="예: 1층 정문 나오면 바로 오른쪽"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {['1층 로비에서 만나요', '건물 정문 앞에서 만나요', '주차장 입구 쪽이에요', '엘리베이터 앞에서 기다릴게요', '편의점 앞에서 만나요'].map(desc => (
+                  <button
+                    key={desc}
+                    type="button"
+                    onClick={() => { if (locDescRef.current) locDescRef.current.value = desc; }}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {desc}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">참고사항 (선택)</label>
+              <input
+                ref={locMemoRef}
+                placeholder="예: 파란 패딩 입고 있을게요"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {['건물 앞 벤치에서 기다릴게요', '늦으면 연락 주세요'].map(memo => (
+                  <button
+                    key={memo}
+                    type="button"
+                    onClick={() => { if (locMemoRef.current) locMemoRef.current.value = memo; }}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {memo}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Button
+              type="button"
+              onClick={handleLocation}
+              disabled={!canSendLoc}
+              className="w-full bg-orange-500 hover:bg-orange-600"
+            >
+              장소 보내기
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* 송금 정보 Sheet */}
+      <Sheet open={bankOpen} onOpenChange={(open) => { setBankOpen(open); if (!open) setCanSendBank(false); }}>
+        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-lg">송금 정보 공유</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 px-4 pb-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium">은행</label>
+              <select
+                ref={bankNameRef}
+                onChange={checkCanSendBank}
+                className="border-input h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                defaultValue={savedBank?.bank || ''}
+              >
+                <option value="" disabled>은행 선택</option>
+                {['카카오뱅크', '토스뱅크', '국민은행', '신한은행', '우리은행', '하나은행', '농협은행', 'SC제일은행', '기업은행', '새마을금고'].map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">계좌번호</label>
+              <input
+                ref={bankAccountRef}
+                onChange={checkCanSendBank}
+                onInput={checkCanSendBank}
+                defaultValue={savedBank?.account || ''}
+                placeholder="'-' 없이 숫자만 입력"
+                inputMode="numeric"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">예금주</label>
+              <input
+                ref={bankHolderRef}
+                onChange={checkCanSendBank}
+                onInput={checkCanSendBank}
+                defaultValue={savedBank?.holder || ''}
+                placeholder="예금주 이름"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">금액 (선택)</label>
+              <input
+                ref={bankAmountRef}
+                placeholder="예: 30,000"
+                inputMode="numeric"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+            </div>
+            <Button
+              type="button"
+              onClick={handleBank}
+              disabled={!canSendBank}
+              className="w-full bg-orange-500 hover:bg-orange-600"
+            >
+              송금 정보 보내기
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* 메시지 원칙 Sheet */}
+      <Sheet open={principleOpen} onOpenChange={(open) => { setPrincipleOpen(open); if (!open) { setSelectedPrinciples([]); setPrincipleCustom(''); } }}>
+        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-lg">메시지 원칙</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 px-4 pb-3">
+            <p className="text-sm text-muted-foreground">거래 시 지키고 싶은 원칙을 선택하세요</p>
+            <div className="space-y-1.5">
+              {principles.map(({ emoji, text }) => (
+                <button
+                  key={text}
+                  type="button"
+                  onClick={() => togglePrinciple(text)}
+                  className={`flex w-full items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
+                    selectedPrinciples.includes(text)
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300'
+                      : 'border-border hover:bg-accent'
+                  }`}
+                >
+                  <span className="text-base">{emoji}</span>
+                  <span className="flex-1">{text}</span>
+                  {selectedPrinciples.includes(text) && <span className="text-orange-500">✓</span>}
+                </button>
+              ))}
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">직접 입력 (선택)</label>
+              <input
+                value={principleCustom}
+                onChange={e => setPrincipleCustom(e.target.value)}
+                placeholder="나만의 거래 원칙을 적어보세요"
+                className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              />
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {['네고 없이 정가 거래 원합니다', '직거래만 가능합니다', '택배 거래도 가능해요', '쿨거래 선호합니다', '거래 후 환불은 어려워요'].map(ex => (
+                  <button
+                    key={ex}
+                    type="button"
+                    onClick={() => setPrincipleCustom(ex)}
+                    className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {ex}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Button
+              type="button"
+              onClick={handlePrinciple}
+              disabled={selectedPrinciples.length === 0 && !principleCustom.trim()}
+              className="w-full bg-orange-500 hover:bg-orange-600"
+            >
+              원칙 보내기
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
     </div>
   );
 }

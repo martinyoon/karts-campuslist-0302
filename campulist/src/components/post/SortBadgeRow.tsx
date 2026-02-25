@@ -11,7 +11,7 @@ interface SortBadgeRowProps {
 
 export default function SortBadgeRow({ sortBy, buildHref, className }: SortBadgeRowProps) {
   return (
-    <div className={`flex gap-1.5 overflow-x-auto px-4 scrollbar-hide ${className ?? 'border-b border-border pb-1.5'}`}>
+    <div className={`flex gap-1.5 overflow-x-auto px-4 scrollbar-hide ${className ?? 'border-b border-border pb-0.5'}`}>
       {SORT_OPTIONS.map(opt => (
         <Link key={opt.value} href={buildHref(opt.value)}>
           <Badge
