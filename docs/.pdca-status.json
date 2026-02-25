@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-25T08:36:51.242Z",
+  "lastUpdated": "2026-02-25T10:25:48.515Z",
   "activeFeatures": [
     "02-design",
     "data",
@@ -143,7 +143,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:14:48.946Z",
-        "lastUpdated": "2026-02-25T08:36:51.242Z"
+        "lastUpdated": "2026-02-25T10:25:48.515Z"
       },
       "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/write/page.tsx"
     },
@@ -234,9 +234,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T09:47:22.914Z",
-        "lastUpdated": "2026-02-25T02:38:49.100Z"
+        "lastUpdated": "2026-02-25T10:24:31.491Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/ui/LoadingSpinner.tsx"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/ui/Toast.tsx"
     },
     "user": {
       "phase": "do",
@@ -364,7 +364,7 @@
   "session": {
     "startedAt": "2026-02-20T06:05:02.769Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-25T08:36:51.242Z"
+    "lastActivity": "2026-02-25T10:25:48.515Z"
   },
   "history": [
     {
@@ -10630,6 +10630,126 @@
     },
     {
       "timestamp": "2026-02-25T08:36:51.242Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T09:28:57.078Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T09:30:11.327Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:13:27.146Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:14:39.117Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:16:56.815Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:18:01.444Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:20:10.608Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:20:15.582Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:20:20.393Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:20:29.221Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:21:18.323Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:21:23.589Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:21:29.325Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:21:37.643Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:23:25.760Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:24:18.995Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:24:24.430Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:24:31.491Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:24:40.089Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T10:25:48.515Z",
       "feature": "write",
       "phase": "do",
       "action": "updated"

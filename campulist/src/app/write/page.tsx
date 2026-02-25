@@ -498,7 +498,7 @@ function WritePageContent() {
       setLocation(fillTemplate(ex.location, user, user.universityId));
     }
 
-    toast('샘플로 채워졌어요!');
+    toast('샘플로 채워졌어요!', 'default', 1000, 'lg', true);
     setHighlightedFields(['제목', '가격', '내용', '태그', '장소']);
     setTimeout(() => setHighlightedFields([]), 1500);
   };
@@ -761,7 +761,8 @@ function WritePageContent() {
       {/* 간격 압축: py-8 → py-4 */}
       {!majorId && step !== 'form' && (
         <div className="px-4 py-4 text-center">
-          <p className="text-muted-foreground">대분류를 선택해주세요</p>
+          <p className="text-4xl text-muted-foreground mb-2">⬆</p>
+          <p className="text-2xl font-bold text-muted-foreground">위에 보이는, 대분류를 선택해주세요</p>
         </div>
       )}
 
@@ -769,7 +770,8 @@ function WritePageContent() {
       {/* 간격 압축: py-6 → py-3 */}
       {majorId && !minorId && step !== 'form' && (
         <div className="px-4 py-3 text-center">
-          <p className="text-muted-foreground">소분류를 선택하면 글쓰기를 시작합니다</p>
+          <p className="text-4xl text-muted-foreground mb-2">⬆</p>
+          <p className="text-2xl font-bold text-muted-foreground">위에 보이는, 소분류를 선택해 주세요</p>
         </div>
       )}
 
@@ -813,7 +815,7 @@ function WritePageContent() {
                         <span ref={spinnerRef} className="truncate max-w-[200px]">샘플 고르는 중...</span>
                       </>
                     ) : (
-                      '샘플 채우기 · 랜덤!'
+                      '샘플로 게시글 채우기'
                     )}
                   </button>
                   <button
@@ -822,7 +824,7 @@ function WritePageContent() {
                     disabled={loadingOthers}
                     className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
                   >
-                    {loadingOthers ? '불러오는 중...' : '다른 글 가져와 고치기'}
+                    {loadingOthers ? '불러오는 중...' : '다른 게시글 가져와서 고치기'}
                   </button>
                 </div>
               </div>

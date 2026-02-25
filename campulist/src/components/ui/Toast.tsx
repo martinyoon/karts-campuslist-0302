@@ -4,14 +4,19 @@ import { useState, useEffect, useCallback, createContext, useContext } from 'rea
 
 type ToastVariant = 'default' | 'success' | 'error';
 
+type ToastSize = 'sm' | 'lg';
+
 interface ToastItem {
   id: number;
   message: string;
   variant: ToastVariant;
+  duration: number;
+  size: ToastSize;
+  dismissOnMove: boolean;
 }
 
 interface ToastContextValue {
-  toast: (message: string, variant?: ToastVariant) => void;
+  toast: (message: string, variant?: ToastVariant, duration?: number, size?: ToastSize, dismissOnMove?: boolean) => void;
 }
 
 const ToastContext = createContext<ToastContextValue>({ toast: () => {} });
@@ -25,9 +30,9 @@ let nextId = 0;
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const toast = useCallback((message: string, variant: ToastVariant = 'default') => {
+  const toast = useCallback((message: string, variant: ToastVariant = 'default', duration: number = 2500, size: ToastSize = 'sm', dismissOnMove: boolean = false) => {
     const id = nextId++;
-    setToasts(prev => [...prev, { id, message, variant }]);
+    setToasts(prev => [...prev, { id, message, variant, duration, size, dismissOnMove }]);
   }, []);
 
   const remove = useCallback((id: number) => {
@@ -55,18 +60,28 @@ const variantStyles: Record<ToastVariant, string> = {
 function ToastMessage({ item, onDone }: { item: ToastItem; onDone: (id: number) => void }) {
   const [visible, setVisible] = useState(false);
 
+  const dismiss = useCallback(() => {
+    setVisible(false);
+    setTimeout(() => onDone(item.id), 200);
+  }, [item.id, onDone]);
+
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
-    const timer = setTimeout(() => {
-      setVisible(false);
-      setTimeout(() => onDone(item.id), 200);
-    }, 2500);
+    const timer = setTimeout(dismiss, item.duration);
+
+    if (item.dismissOnMove) {
+      const handler = () => { clearTimeout(timer); dismiss(); };
+      window.addEventListener('mousemove', handler, { once: true });
+      window.addEventListener('touchstart', handler, { once: true });
+      return () => { clearTimeout(timer); window.removeEventListener('mousemove', handler); window.removeEventListener('touchstart', handler); };
+    }
+
     return () => clearTimeout(timer);
-  }, [item.id, onDone]);
+  }, [item.id, item.duration, item.dismissOnMove, onDone, dismiss]);
 
   return (
     <div
-      className={`rounded-lg px-4 py-2.5 text-sm shadow-lg transition-all duration-200 ${variantStyles[item.variant]} ${
+      className={`rounded-lg shadow-lg transition-all duration-200 ${item.size === 'lg' ? 'px-6 py-3 text-2xl font-bold' : 'px-4 py-2.5 text-sm'} ${variantStyles[item.variant]} ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
       }`}
     >
