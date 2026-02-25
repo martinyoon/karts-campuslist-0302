@@ -8,6 +8,7 @@ import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import Breadcrumb from '@/components/layout/Breadcrumb';
 
 interface Props {
   params: Promise<{ university: string }>;
@@ -60,15 +61,13 @@ export default async function UniversityPage({ params, searchParams }: Props) {
         <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">{university.region} · {university.nameEn}</p>
       </div>
 
-      {/* 브레드크럼 — 간격 압축: py-2 → py-1 */}
-      <div className="border-b border-border px-4 py-1">
-        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
-          <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
-          <span className="text-orange-300">›</span>
-          <span className="font-semibold text-orange-400">{university.name} · 전체보기</span>
-          <span className="text-orange-300">›</span>
-        </nav>
-      </div>
+      <Breadcrumb
+        segments={[
+          { label: '모든 대학', href: '/' },
+          { label: university.name, suffix: '· 전체보기' },
+        ]}
+        showTrailingSeparator
+      />
 
       <CategoryGrid universitySlug={slug} />
 

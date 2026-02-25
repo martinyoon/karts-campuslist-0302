@@ -16,6 +16,7 @@ import PostBottomAction from '@/components/post/PostBottomAction';
 import ViewCountTracker from '@/components/post/ViewCountTracker';
 import LocalPostView from '@/components/post/LocalPostView';
 import ContactMethodsDisplay from '@/components/post/ContactMethodsDisplay';
+import Breadcrumb from '@/components/layout/Breadcrumb';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -77,21 +78,16 @@ export default async function PostDetailPage({ params }: Props) {
         </div>
       </Link>
 
+      <Breadcrumb segments={[
+        { label: '모든 대학', href: '/' },
+        { label: post.university.name, href: `/${post.university.slug}` },
+        { label: post.categoryMajor.name, href: `/${post.university.slug}/${post.categoryMajor.slug}`, icon: post.categoryMajor.icon },
+        { label: post.categoryMinor.name },
+      ]} />
+
       {/* 게시글 내용 — 간격 압축: py-4 → py-2 */}
       <div className="px-4 py-2">
-        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
-          <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
-          <span className="text-orange-300">›</span>
-          <Link href={`/${post.university.slug}`} className="text-orange-400 hover:text-orange-300 hover:underline">{post.university.name}</Link>
-          <span className="text-orange-300">›</span>
-          <Link href={`/${post.university.slug}/${post.categoryMajor.slug}`} className="text-orange-400 hover:text-orange-300 hover:underline">
-            <span className="cat-icon">{post.categoryMajor.icon} </span>{post.categoryMajor.name}
-          </Link>
-          <span className="text-orange-300">›</span>
-          <span className="font-semibold text-orange-400">{post.categoryMinor.name}</span>
-        </nav>
-
-        <div className="mt-1 flex items-center gap-1.5"> {/* 간격 압축: mt-2 → mt-1, gap-2 → gap-1.5 */}
+        <div className="flex items-center gap-1.5"> {/* 간격 압축: mt-2 → mt-1, gap-2 → gap-1.5 */}
           {post.status !== 'active' && (
             <Badge variant={post.status === 'reserved' ? 'secondary' : 'outline'} className={post.status === 'reserved' ? 'bg-orange-500/10 text-orange-500' : 'bg-green-500/10 text-green-500'}>
               {post.status === 'reserved' ? '예약중' : post.status === 'completed' ? '거래완료' : post.status}

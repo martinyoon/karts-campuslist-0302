@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Breadcrumb, { type BreadcrumbSegment } from '@/components/layout/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -712,38 +713,23 @@ function WritePageContent() {
         </div>
       </div>
 
-      {/* 브레드크럼 */}
-      {/* 간격 압축: py-2 → py-1 */}
-      <div className="border-b border-border px-4 py-1">
-        {/* 간격 압축: gap-2 → gap-1.5 */}
-        <nav aria-label="브레드크럼" className="flex items-center gap-1.5 text-base text-muted-foreground">
-          <span className="text-orange-400">모든 대학</span>
-          <span className="text-orange-300">›</span>
-          <span className="text-orange-400">{selectedUni?.name || '대학'}</span>
-          <span className="text-orange-300">›</span>
-          {selectedMajor ? (
-            <>
-              {selectedMinor ? (
-                <button onClick={handleChangeCategory} className="text-orange-400 hover:text-orange-300 hover:underline">
-                  <span className="cat-icon">{selectedMajor.icon} </span>{selectedMajor.name}
-                </button>
-              ) : (
-                <span className="font-semibold text-orange-400">
-                  <span className="cat-icon">{selectedMajor.icon} </span>{selectedMajor.name}
-                </span>
-              )}
-              {selectedMinor && (
-                <>
-                  <span className="text-orange-300">›</span>
-                  <span className="font-semibold text-orange-400">{selectedMinor.name}</span>
-                </>
-              )}
-            </>
-          ) : (
-            <span className="font-semibold text-orange-400">{isEditMode ? '글 수정' : '카테고리 선택'}</span>
-          )}
-        </nav>
-      </div>
+      <Breadcrumb segments={(() => {
+        const segs: BreadcrumbSegment[] = [
+          { label: '모든 대학', href: '/' },
+          { label: selectedUni?.name || '대학', href: `/${selectedUni?.slug || ''}` },
+        ];
+        if (selectedMajor) {
+          if (selectedMinor) {
+            segs.push({ label: selectedMajor.name, icon: selectedMajor.icon, onClick: handleChangeCategory });
+            segs.push({ label: selectedMinor.name });
+          } else {
+            segs.push({ label: selectedMajor.name, icon: selectedMajor.icon });
+          }
+        } else {
+          segs.push({ label: isEditMode ? '글 수정' : '카테고리 선택' });
+        }
+        return segs;
+      })()} />
 
       {/* 카테고리 아이콘 그리드 */}
       <WriteCategoryGrid activeId={majorId} onSelect={handleMajorSelect} />

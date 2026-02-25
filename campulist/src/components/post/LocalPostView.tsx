@@ -15,6 +15,7 @@ import PostBottomAction from '@/components/post/PostBottomAction';
 import ViewCountTracker from '@/components/post/ViewCountTracker';
 import PostCard from '@/components/post/PostCard';
 import ContactMethodsDisplay from '@/components/post/ContactMethodsDisplay';
+import Breadcrumb from '@/components/layout/Breadcrumb';
 import { getPostDetail, getRelatedPosts } from '@/lib/api';
 import { formatPrice, formatRelativeTime } from '@/lib/format';
 import type { PostDetail, PostListItem } from '@/lib/types';
@@ -89,21 +90,16 @@ export default function LocalPostView({ id }: LocalPostViewProps) {
         </div>
       </Link>
 
-      {/* 게시글 내용 */}
-      <div className="px-4 py-4">
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Link href={`/${post.university.slug}`} className="hover:text-blue-500">
-            {post.university.name}
-          </Link>
-          <span>›</span>
-          <Link href={`/${post.university.slug}/${post.categoryMajor.slug}`} className="hover:text-blue-500">
-            <span className="cat-icon">{post.categoryMajor.icon} </span>{post.categoryMajor.name}
-          </Link>
-          <span>›</span>
-          <Link href={`/${post.university.slug}/${post.categoryMajor.slug}?minor=${post.categoryMinor.slug}`} className="hover:text-blue-500">{post.categoryMinor.name}</Link>
-        </nav>
+      <Breadcrumb segments={[
+        { label: '모든 대학', href: '/' },
+        { label: post.university.name, href: `/${post.university.slug}` },
+        { label: post.categoryMajor.name, href: `/${post.university.slug}/${post.categoryMajor.slug}`, icon: post.categoryMajor.icon },
+        { label: post.categoryMinor.name },
+      ]} />
 
-        <div className="mt-2 flex items-center gap-2">
+      {/* 게시글 내용 */}
+      <div className="px-4 py-2">
+        <div className="flex items-center gap-1.5">
           {post.status !== 'active' && (
             <Badge variant={post.status === 'reserved' ? 'secondary' : 'outline'} className={post.status === 'reserved' ? 'bg-orange-500/10 text-orange-500' : 'bg-green-500/10 text-green-500'}>
               {post.status === 'reserved' ? '예약중' : post.status === 'completed' ? '거래완료' : post.status}

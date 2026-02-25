@@ -8,6 +8,7 @@ import CategoryGrid from '@/components/post/CategoryGrid';
 import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/badge';
+import Breadcrumb from '@/components/layout/Breadcrumb';
 
 interface Props {
   params: Promise<{ category: string }>;
@@ -70,28 +71,17 @@ export default async function AllCategoryPage({ params, searchParams }: Props) {
         <p className="mt-0.5 text-sm text-blue-500 dark:text-blue-400">전체 캠퍼스 통합 · All Universities</p>
       </div>
 
-      {/* 브레드크럼 — 간격 압축: py-2 → py-1 */}
-      <div className="border-b border-border px-4 py-1">
-        <nav aria-label="브레드크럼" className="flex items-center gap-2 text-base text-muted-foreground">
-          <Link href="/" className="text-orange-400 hover:text-orange-300 hover:underline">모든 대학</Link>
-          <span className="text-orange-300">›</span>
-          {activeMinor ? (
-            <>
-              <Link href={buildUrl({ minor: '' })} className="text-orange-400 hover:text-orange-300 hover:underline">
-                <span className="cat-icon">{category.icon} </span>{category.name}
-              </Link>
-              <span className="text-orange-300">›</span>
-              <span className="font-semibold text-orange-400">{activeMinor.name} · 전체보기</span>
-              <span className="text-orange-300">›</span>
-            </>
-          ) : (
-            <>
-              <span className="font-semibold text-orange-400"><span className="cat-icon">{category.icon} </span>{category.name} · 전체보기</span>
-              <span className="text-orange-300">›</span>
-            </>
-          )}
-        </nav>
-      </div>
+      <Breadcrumb
+        segments={activeMinor ? [
+          { label: '모든 대학', href: '/' },
+          { label: category.name, href: buildUrl({ minor: '' }), icon: category.icon },
+          { label: activeMinor.name },
+        ] : [
+          { label: '모든 대학', href: '/' },
+          { label: category.name, icon: category.icon, suffix: '· 전체보기' },
+        ]}
+        showTrailingSeparator
+      />
 
       {/* 카테고리 바로가기 */}
       <CategoryGrid activeSlug={catSlug} />
