@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-25T05:00:02.779Z",
+  "lastUpdated": "2026-02-25T06:02:48.467Z",
   "activeFeatures": [
     "02-design",
     "data",
@@ -51,9 +51,9 @@
       "archivedAt": "2026-02-20T10:42:00.000Z",
       "archivedTo": "docs/archive/2026-02/campulist/",
       "phaseNumber": 3,
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/page.tsx",
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/lib/types.ts",
       "timestamps": {
-        "lastUpdated": "2026-02-25T02:39:44.697Z"
+        "lastUpdated": "2026-02-25T05:40:29.913Z"
       }
     },
     "data": {
@@ -65,9 +65,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:08:12.371Z",
-        "lastUpdated": "2026-02-24T15:28:22.039Z"
+        "lastUpdated": "2026-02-25T05:40:42.232Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/data/categories.ts"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/data/posts.ts"
     },
     "layout": {
       "phase": "do",
@@ -91,9 +91,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:12:14.928Z",
-        "lastUpdated": "2026-02-25T05:00:02.779Z"
+        "lastUpdated": "2026-02-25T06:02:48.467Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/post/SortBadgeRow.tsx"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/post/ImageGallery.tsx"
     },
     "[university]": {
       "phase": "do",
@@ -364,7 +364,7 @@
   "session": {
     "startedAt": "2026-02-20T06:05:02.769Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-25T05:00:02.779Z"
+    "lastActivity": "2026-02-25T06:02:48.467Z"
   },
   "history": [
     {
@@ -10318,6 +10318,102 @@
     },
     {
       "timestamp": "2026-02-25T05:00:02.779Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:40:09.343Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:40:29.913Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:40:42.232Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:40:58.910Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:46:39.069Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:46:45.552Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:48:16.806Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:48:57.814Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:50:46.478Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:52:12.876Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:59:39.967Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T05:59:55.939Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T06:00:02.023Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T06:00:14.165Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T06:00:19.720Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-25T06:02:48.467Z",
       "feature": "post",
       "phase": "do",
       "action": "updated"

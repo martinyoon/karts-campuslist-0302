@@ -1625,3 +1625,51 @@ Check-1: 52% → Check-3: 76% → Check-4: 88% → Check-5: 93% → Check-6: 96%
 | `campulist/src/components/post/SortBadgeRow.tsx` | 패딩 축소 |
 | `campulist/src/app/all/[category]/page.tsx` | 소분류 컨테이너 스타일 |
 | `campulist/src/app/[university]/[category]/page.tsx` | 소분류 컨테이너 스타일 |
+
+---
+
+## 43. 이미지 갤러리 개선 — 가로 스크롤 캐러셀 + 자동 슬라이드 (2026-02-25)
+
+게시글 상세 페이지의 이미지 표시 방식을 좌우 화살표 → 가로 스크롤 캐러셀로 전면 교체.
+
+### 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| 가로 스크롤 | CSS `scroll-snap` (`snap-x snap-mandatory` + `snap-start`)로 스와이프/드래그 |
+| 도트 인디케이터 | 하단 중앙에 현재 이미지 위치 표시 (`bg-white` / `bg-white/40`) |
+| 자동 슬라이드 | 5초 간격으로 다음 이미지 자동 전환, 마지막→첫 번째로 순환 |
+| 사용자 조작 시 정지 | 터치/드래그/휠/스크롤 감지 시 자동 슬라이드 **완전 정지** (재개 없음) |
+| IntersectionObserver | 스크롤 위치 기반으로 현재 보이는 이미지 인덱스 감지 |
+| 목록 카드 이미지 뱃지 | 여러 장일 때 썸네일 우측 하단에 `📷 N` 뱃지 표시 |
+
+### 이미지 크기
+
+- 기존 크기 유지: `ml-4 mt-2 w-1/3 aspect-video` (풀 너비 아님)
+
+### 버그 수정 (자동 슬라이드 정지 불량)
+
+**원인:** `onTouchStart`와 `onMouseDown`만으로는 데스크톱 트랙패드/마우스 휠 스크롤을 감지 불가
+
+**수정:**
+- `onWheel` 이벤트 추가 — 마우스 휠/트랙패드 감지
+- `onScroll` + `programmaticScrollRef` — 모든 스크롤 감지하되 자동 슬라이드의 프로그래밍 스크롤은 무시
+- `scrollToIndex` 호출 시 600ms 동안 프로그래밍 스크롤 플래그 활성화
+
+### 코드 품질 개선
+
+| 문제 | 수정 |
+|------|------|
+| React Hooks 규칙 위반 (조기 return이 Hooks 앞) | 조기 return을 모든 Hooks 뒤로 이동 |
+| state updater 내 side effect (`setCurrent` 안에서 `scrollToIndex`) | DOM `scrollLeft`에서 직접 읽어 분리 호출 |
+| setTimeout 누수 (연속 호출 시 타이머 겹침) | `clearTimeout` + unmount cleanup effect 추가 |
+| timerRef 타입 불일치 (`setTimeout` → `setInterval`) | `ReturnType<typeof setInterval>`로 수정 |
+
+### 수정 파일 목록
+
+| 파일 | 변경 |
+|------|------|
+| `campulist/src/components/post/ImageGallery.tsx` | 가로 스크롤 캐러셀 전면 리뉴얼 |
+| `campulist/src/components/post/PostCard.tsx` | 썸네일에 이미지 개수 뱃지 추가 |
+| `campulist/src/lib/types.ts` | `PostListItem`에 `imageCount` 필드 추가 |
+| `campulist/src/data/posts.ts` | `toPostListItem()`에 `imageCount: images.length` 반환 |

@@ -27,13 +27,18 @@ export default function PostCard({ post }: PostCardProps) {
     <Link href={`/post/${post.id}`} className="flex gap-2 border-b border-border px-4 py-3 transition-colors hover:bg-muted/50"> {/* 간격 압축: py-5 → py-3, gap-4 → gap-2 */}
       {/* 썸네일 */}
       {post.thumbnail ? (
-        <div className="h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-muted">
+        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-muted">
           <img
             src={post.thumbnail}
             alt={post.title}
             className="h-full w-full object-cover"
             loading="lazy"
           />
+          {post.imageCount > 1 && (
+            <div className="absolute bottom-1 right-1 rounded bg-black/60 px-1.5 py-0.5 text-xs text-white">
+              📷 {post.imageCount}
+            </div>
+          )}
         </div>
       ) : (
         <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
