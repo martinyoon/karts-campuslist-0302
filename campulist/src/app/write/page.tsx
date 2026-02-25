@@ -104,7 +104,6 @@ function WritePageContent() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [highlightedFields, setHighlightedFields] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [showLocked, setShowLocked] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'title' | 'price' | 'body' | 'delete' | null>(null);
   const [showOtherPosts, setShowOtherPosts] = useState(false);
   const [otherPosts, setOtherPosts] = useState<PostListItem[]>([]);
