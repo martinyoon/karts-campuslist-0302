@@ -2174,3 +2174,42 @@ campulist/src/app/search/page.tsx
 ```
 
 ### TypeScript 빌드: 0 에러
+
+---
+
+## 작업 일자: 2026-02-26 (3차) — 카테고리 이름 변경 + 소분류 추가
+
+### A. 대분류 이름 변경: "커뮤니티" → "게시판"
+
+기존 "커뮤니티"가 직관적이지 않아 간결한 "게시판"으로 변경.
+소분류(스터디, 동아리, 자유게시판 등)가 이미 구체적이므로 대분류는 짧게.
+
+| 파일 | 변경 |
+|------|------|
+| `data/categories.ts` | `name: '커뮤니티'` → `name: '게시판'` (slug `community` 유지) |
+| `data/categoryExamples.ts` | `"커뮤니티에서"` → `"게시판에서"` |
+
+### B. 소분류 추가: "🔥 으쌰으쌰" (게시판 > 으쌰으쌰)
+
+캠퍼스 학생들이 서로 응원/격려/동기부여 글을 올리는 게시판.
+
+| 항목 | 값 |
+|------|-----|
+| id | 48 |
+| name | 으쌰으쌰 |
+| slug | cheer |
+| icon | 🔥 |
+| postAccess | campus |
+| sortOrder | 8 |
+
+| 파일 | 변경 |
+|------|------|
+| `data/categories.ts` | 소분류 항목 추가 |
+| `data/categoryExamples.ts` | 글쓰기 예시 템플릿 추가 |
+
+### 영향 범위
+
+- slug 불변 → URL/라우팅 변경 없음
+- UI 자동 반영 (CategoryGrid, Header 메뉴, 글쓰기 폼 모두 데이터 기반)
+
+### TypeScript 빌드: 0 에러

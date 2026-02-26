@@ -514,7 +514,7 @@ export const categoryExamples: Record<number, CategoryExample> = {
     negotiable: false,
     body: `(자유롭게 내용을 작성해주세요)
 
-{{university}} 커뮤니티에서 다양한 이야기를 나눠보세요.`,
+{{university}} 게시판에서 다양한 이야기를 나눠보세요.`,
     tags: ['자유게시판'],
     location: '',
   },
@@ -534,6 +534,18 @@ export const categoryExamples: Record<number, CategoryExample> = {
 
 많은 참여 부탁드립니다!`,
     tags: ['봉사활동', '봉사', '참여'],
+    location: '',
+  },
+
+  // 으쌰으쌰 (id: 48)
+  48: {
+    title: '{{prefix}} 으쌰으쌰! (제목을 입력하세요)',
+    price: '',
+    negotiable: false,
+    body: `(응원, 격려, 동기부여 메시지를 남겨주세요)
+
+{{university}} 학우들과 함께 힘내봐요! 🔥`,
+    tags: ['으쌰으쌰', '응원', '파이팅'],
     location: '',
   },
 

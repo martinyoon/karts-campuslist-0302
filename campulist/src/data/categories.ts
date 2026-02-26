@@ -5,7 +5,7 @@ export const categories: Category[] = [
   { id: 1, name: '중고마켓', slug: 'market', parentId: null, icon: '📦', sortOrder: 1 },
   { id: 2, name: '주거', slug: 'housing', parentId: null, icon: '🏠', sortOrder: 2 },
   { id: 3, name: '일자리', slug: 'jobs', parentId: null, icon: '💼', sortOrder: 3 },
-  { id: 4, name: '커뮤니티', slug: 'community', parentId: null, icon: '👥', sortOrder: 4 },
+  { id: 4, name: '게시판', slug: 'community', parentId: null, icon: '👥', sortOrder: 4 },
   { id: 5, name: '서비스', slug: 'services', parentId: null, icon: '🛠️', sortOrder: 5 },
   { id: 6, name: '캠퍼스라이프', slug: 'campus-life', parentId: null, icon: '🏪', sortOrder: 6 },
   { id: 7, name: '긱·의뢰', slug: 'gigs', parentId: null, icon: '📣', sortOrder: 7 },
@@ -45,6 +45,7 @@ export const categories: Category[] = [
   { id: 45, name: '학술/세미나', slug: 'seminar', parentId: 4, icon: '🎓', sortOrder: 5, postAccess: 'campus' },
   { id: 46, name: '자유게시판', slug: 'free-board', parentId: 4, icon: '💬', sortOrder: 6, postAccess: 'campus' },
   { id: 47, name: '봉사활동', slug: 'volunteer', parentId: 4, icon: '🤝', sortOrder: 7, postAccess: 'campus' },
+  { id: 48, name: '으쌰으쌰', slug: 'cheer', parentId: 4, icon: '🔥', sortOrder: 8, postAccess: 'campus' },
 
   // 서비스 소분류 (전부 open)
   { id: 51, name: '이사/운송', slug: 'moving', parentId: 5, icon: '🚛', sortOrder: 1, postAccess: 'open' },
