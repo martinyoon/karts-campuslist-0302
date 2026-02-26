@@ -3,8 +3,21 @@
 // Canvas API를 사용하여 이미지를 JPEG로 압축
 // ============================================================
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+function validateImageFile(file: File): void {
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error(`지원하지 않는 파일 형식입니다: ${file.type}`);
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error(`파일 크기가 10MB를 초과합니다 (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+  }
+}
+
 /** 게시글 이미지 압축 (최대 800px, JPEG 0.7 품질) */
 export async function compressImage(file: File, maxDim = 800, quality = 0.7): Promise<string> {
+  validateImageFile(file);
   return new Promise((resolve, reject) => {
     const img = new window.Image();
     img.onload = () => {
@@ -30,6 +43,7 @@ export async function compressImage(file: File, maxDim = 800, quality = 0.7): Pr
 
 /** 프로필 사진 압축 (200x200 정사각형 크롭, JPEG 0.8 품질) */
 export async function compressProfileImage(file: File): Promise<string> {
+  validateImageFile(file);
   return new Promise((resolve, reject) => {
     const img = new window.Image();
     img.onload = () => {

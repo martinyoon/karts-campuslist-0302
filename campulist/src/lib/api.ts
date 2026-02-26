@@ -8,7 +8,7 @@ import { mockPosts, toPostListItem, getPostImages, getPostTags } from '@/data/po
 import { universities } from '@/data/universities';
 import { categories } from '@/data/categories';
 import { getUserSummary, mockUsers } from '@/data/users';
-import { STORAGE_KEYS } from './constants';
+import { STORAGE_KEYS, LIMITS } from './constants';
 
 // localStorage에서 사용자 생성 게시글 가져오기
 function getLocalPosts(): Post[] {
@@ -211,6 +211,10 @@ export function updatePost(postId: string, input: {
   images?: string[];
   status?: PostStatus;
 }): void {
+  if (!input.title.trim()) throw new Error('제목을 입력해주세요.');
+  if (input.title.length > LIMITS.TITLE_MAX_LENGTH) throw new Error(`제목은 ${LIMITS.TITLE_MAX_LENGTH}자 이내로 입력해주세요.`);
+  if (!input.body.trim()) throw new Error('내용을 입력해주세요.');
+  if (input.body.length > LIMITS.BODY_MAX_LENGTH) throw new Error(`내용은 ${LIMITS.BODY_MAX_LENGTH}자 이내로 입력해주세요.`);
   const now = new Date().toISOString();
   // localStorage 게시글: 직접 수정
   if (postId.startsWith('local-')) {
@@ -281,9 +285,13 @@ export function createPost(input: {
   tags: string[];
   images?: string[];
 }): Post {
+  if (!input.title.trim()) throw new Error('제목을 입력해주세요.');
+  if (input.title.length > LIMITS.TITLE_MAX_LENGTH) throw new Error(`제목은 ${LIMITS.TITLE_MAX_LENGTH}자 이내로 입력해주세요.`);
+  if (!input.body.trim()) throw new Error('내용을 입력해주세요.');
+  if (input.body.length > LIMITS.BODY_MAX_LENGTH) throw new Error(`내용은 ${LIMITS.BODY_MAX_LENGTH}자 이내로 입력해주세요.`);
   const now = new Date().toISOString();
   const post: Post = {
-    id: `local-${Date.now()}`,
+    id: `local-${crypto.randomUUID()}`,
     title: input.title,
     body: input.body,
     authorId: input.authorId,

@@ -88,7 +88,7 @@ export function createCamNotif(input: {
   link?: string;
 }): void {
   const notif: CamNotif = {
-    id: `cn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: `cn-${crypto.randomUUID()}`,
     recipientId: input.recipientId,
     type: input.type,
     title: input.title,

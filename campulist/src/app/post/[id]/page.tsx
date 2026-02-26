@@ -29,7 +29,7 @@ export default async function PostDetailPage({ params }: Props) {
   const { id } = await params;
   const [post, relatedPosts] = await Promise.all([
     getPostDetail(id),
-    getRelatedPosts(id, 4),
+    getRelatedPosts(id, 4).catch(() => []),
   ]);
   if (!post) {
     // local-* 게시글은 localStorage에 저장되어 서버에서 접근 불가 → 클라이언트 렌더링

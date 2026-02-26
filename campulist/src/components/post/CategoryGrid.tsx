@@ -21,6 +21,11 @@ export default function CategoryGrid(props: CategoryGridProps) {
   // A: 스크롤 애니메이션 충돌 방지용 ref
   const animFrameRef = useRef<number | null>(null);
 
+  // animFrameRef cleanup (언마운트 시 애니메이션 취소)
+  useEffect(() => {
+    return () => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); };
+  }, []);
+
   // D: 상단 대분류 가로 스크롤 영역 ref
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const activeItemRef = useRef<HTMLDivElement>(null);

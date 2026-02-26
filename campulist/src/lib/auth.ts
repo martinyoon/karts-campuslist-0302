@@ -166,7 +166,7 @@ export function mockSignup(data: SignupData): AuthResult {
 
   // 새 유저 생성
   const newUser: RegisteredUser = {
-    id: `local-user-${Date.now()}`,
+    id: crypto.randomUUID(),
     email: trimmedEmail,
     password,
     nickname: trimmedNickname,

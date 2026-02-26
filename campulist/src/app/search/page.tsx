@@ -50,6 +50,7 @@ export default async function SearchPage({ searchParams }: Props) {
             name="q"
             defaultValue={query}
             placeholder="검색어를 입력하세요"
+            aria-label="검색어 입력"
             className="flex h-10 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           <button type="submit" className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">

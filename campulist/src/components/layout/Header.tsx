@@ -40,6 +40,11 @@ export default function Header() {
     return () => window.removeEventListener('camtalkUpdate', update);
   }, [user]);
 
+  // animFrameRef cleanup (언마운트 시 애니메이션 취소)
+  useEffect(() => {
+    return () => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); };
+  }, []);
+
   // 현재 pathname에서 대학 slug, 카테고리 slug 추출
   const currentUniSlug = universities.find(u => pathname.startsWith(`/${u.slug}`))?.slug;
   const pathParts = pathname.split('/').filter(Boolean);

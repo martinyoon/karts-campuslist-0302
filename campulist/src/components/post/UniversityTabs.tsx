@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { universities } from '@/data/universities';
 import { majorCategories } from '@/data/categories';
@@ -39,6 +39,11 @@ export default function UniversityTabs(props: UniversityTabsProps) {
   /* ── link mode (default): button + router.push 기반 ── */
   const router = useRouter();
   const animFrameRef = useRef<number | null>(null);
+
+  // animFrameRef cleanup (언마운트 시 애니메이션 취소)
+  useEffect(() => {
+    return () => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); };
+  }, []);
 
   const currentSlug = universities.find(u => pathname.startsWith(`/${u.slug}`))?.slug;
 
