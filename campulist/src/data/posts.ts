@@ -2,6 +2,7 @@ import type { Post, PostListItem } from '@/lib/types';
 import { categories } from './categories';
 import { universities } from './universities';
 import { getUserSummary } from './users';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 export const mockPosts: Post[] = [
   // ===== 서울대 마켓 =====
@@ -141,7 +142,7 @@ export function getPostImages(postId: string): string[] {
   if (postImages[postId]) return postImages[postId];
   if (typeof window === 'undefined') return [];
   try {
-    const saved = localStorage.getItem('campulist_post_images');
+    const saved = localStorage.getItem(STORAGE_KEYS.POST_IMAGES);
     const allImages: Record<string, string[]> = saved ? JSON.parse(saved) : {};
     return allImages[postId] || [];
   } catch { return []; }
@@ -151,7 +152,7 @@ export function getPostTags(postId: string): string[] {
   if (postTags[postId]) return postTags[postId];
   if (typeof window === 'undefined') return [];
   try {
-    const saved = localStorage.getItem('campulist_post_tags');
+    const saved = localStorage.getItem(STORAGE_KEYS.POST_TAGS);
     const allTags: Record<string, string[]> = saved ? JSON.parse(saved) : {};
     return allTags[postId] || [];
   } catch { return []; }

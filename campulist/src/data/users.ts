@@ -53,7 +53,7 @@ export function getUserSummary(userId: string): UserSummary {
   if (typeof window !== 'undefined') {
     try {
       const registered: Array<{ id: string; email: string; nickname: string }> =
-        JSON.parse(localStorage.getItem('campulist_registered_users') || '[]');
+        JSON.parse(localStorage.getItem(STORAGE_KEYS.REGISTERED_USERS) || '[]');
       const regUser = registered.find(u => u.id === userId);
       if (regUser) {
         return {

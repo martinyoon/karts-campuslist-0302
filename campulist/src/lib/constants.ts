@@ -17,6 +17,10 @@ export const STORAGE_KEYS = {
   POST_IMAGES: 'campulist_post_images',
   SHOW_ICONS: 'campulist_show_icons',
   PROFILE_OVERRIDES: 'campulist_profile_overrides',
+  SUGGESTIONS: 'campulist_suggestions',
+  CAMTALK_ROOMS: 'ct_rooms',
+  CAMTALK_MESSAGES: 'ct_msgs',
+  CAMNOTIF: 'cn_notifs',
 } as const;
 
 export const LIMITS = {

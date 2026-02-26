@@ -5,9 +5,10 @@ import PostFeedWithLocal from '@/components/post/PostFeedWithLocal';
 import EmptyState from '@/components/ui/EmptyState';
 import RecentSearches from '@/components/search/RecentSearches';
 import PriceFilter from '@/components/search/PriceFilter';
+import SearchFilters from '@/components/search/SearchFilters';
 
 interface Props {
-  searchParams: Promise<{ q?: string; sort?: string; priceMin?: string; priceMax?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; priceMin?: string; priceMax?: string; uni?: string; cat?: string }>;
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
@@ -21,14 +22,22 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function SearchPage({ searchParams }: Props) {
-  const { q, sort, priceMin: pMin, priceMax: pMax } = await searchParams;
+  const { q, sort, priceMin: pMin, priceMax: pMax, uni, cat } = await searchParams;
   const query = q?.trim() || '';
   const sortBy = (sort as 'latest' | 'price_asc' | 'price_desc' | 'popular') || 'latest';
-  const priceMin = pMin ? Number(pMin) : undefined;
-  const priceMax = pMax ? Number(pMax) : undefined;
+  const priceMin = pMin && !isNaN(Number(pMin)) ? Number(pMin) : undefined;
+  const priceMax = pMax && !isNaN(Number(pMax)) ? Number(pMax) : undefined;
 
   const posts = query
-    ? await getPosts({ query, sortBy, priceMin, priceMax, limit: 50 })
+    ? await getPosts({
+        query,
+        sortBy,
+        priceMin,
+        priceMax,
+        universitySlug: uni || undefined,
+        categoryMajorSlug: cat || undefined,
+        limit: 50,
+      })
     : [];
 
   return (
@@ -54,20 +63,23 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
       </div>
 
-      {/* 정렬 옵션 + 가격 필터 */}
+      {/* 대학/카테고리 필터 + 정렬 옵션 + 가격 필터 */}
       {query && posts.length > 0 && (
         <>
+          <SearchFilters query={query} sort={sortBy} priceMin={priceMin} priceMax={priceMax} currentUni={uni} currentCat={cat} />
           <SortBadgeRow
             sortBy={sortBy}
             buildHref={s => {
               const p = new URLSearchParams({ q: query, sort: s });
+              if (uni) p.set('uni', uni);
+              if (cat) p.set('cat', cat);
               if (priceMin !== undefined) p.set('priceMin', String(priceMin));
               if (priceMax !== undefined) p.set('priceMax', String(priceMax));
               return `/search?${p.toString()}`;
             }}
             className="py-1.5"
           />
-          <PriceFilter query={query} sort={sortBy} currentMin={priceMin} currentMax={priceMax} />
+          <PriceFilter query={query} sort={sortBy} currentMin={priceMin} currentMax={priceMax} uni={uni} cat={cat} />
         </>
       )}
 

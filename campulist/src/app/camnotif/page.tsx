@@ -38,11 +38,13 @@ function CamNotifContent() {
 
   const handleRead = (id: string) => {
     markRead(id);
+    setNotifs(getMyNotifs(userId));
     setUnreadCount(getMyUnreadCount(userId));
   };
 
   const handleReadAll = () => {
     markAllRead(userId);
+    setNotifs(getMyNotifs(userId));
     setUnreadCount(0);
   };
 

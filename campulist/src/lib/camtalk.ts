@@ -33,8 +33,10 @@ export interface CamTalkMessage {
 
 // ─── localStorage 헬퍼 ───
 
-const KEY_ROOMS = 'ct_rooms';
-const KEY_MSGS = 'ct_msgs';
+import { STORAGE_KEYS } from '@/lib/constants';
+
+const KEY_ROOMS = STORAGE_KEYS.CAMTALK_ROOMS;
+const KEY_MSGS = STORAGE_KEYS.CAMTALK_MESSAGES;
 
 function readRooms(): CamTalkRoom[] {
   if (typeof window === 'undefined') return [];

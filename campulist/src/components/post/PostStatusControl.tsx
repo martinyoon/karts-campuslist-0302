@@ -42,7 +42,7 @@ export default function PostStatusControl({ postId, authorId }: PostStatusContro
   return (
     <div className="border-b border-border px-4 py-4">
       <div className="flex gap-2">
-        <Button variant="destructive" onClick={handleEdit} className="flex-1 text-base py-3 h-auto">
+        <Button variant="outline" onClick={handleEdit} className="flex-1 text-base py-3 h-auto">
           수정하기
         </Button>
         <Button variant="destructive" onClick={() => setShowDeleteSheet(true)} className="flex-1 text-base py-3 h-auto">

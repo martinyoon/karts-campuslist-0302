@@ -10,9 +10,11 @@ interface PriceFilterProps {
   sort: string;
   currentMin?: number;
   currentMax?: number;
+  uni?: string;
+  cat?: string;
 }
 
-export default function PriceFilter({ query, sort, currentMin, currentMax }: PriceFilterProps) {
+export default function PriceFilter({ query, sort, currentMin, currentMax, uni, cat }: PriceFilterProps) {
   const router = useRouter();
   const [min, setMin] = useState(currentMin?.toString() || '');
   const [max, setMax] = useState(currentMax?.toString() || '');
@@ -21,6 +23,8 @@ export default function PriceFilter({ query, sort, currentMin, currentMax }: Pri
   const apply = () => {
     const params = new URLSearchParams();
     params.set('q', query);
+    if (uni) params.set('uni', uni);
+    if (cat) params.set('cat', cat);
     if (sort !== 'latest') params.set('sort', sort);
     if (min) params.set('priceMin', min);
     if (max) params.set('priceMax', max);
@@ -32,6 +36,8 @@ export default function PriceFilter({ query, sort, currentMin, currentMax }: Pri
     setMax('');
     const params = new URLSearchParams();
     params.set('q', query);
+    if (uni) params.set('uni', uni);
+    if (cat) params.set('cat', cat);
     if (sort !== 'latest') params.set('sort', sort);
     router.push(`/search?${params.toString()}`);
   };

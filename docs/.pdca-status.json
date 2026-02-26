@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-25T14:27:25.445Z",
+  "lastUpdated": "2026-02-26T01:11:00.617Z",
   "activeFeatures": [
     "02-design",
     "data",
@@ -26,7 +26,8 @@
     "notifications2",
     "camtalk",
     "camnotif",
-    "ad"
+    "ad",
+    "suggest"
   ],
   "primaryFeature": "campulist",
   "features": {
@@ -51,9 +52,9 @@
       "archivedAt": "2026-02-20T10:42:00.000Z",
       "archivedTo": "docs/archive/2026-02/campulist/",
       "phaseNumber": 3,
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/page.tsx",
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/lib/camnotif.ts",
       "timestamps": {
-        "lastUpdated": "2026-02-25T14:26:54.019Z"
+        "lastUpdated": "2026-02-26T01:09:57.269Z"
       }
     },
     "data": {
@@ -65,9 +66,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:08:12.371Z",
-        "lastUpdated": "2026-02-25T14:27:25.445Z"
+        "lastUpdated": "2026-02-26T01:09:18.989Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/data/categories.ts"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/data/users.ts"
     },
     "layout": {
       "phase": "do",
@@ -78,9 +79,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:11:45.301Z",
-        "lastUpdated": "2026-02-25T13:22:45.915Z"
+        "lastUpdated": "2026-02-26T00:54:54.401Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/layout/BottomNav.tsx"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/layout/Header.tsx"
     },
     "post": {
       "phase": "do",
@@ -91,9 +92,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:12:14.928Z",
-        "lastUpdated": "2026-02-25T14:21:21.132Z"
+        "lastUpdated": "2026-02-26T01:10:43.891Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/post/PopularQuickChips.tsx"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/post/PostStatusControl.tsx"
     },
     "[university]": {
       "phase": "do",
@@ -156,7 +157,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:45:13.230Z",
-        "lastUpdated": "2026-02-25T02:50:11.974Z"
+        "lastUpdated": "2026-02-26T01:11:00.617Z"
       },
       "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/search/page.tsx"
     },
@@ -182,7 +183,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:47:41.911Z",
-        "lastUpdated": "2026-02-25T13:22:49.403Z"
+        "lastUpdated": "2026-02-26T00:54:42.339Z"
       },
       "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/my/page.tsx"
     },
@@ -338,7 +339,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-22T14:53:56.806Z",
-        "lastUpdated": "2026-02-24T06:37:51.050Z"
+        "lastUpdated": "2026-02-26T01:10:22.146Z"
       },
       "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/camnotif/page.tsx"
     },
@@ -354,6 +355,19 @@
         "lastUpdated": "2026-02-23T11:07:03.059Z"
       },
       "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/ad/page.tsx"
+    },
+    "suggest": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-26T00:54:25.954Z",
+        "lastUpdated": "2026-02-26T01:08:25.287Z"
+      },
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/suggest/page.tsx"
     }
   },
   "pipeline": {
@@ -364,7 +378,7 @@
   "session": {
     "startedAt": "2026-02-20T06:05:02.769Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-25T14:27:25.445Z"
+    "lastActivity": "2026-02-26T01:11:00.617Z"
   },
   "history": [
     {
@@ -10919,6 +10933,144 @@
     {
       "timestamp": "2026-02-25T14:27:25.445Z",
       "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:27:03.026Z",
+      "feature": "search",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:27:13.458Z",
+      "feature": "search",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:27:18.348Z",
+      "feature": "search",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:27:26.372Z",
+      "feature": "search",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:27:37.392Z",
+      "feature": "search",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:27:45.235Z",
+      "feature": "search",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:27:55.681Z",
+      "feature": "search",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:53:55.190Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:54:25.954Z",
+      "feature": "suggest",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:54:42.339Z",
+      "feature": "my",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:54:54.401Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T00:55:17.603Z",
+      "feature": "suggest",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:08:25.287Z",
+      "feature": "suggest",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:08:48.993Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:08:53.777Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:08:59.101Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:09:18.989Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:09:47.041Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:09:52.456Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:09:57.269Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:10:22.146Z",
+      "feature": "camnotif",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:10:43.891Z",
+      "feature": "post",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-26T01:11:00.617Z",
+      "feature": "search",
       "phase": "do",
       "action": "updated"
     }

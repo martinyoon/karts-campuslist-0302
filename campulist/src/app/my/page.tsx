@@ -148,6 +148,7 @@ function MyPageContent() {
         {[
           { icon: '🔔', label: '캠알림', href: '/camnotif' },
           { icon: 'ℹ️', label: '서비스 소개', href: '/about' },
+          { icon: '📬', label: '건의함', href: '/suggest' },
         ].map(item => (
           <Link
             key={item.label}

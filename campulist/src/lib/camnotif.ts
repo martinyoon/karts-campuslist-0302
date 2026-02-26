@@ -20,7 +20,9 @@ export interface CamNotif {
 
 // ─── localStorage 헬퍼 ───
 
-const KEY = 'cn_notifs';
+import { STORAGE_KEYS } from '@/lib/constants';
+
+const KEY = STORAGE_KEYS.CAMNOTIF;
 
 function readNotifs(): CamNotif[] {
   if (typeof window === 'undefined') return [];

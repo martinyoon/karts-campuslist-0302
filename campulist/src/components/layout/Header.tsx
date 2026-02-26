@@ -78,6 +78,8 @@ export default function Header() {
                       </Link>
                     );
                   })}
+                  <div className="my-1 border-t border-border" />
+                  <Link href="/suggest" className="text-base hover:text-orange-400">📬 건의하기</Link>
                 </nav>
               </SheetContent>
             </Sheet>
