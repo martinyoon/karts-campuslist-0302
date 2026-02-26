@@ -164,7 +164,8 @@ export async function getAllUniversities() {
 }
 
 export async function getUserById(userId: string): Promise<User | null> {
-  return mockUsers.find(u => u.id === userId) || null;
+  const { getFullUser } = await import('./auth');
+  return getFullUser(userId);
 }
 
 export async function getUserPosts(userId: string): Promise<PostListItem[]> {
@@ -396,8 +397,14 @@ export function getFilteredLocalPosts(filters?: {
     posts = posts.filter(p => p.title.toLowerCase().includes(q) || p.body.toLowerCase().includes(q));
   }
   if (filters?.authorId) posts = posts.filter(p => p.authorId === filters.authorId);
-  if (filters?.priceMin !== undefined) posts = posts.filter(p => p.price !== null && p.price >= filters.priceMin!);
-  if (filters?.priceMax !== undefined) posts = posts.filter(p => p.price !== null && p.price <= filters.priceMax!);
+  if (filters?.priceMin !== undefined) {
+    const min = filters.priceMin;
+    posts = posts.filter(p => p.price !== null && p.price >= min);
+  }
+  if (filters?.priceMax !== undefined) {
+    const max = filters.priceMax;
+    posts = posts.filter(p => p.price !== null && p.price <= max);
+  }
   return posts.map(toPostListItem);
 }
 

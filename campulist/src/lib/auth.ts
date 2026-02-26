@@ -20,6 +20,7 @@ interface RegisteredUser {
   universityId: number;
   campus: string | null;
   department: string | null;
+  avatarUrl?: string | null;
   createdAt: string;
 }
 
@@ -73,7 +74,7 @@ export function getFullUser(userId: string): User | null {
       id: registered.id,
       email: registered.email,
       nickname: registered.nickname,
-      avatarUrl: null,
+      avatarUrl: registered.avatarUrl ?? null,
       role: 'user',
       memberType: registered.memberType,
       universityId: registered.universityId,
@@ -192,6 +193,7 @@ export interface ProfileUpdateData {
   department?: string | null;
   memberType?: MemberType;
   campus?: string | null;
+  avatarUrl?: string | null;
 }
 
 export function mockUpdateProfile(userId: string, data: ProfileUpdateData): AuthResult {
@@ -231,6 +233,7 @@ export function mockUpdateProfile(userId: string, data: ProfileUpdateData): Auth
     if (data.department !== undefined) current.department = data.department;
     if (data.memberType !== undefined) current.memberType = data.memberType;
     if (data.campus !== undefined) current.campus = data.campus;
+    if (data.avatarUrl !== undefined) current.avatarUrl = data.avatarUrl;
     allOverrides[userId] = current;
     localStorage.setItem(STORAGE_KEYS.PROFILE_OVERRIDES, JSON.stringify(allOverrides));
     return { success: true, userId };
@@ -245,6 +248,7 @@ export function mockUpdateProfile(userId: string, data: ProfileUpdateData): Auth
   if (data.department !== undefined) registeredUsers[idx].department = data.department;
   if (data.memberType !== undefined) registeredUsers[idx].memberType = data.memberType;
   if (data.campus !== undefined) registeredUsers[idx].campus = data.campus;
+  if (data.avatarUrl !== undefined) registeredUsers[idx].avatarUrl = data.avatarUrl;
 
   saveRegisteredUsers(registeredUsers);
   return { success: true, userId };
@@ -263,9 +267,16 @@ export function mockDeleteAccount(userId: string): void {
   const users = getRegisteredUsers().filter(u => u.id !== userId);
   saveRegisteredUsers(users);
 
-  // 사용자 관련 localStorage 전부 삭제 (UI 설정 제외)
+  // 현재 세션 로그아웃
+  localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+
+  // 개인 데이터만 삭제 (공유 데이터인 REGISTERED_USERS, UI 설정은 보존)
+  const preserveKeys: string[] = [
+    STORAGE_KEYS.REGISTERED_USERS,
+    STORAGE_KEYS.SHOW_ICONS,
+  ];
   Object.values(STORAGE_KEYS).forEach(key => {
-    if (key !== STORAGE_KEYS.SHOW_ICONS) {
+    if (!preserveKeys.includes(key)) {
       localStorage.removeItem(key);
     }
   });

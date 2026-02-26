@@ -21,6 +21,7 @@ import UniversityTabs from '@/components/post/UniversityTabs';
 import CategoryGrid from '@/components/post/CategoryGrid';
 import { categoryExamples, categoryExampleSets } from '@/data/categoryExamples';
 import { getCategoryBySlug, getMinorCategories, majorCategories, categories } from '@/data/categories';
+import { compressImage } from '@/lib/imageUtils';
 
 interface WriteDraft {
   title: string;
@@ -153,36 +154,13 @@ function WritePageContent() {
     return exSet.popularTags.filter(t => !tags.includes(t));
   }, [exSet, tags]);
 
-  async function compressImage(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_DIM = 800;
-        let w = img.width;
-        let h = img.height;
-        if (w > MAX_DIM || h > MAX_DIM) {
-          if (w > h) { h = (h / w) * MAX_DIM; w = MAX_DIM; }
-          else { w = (w / h) * MAX_DIM; h = MAX_DIM; }
-        }
-        canvas.width = w;
-        canvas.height = h;
-        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
-        URL.revokeObjectURL(img.src);
-      };
-      img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error('이미지 로드 실패')); };
-      img.src = URL.createObjectURL(file);
-    });
-  }
-
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     const remaining = LIMITS.MAX_IMAGES - images.length;
     const selected = Array.from(files).slice(0, remaining);
     try {
-      const compressed = await Promise.all(selected.map(compressImage));
+      const compressed = await Promise.all(selected.map(f => compressImage(f)));
       setImages(prev => [...prev, ...compressed]);
     } catch {
       toast('일부 이미지를 처리할 수 없습니다.');
@@ -517,7 +495,9 @@ function WritePageContent() {
 
   const fillRandomExample = () => {
     if (!user || exExamples.length === 0) return;
+    if (isSpinning) return; // 중복 클릭 방지
     if (exExamples.length === 1) { fillSmartExamples(0); return; }
+    if (spinIntervalRef.current) clearInterval(spinIntervalRef.current);
     const capturedUser = user;
     setIsSpinning(true);
     let count = 0;
@@ -640,6 +620,7 @@ function WritePageContent() {
       return;
     }
 
+    if (!majorId || !minorId || !user) return;
     setSubmitting(true);
 
     const contactMethods = {
@@ -653,8 +634,8 @@ function WritePageContent() {
       title: title.trim(),
       body: body.trim(),
       universityId,
-      categoryMajorId: majorId!,
-      categoryMinorId: minorId!,
+      categoryMajorId: majorId,
+      categoryMinorId: minorId,
       price: price ? Number(price) : null,
       priceNegotiable,
       locationDetail: location.trim() || null,
@@ -666,7 +647,7 @@ function WritePageContent() {
       toast('게시글이 수정되었습니다!');
       router.push(`/post/${editId}`);
     } else {
-      const post = createPost({ ...postData, authorId: user!.id, tags, images });
+      const post = createPost({ ...postData, authorId: user.id, tags, images });
       clearDraft();
       toast('게시글이 등록되었습니다!');
       // 카테고리 목록으로 이동 (내 글이 최상단에 보이는지 확인 가능)
@@ -797,8 +778,10 @@ function WritePageContent() {
             {/* 예시 채우기 영역: 간격 압축: space-y-2.5 → space-y-1.5, p-3 → p-1.5 */}
             {hasExample && (
               <div className="space-y-1.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-1.5">
-                {/* 섹션 안내 */}
-                <p className="text-xl font-bold text-foreground">글 제목·내용을 어떻게 채울지 막막하다면?</p>
+                {/* 글쓰기 위치 브레드크럼 + 안내 */}
+                <p className="text-lg font-bold text-foreground">
+                  📍 {selectedUni?.name || '대학'} › {selectedMajor && <><span className="cat-icon">{selectedMajor.icon}</span> {selectedMajor.name}</>}{selectedMinor && <> › {selectedMinor.name}</>} <span className="text-muted-foreground">— 글 제목·내용을 어떻게 채울지 막막하다면?</span>
+                </p>
 
 
                 {/* 예시 채우기 + 다른 글 가져오기 — 1줄 가로 배치 */}
@@ -1199,13 +1182,13 @@ function WritePageContent() {
                 </SheetHeader>
                 <div className="space-y-3 px-4 pb-4">
                   {/* 캠퍼스톡 기본 */}
-                  <div className="flex items-center gap-2 rounded-xl border-2 border-blue-500 bg-blue-500/5 px-4 py-3">
-                    <span className="text-lg">💬</span>
+                  <div className="flex items-center gap-3 rounded-xl border-2 border-orange-500 bg-orange-500/10 px-4 py-4">
+                    <span className="text-2xl">💬</span>
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-blue-600">캠퍼스톡</p>
-                      <p className="text-xs text-muted-foreground">기본 — 항상 사용 가능</p>
+                      <p className="text-lg font-bold text-orange-600 dark:text-orange-400">캠퍼스톡</p>
+                      <p className="text-sm font-medium text-orange-500/80 dark:text-orange-400/70">기본 — 항상 사용 가능</p>
                     </div>
-                    <span className="text-xs font-medium text-blue-500">✅ 기본</span>
+                    <span className="text-sm font-bold text-orange-500">✅ 기본</span>
                   </div>
 
                   <p className="text-sm font-medium text-muted-foreground">추가 연락 방법을 선택해 주세요 (선택)</p>
@@ -1436,7 +1419,7 @@ function WritePageContent() {
             </Sheet>
 
             {/* 등록 버튼 (누르면 미리보기 → 최종 등록) */}
-            <div>
+            <div id="write-submit-area">
               <Button
                 onClick={handlePreviewBeforeSubmit}
                 disabled={!title || !minorId || submitting}

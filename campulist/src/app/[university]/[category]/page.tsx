@@ -79,29 +79,29 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         showTrailingSeparator
       />
 
-      {/* 카테고리 바로가기 */}
-      <CategoryGrid universitySlug={uniSlug} activeSlug={catSlug} />
-
-      {/* 소분류 필터 — 선택된 대분류와 동일 blue 계열로 시각적 연결 */}
-      <div className="mx-4 mb-0.5 rounded-md bg-blue-50/70 px-2 py-px dark:bg-blue-950/30">
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
-          {minors.map(minor => (
-            <Link key={minor.slug} href={buildUrl({ minor: minor.slug })}>
-              <Badge
-                variant="outline"
-                className={`shrink-0 cursor-pointer text-sm px-2.5 py-0.5 ${minorSlug === minor.slug ? 'border-2 border-orange-500 text-orange-600 font-bold dark:text-orange-300' : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'}`}
-              >
-                <span className="cat-icon">{minor.icon} </span>{minor.name}
-              </Badge>
-            </Link>
-          ))}
+      {/* 카테고리 바로가기 + 소분류 필터 */}
+      <CategoryGrid universitySlug={uniSlug} activeSlug={catSlug} activeMinorSlug={minorSlug}>
+        <div className="mx-4 mb-0.5 rounded-md bg-blue-50/70 px-2 py-px dark:bg-blue-950/30">
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+            {minors.map(minor => (
+              <Link key={minor.slug} href={buildUrl({ minor: minor.slug })}>
+                <Badge
+                  variant="outline"
+                  className={`shrink-0 cursor-pointer text-sm px-2.5 py-0.5 ${minorSlug === minor.slug ? 'border-2 border-orange-500 text-orange-600 font-bold dark:text-orange-300' : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'}`}
+                >
+                  <span className="cat-icon">{minor.icon} </span>{minor.name}
+                </Badge>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      </CategoryGrid>
 
       {/* 정렬 옵션 */}
       <SortBadgeRow sortBy={sortBy} buildHref={s => buildUrl({ sort: s })} />
 
       {/* 게시글 목록 */}
+      <div id="post-list" />
       <PostFeedWithLocal
         serverPosts={posts}
         universityId={university.id}

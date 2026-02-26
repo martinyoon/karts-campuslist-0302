@@ -11,24 +11,17 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import EmptyState from '@/components/ui/EmptyState';
 import VerifiedBadge from '@/components/ui/VerifiedBadge';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { getMyPosts, getPostsByIds, getRecentViewedPosts } from '@/lib/api';
+import { getMyPosts, getPostsByIds, getRecentViewedPosts, getLikedPostIds } from '@/lib/api';
 import { formatPrice, formatRelativeTime } from '@/lib/format';
 import type { PostListItem, MemberType } from '@/lib/types';
-import { STORAGE_KEYS, MEMBER_TYPE_LABELS } from '@/lib/constants';
+import { MEMBER_TYPE_LABELS } from '@/lib/constants';
 import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { universities } from '@/data/universities';
+import { compressProfileImage } from '@/lib/imageUtils';
 
 type Tab = 'selling' | 'likes' | 'recent' | 'reviews';
-
-function getLikedPostIds(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.LIKED_POSTS) || '[]');
-  } catch {
-    return [];
-  }
-}
 
 function MyPageContent() {
   const router = useRouter();
@@ -46,6 +39,7 @@ function MyPageContent() {
   const [editDepartment, setEditDepartment] = useState('');
   const [editMemberType, setEditMemberType] = useState<MemberType>('undergraduate');
   const [editCampus, setEditCampus] = useState<string | null>(null);
+  const [editAvatarUrl, setEditAvatarUrl] = useState<string | null>(null);
   const [editError, setEditError] = useState('');
 
   useEffect(() => {
@@ -85,9 +79,13 @@ function MyPageContent() {
       <div className="px-4 py-3">
         {/* 간격 압축: gap-4 → gap-2 */}
         <div className="flex items-center gap-2">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
-            {user.nickname.charAt(0)}
-          </div>
+          {user.avatarUrl ? (
+            <img src={user.avatarUrl} alt="" className="h-16 w-16 rounded-full object-cover" />
+          ) : (
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
+              {user.nickname.charAt(0)}
+            </div>
+          )}
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold">{user.nickname}</h1>
@@ -116,6 +114,7 @@ function MyPageContent() {
                 setEditDepartment(user.department ?? '');
                 setEditMemberType(user.memberType);
                 setEditCampus(user.campus);
+                setEditAvatarUrl(user.avatarUrl);
                 setEditError('');
                 setEditOpen(true);
               }}
@@ -337,6 +336,47 @@ function MyPageContent() {
           </SheetHeader>
           {/* 간격 압축: space-y-4 → space-y-2, pb-6 → pb-3 */}
           <div className="space-y-2 px-4 pb-3">
+            {/* 프로필 사진 */}
+            <div className="flex items-center gap-3">
+              <label className="relative cursor-pointer">
+                {editAvatarUrl ? (
+                  <img src={editAvatarUrl} alt="" className="h-16 w-16 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 text-2xl font-bold text-blue-500">
+                    {user.nickname.charAt(0)}
+                  </div>
+                )}
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs text-white">📷</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const compressed = await compressProfileImage(file);
+                      setEditAvatarUrl(compressed);
+                    } catch {
+                      toast('이미지를 처리할 수 없습니다.');
+                    }
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              <div className="space-y-1">
+                <p className="text-sm font-medium">프로필 사진</p>
+                {editAvatarUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setEditAvatarUrl(null)}
+                    className="text-xs text-red-500 hover:underline"
+                  >
+                    삭제
+                  </button>
+                )}
+              </div>
+            </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium">닉네임</label>
               <Input
@@ -408,6 +448,7 @@ function MyPageContent() {
                   department: editDepartment.trim() || null,
                   memberType: editMemberType,
                   campus: editCampus,
+                  avatarUrl: editAvatarUrl,
                 });
                 if (result.success) {
                   toast('프로필이 수정되었습니다');

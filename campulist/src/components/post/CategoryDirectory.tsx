@@ -29,9 +29,10 @@ export default function CategoryDirectory({
 
   useEffect(() => {
     if (open && activeRef.current) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 300);
+      return () => clearTimeout(timer);
     }
   }, [open, activeMajorId]);
 

@@ -59,7 +59,7 @@ export function markRead(notifId: string): void {
   if (idx >= 0) {
     notifs[idx].isRead = true;
     writeNotifs(notifs);
-    window.dispatchEvent(new Event('camnotifUpdate'));
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('camnotifUpdate'));
   }
 }
 
@@ -75,7 +75,7 @@ export function markAllRead(recipientId: string): void {
   });
   if (changed) {
     writeNotifs(notifs);
-    window.dispatchEvent(new Event('camnotifUpdate'));
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('camnotifUpdate'));
   }
 }
 
@@ -100,5 +100,5 @@ export function createCamNotif(input: {
   const notifs = readNotifs();
   notifs.push(notif);
   writeNotifs(notifs);
-  window.dispatchEvent(new Event('camnotifUpdate'));
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('camnotifUpdate'));
 }

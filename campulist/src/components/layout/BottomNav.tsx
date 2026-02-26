@@ -41,6 +41,12 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href === '/write' ? writeHref : item.href}
+              onClick={e => {
+                if (item.href === '/write' && pathname.startsWith('/write')) {
+                  e.preventDefault();
+                  document.getElementById('write-submit-area')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
               className={`relative flex flex-col items-center gap-0.5 ${isActive ? 'text-orange-400' : 'text-muted-foreground'}`}

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -15,8 +15,10 @@ import { getWriteUrl } from '@/lib/writeUrl';
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
   const searchParams = useSearchParams();
+  const animFrameRef = useRef<number | null>(null);
   const writeHref = getWriteUrl(pathname, searchParams.toString());
   const [unreadCount, setUnreadCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -85,10 +87,44 @@ export default function Header() {
             </Sheet>
 
             {/* 로고 */}
-            <Link href="/" className="flex shrink-0 flex-col leading-tight">
+            <button
+              onClick={() => {
+                router.push('/');
+                if (animFrameRef.current) {
+                  cancelAnimationFrame(animFrameRef.current);
+                  animFrameRef.current = null;
+                }
+                setTimeout(() => {
+                  const target = document.getElementById('post-list');
+                  if (!target) return;
+                  const start = window.scrollY;
+                  const targetTop = target.getBoundingClientRect().top + start;
+                  const offset = window.innerHeight * 1 / 5;
+                  const end = Math.max(0, targetTop - offset);
+                  const distance = end - start;
+                  const duration = 600;
+                  let startTime: number | null = null;
+                  const step = (timestamp: number) => {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+                    const ease = progress < 0.5
+                      ? 2 * progress * progress
+                      : 1 - (-2 * progress + 2) ** 2 / 2;
+                    window.scrollTo(0, start + distance * ease);
+                    if (progress < 1) {
+                      animFrameRef.current = requestAnimationFrame(step);
+                    } else {
+                      animFrameRef.current = null;
+                    }
+                  };
+                  animFrameRef.current = requestAnimationFrame(step);
+                }, 300);
+              }}
+              className="flex shrink-0 flex-col leading-tight"
+            >
               <span className={`text-xl font-bold ${isHome ? 'text-orange-400' : 'text-muted-foreground'}`}>캠퍼스리스트</span>
               <span className="hidden text-xs text-muted-foreground md:block">Campu(s)+LIST+.COM=CAMPuLIST.COM</span>
-            </Link>
+            </button>
 
             {/* 우측 버튼 */}
             <div className="ml-auto flex items-center gap-1">
@@ -102,7 +138,17 @@ export default function Header() {
               </span>
               {user ? (
                 <>
-                  <Link href={writeHref} className={`flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/write') ? 'text-orange-400' : 'text-muted-foreground'}`} aria-label="글쓰기">
+                  <Link
+                    href={writeHref}
+                    onClick={e => {
+                      if (pathname.startsWith('/write')) {
+                        e.preventDefault();
+                        document.getElementById('write-submit-area')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                    }}
+                    className={`flex h-auto flex-col items-center gap-0.5 px-2 py-1 ${pathname.startsWith('/write') ? 'text-orange-400' : 'text-muted-foreground'}`}
+                    aria-label="글쓰기"
+                  >
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
                       <span className="text-xs font-medium">글쓰기</span>
                   </Link>

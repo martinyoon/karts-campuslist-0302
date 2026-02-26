@@ -155,7 +155,7 @@ export function startCamTalk(input: {
     });
   }
 
-  window.dispatchEvent(new Event('camtalkUpdate'));
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('camtalkUpdate'));
   return room;
 }
 
@@ -209,7 +209,7 @@ export function sendMessage(roomId: string, senderId: string, content: string): 
     }
   }
 
-  window.dispatchEvent(new Event('camtalkUpdate'));
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('camtalkUpdate'));
   return msg;
 }
 
@@ -227,6 +227,6 @@ export function markRead(roomId: string, userId: string): void {
   if (idx >= 0) {
     rooms[idx].unread[userId] = 0;
     writeRooms(rooms);
-    window.dispatchEvent(new Event('camtalkUpdate'));
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('camtalkUpdate'));
   }
 }

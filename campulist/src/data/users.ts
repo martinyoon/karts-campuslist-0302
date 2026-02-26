@@ -6,6 +6,7 @@ interface ProfileOverride {
   department?: string | null;
   memberType?: MemberType;
   campus?: string | null;
+  avatarUrl?: string | null;
 }
 
 /** mockUsers의 프로필 수정 사항을 localStorage에서 가져옴 */
@@ -42,7 +43,7 @@ export function getUserSummary(userId: string): UserSummary {
     return {
       id: user.id,
       nickname: override?.nickname ?? user.nickname,
-      avatarUrl: user.avatarUrl,
+      avatarUrl: override?.avatarUrl !== undefined ? override.avatarUrl : user.avatarUrl,
       isVerified: user.isVerified,
       mannerTemp: user.mannerTemp,
       tradeCount: user.tradeCount,
@@ -52,14 +53,14 @@ export function getUserSummary(userId: string): UserSummary {
   // localStorage 가입유저에서 찾기
   if (typeof window !== 'undefined') {
     try {
-      const registered: Array<{ id: string; email: string; nickname: string }> =
+      const registered: Array<{ id: string; email: string; nickname: string; avatarUrl?: string | null }> =
         JSON.parse(localStorage.getItem(STORAGE_KEYS.REGISTERED_USERS) || '[]');
       const regUser = registered.find(u => u.id === userId);
       if (regUser) {
         return {
           id: regUser.id,
           nickname: regUser.nickname,
-          avatarUrl: null,
+          avatarUrl: regUser.avatarUrl ?? null,
           isVerified: regUser.email?.endsWith('.ac.kr') ?? false,
           mannerTemp: 36.5,
           tradeCount: 0,

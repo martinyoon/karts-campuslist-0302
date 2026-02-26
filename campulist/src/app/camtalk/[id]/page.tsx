@@ -27,7 +27,7 @@ function extractAppointment(content: string) {
 }
 
 /** 구조화 메시지 제목 강조 + /post/xxx 링크 변환 */
-const STRUCTURED_PREFIXES = ['📜 메시지 원칙', '📅 거래 약속', '✅ 약속 확정!', '❌ 약속 취소', '🤝 약속 종료', '📍 만남 장소', '🏦 송금 정보'];
+const STRUCTURED_PREFIXES = ['📜 메시지 원칙', '📅 거래 약속', '✅ 약속 확정!', '❌ 약속 취소', '🤝 약속 종료', '📍 만남 장소', '🏦 송금 정보', '📱 연락 방법'];
 
 function renderContent(content: string) {
   const isStructured = STRUCTURED_PREFIXES.some(p => content.startsWith(p));
@@ -80,6 +80,12 @@ function CamTalkDetailContent() {
   const [principleOpen, setPrincipleOpen] = useState(false);
   const [selectedPrinciples, setSelectedPrinciples] = useState<string[]>([]);
   const [principleCustom, setPrincipleCustom] = useState('');
+  const [contactOpen, setContactOpen] = useState(false);
+  const [ctPhone, setCtPhone] = useState('');
+  const [ctPhoneCall, setCtPhoneCall] = useState(true);
+  const [ctPhoneSms, setCtPhoneSms] = useState(true);
+  const [ctKakao, setCtKakao] = useState('');
+  const [ctEmail, setCtEmail] = useState('');
   const appDateRef = useRef<HTMLInputElement>(null);
   const appTimeRef = useRef<HTMLSelectElement>(null);
   const appLocationRef = useRef<HTMLInputElement>(null);
@@ -261,6 +267,39 @@ function CamTalkDetailContent() {
     setMessages(prev => [...prev, newMsg]);
     setBankOpen(false);
     setCanSendBank(false);
+  };
+
+  // 연락방법: Sheet 열 때 localStorage에서 불러오기
+  const savedContact = useMemo(() => {
+    if (!myId) return null;
+    try { return JSON.parse(localStorage.getItem(`ct_contact_info_${myId}`) || 'null'); }
+    catch { return null; }
+  }, [contactOpen, myId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (contactOpen && savedContact) {
+      if (savedContact.phone) { setCtPhone(savedContact.phone); setCtPhoneCall(savedContact.phoneCall ?? true); setCtPhoneSms(savedContact.phoneSms ?? true); }
+      if (savedContact.kakao) setCtKakao(savedContact.kakao);
+      if (savedContact.email) setCtEmail(savedContact.email);
+    }
+  }, [contactOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const canSendContact = !!(ctPhone.trim() || ctKakao.trim() || ctEmail.trim());
+
+  const handleContact = () => {
+    const parts = ['📱 연락 방법', '💬 캠퍼스톡: 기본'];
+    if (ctPhone.trim()) {
+      const modes = [ctPhoneCall && '전화', ctPhoneSms && '문자'].filter(Boolean).join('·');
+      parts.push(`📱 전화번호: ${ctPhone.trim()}${modes ? ` (${modes})` : ''}`);
+    }
+    if (ctKakao.trim()) parts.push(`💬 카카오톡: ${ctKakao.trim()}`);
+    if (ctEmail.trim()) parts.push(`📧 이메일: ${ctEmail.trim()}`);
+    if (myId) {
+      try { localStorage.setItem(`ct_contact_info_${myId}`, JSON.stringify({ phone: ctPhone.trim(), phoneCall: ctPhoneCall, phoneSms: ctPhoneSms, kakao: ctKakao.trim(), email: ctEmail.trim() })); } catch {}
+    }
+    const newMsg = sendMessage(roomId, myId, parts.join('\n'));
+    setMessages(prev => [...prev, newMsg]);
+    setContactOpen(false);
   };
 
   const principles = [
@@ -453,28 +492,35 @@ function CamTalkDetailContent() {
             전송
           </Button>
         </form>
-        {/* 빠른 메시지 칩 */}
+        {/* 액션 버튼 */}
         <div className="flex gap-2 overflow-x-auto pt-1.5 scrollbar-hide">
           <button
             type="button"
             onClick={() => setAppointmentOpen(true)}
             className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
           >
-            📅 약속 잡기
+            📅 약속잡기
+          </button>
+          <button
+            type="button"
+            onClick={() => setContactOpen(true)}
+            className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
+          >
+            📱 연락방법
           </button>
           <button
             type="button"
             onClick={() => setLocationOpen(true)}
             className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
           >
-            📍 장소 안내
+            📍 장소안내
           </button>
           <button
             type="button"
             onClick={() => { setBankOpen(true); if (savedBank?.bank && savedBank?.account && savedBank?.holder) setCanSendBank(true); }}
             className="shrink-0 rounded-full border border-orange-500 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
           >
-            🏦 송금 정보
+            🏦 송금정보
           </button>
           <button
             type="button"
@@ -483,11 +529,14 @@ function CamTalkDetailContent() {
           >
             📜 메시지 원칙
           </button>
+        </div>
+        {/* 예시 문구 */}
+        <div className="flex gap-2 overflow-x-auto pt-1 scrollbar-hide">
           {['안녕하세요?', '감사합니다!', '아직 판매중인가요?', '직거래 장소 어디가 편하세요?', '오늘 거래 가능하신가요?'].map(msg => (
             <button
               key={msg}
               type="button"
-              onClick={() => setInput(msg)}
+              onClick={() => setInput(prev => prev ? prev + ' ' + msg : msg)}
               className="shrink-0 rounded-full border border-orange-400/40 px-3 py-1 text-sm text-orange-600 transition-colors hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-950"
             >
               {msg}
@@ -829,6 +878,109 @@ function CamTalkDetailContent() {
               className="w-full bg-orange-500 hover:bg-orange-600"
             >
               원칙 보내기
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* 연락 방법 Sheet */}
+      <Sheet open={contactOpen} onOpenChange={(open) => { setContactOpen(open); if (!open) { setCtPhone(''); setCtPhoneCall(true); setCtPhoneSms(true); setCtKakao(''); setCtEmail(''); } }}>
+        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-lg">연락 방법 공유</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 px-4 pb-3">
+            {/* 캠퍼스톡 (기본) */}
+            <div className="flex items-center gap-2.5 rounded-lg border border-orange-500 bg-orange-50 px-3 py-2.5 dark:bg-orange-950">
+              <span className="text-base">💬</span>
+              <div className="flex-1">
+                <span className="text-sm font-medium text-orange-700 dark:text-orange-300">캠퍼스톡</span>
+                <span className="ml-1.5 text-xs text-muted-foreground">기본 — 항상 사용 가능</span>
+              </div>
+              <span className="text-xs font-bold text-orange-500">✅ 기본</span>
+            </div>
+
+            <p className="text-xs text-muted-foreground">추가 연락 방법을 선택해 주세요 (선택)</p>
+
+            {/* 전화번호 */}
+            <div className="rounded-lg border border-border px-3 py-2.5">
+              <button type="button" onClick={() => setCtPhone(prev => prev ? '' : (savedContact?.phone || ' '))} className="flex w-full items-center gap-2.5 text-left">
+                <span className="text-base">📱</span>
+                <span className="flex-1 text-sm font-medium">전화번호</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${ctPhone ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>{ctPhone ? 'ON' : 'OFF'}</span>
+              </button>
+              {!!ctPhone && (
+                <div className="mt-2 space-y-1.5">
+                  <input
+                    type="tel"
+                    value={ctPhone.trim()}
+                    onChange={e => setCtPhone(e.target.value)}
+                    placeholder="010-0000-0000"
+                    className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                  />
+                  <div className="flex gap-3">
+                    <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <input type="checkbox" checked={ctPhoneCall} onChange={e => setCtPhoneCall(e.target.checked)} className="rounded" />
+                      전화 OK
+                    </label>
+                    <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <input type="checkbox" checked={ctPhoneSms} onChange={e => setCtPhoneSms(e.target.checked)} className="rounded" />
+                      문자 OK
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 카카오 오픈채팅 */}
+            <div className="rounded-lg border border-border px-3 py-2.5">
+              <button type="button" onClick={() => setCtKakao(prev => prev ? '' : (savedContact?.kakao || ' '))} className="flex w-full items-center gap-2.5 text-left">
+                <span className="text-base">💬</span>
+                <span className="flex-1 text-sm font-medium">카카오 오픈채팅</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${ctKakao ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>{ctKakao ? 'ON' : 'OFF'}</span>
+              </button>
+              {!!ctKakao && (
+                <div className="mt-2">
+                  <input
+                    type="url"
+                    value={ctKakao.trim()}
+                    onChange={e => setCtKakao(e.target.value)}
+                    placeholder="https://open.kakao.com/o/..."
+                    className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* 이메일 */}
+            <div className="rounded-lg border border-border px-3 py-2.5">
+              <button type="button" onClick={() => setCtEmail(prev => prev ? '' : (savedContact?.email || user?.email || ' '))} className="flex w-full items-center gap-2.5 text-left">
+                <span className="text-base">📧</span>
+                <span className="flex-1 text-sm font-medium">이메일</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${ctEmail ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>{ctEmail ? 'ON' : 'OFF'}</span>
+              </button>
+              {!!ctEmail && (
+                <div className="mt-2">
+                  <input
+                    type="email"
+                    value={ctEmail.trim()}
+                    onChange={e => setCtEmail(e.target.value)}
+                    placeholder="example@university.ac.kr"
+                    className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                  />
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-muted-foreground">⚠️ 연락처는 상대방에게 공개됩니다</p>
+
+            <Button
+              type="button"
+              onClick={handleContact}
+              disabled={!canSendContact}
+              className="w-full bg-orange-500 hover:bg-orange-600"
+            >
+              연락 방법 보내기
             </Button>
           </div>
         </SheetContent>

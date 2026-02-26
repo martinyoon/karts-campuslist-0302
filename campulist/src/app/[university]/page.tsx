@@ -62,6 +62,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
 
       <Separator />
 
+      <div id="post-list" />
       <section>
         <div className="flex items-center justify-between px-4 py-2"> {/* 간격 압축: py-4 → py-2 */}
           <h2 className="text-xl font-bold">{university.name} 게시글</h2>
