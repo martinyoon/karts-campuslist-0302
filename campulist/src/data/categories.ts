@@ -37,15 +37,15 @@ export const categories: Category[] = [
   { id: 37, name: '구인', slug: 'hiring', parentId: 3, icon: '📢', sortOrder: 7, postAccess: 'open' },
   { id: 36, name: '구직', slug: 'job-seeking', parentId: 3, icon: '🙋', sortOrder: 8, postAccess: 'campus' },
 
-  // 커뮤니티 소분류 (전부 campus)
-  { id: 41, name: '스터디/팀원', slug: 'study', parentId: 4, icon: '📖', sortOrder: 1, postAccess: 'campus' },
-  { id: 42, name: '동아리/모임', slug: 'club', parentId: 4, icon: '🎯', sortOrder: 2, postAccess: 'campus' },
-  { id: 43, name: '카풀/동행', slug: 'carpool', parentId: 4, icon: '🚗', sortOrder: 3, postAccess: 'campus' },
-  { id: 44, name: '분실물', slug: 'lost-found', parentId: 4, icon: '🔍', sortOrder: 4, postAccess: 'campus' },
-  { id: 45, name: '학술/세미나', slug: 'seminar', parentId: 4, icon: '🎓', sortOrder: 5, postAccess: 'campus' },
-  { id: 46, name: '자유게시판', slug: 'free-board', parentId: 4, icon: '💬', sortOrder: 6, postAccess: 'campus' },
-  { id: 47, name: '봉사활동', slug: 'volunteer', parentId: 4, icon: '🤝', sortOrder: 7, postAccess: 'campus' },
-  { id: 48, name: '으쌰으쌰', slug: 'cheer', parentId: 4, icon: '🔥', sortOrder: 8, postAccess: 'campus' },
+  // 게시판 소분류 (전부 campus)
+  { id: 48, name: '으쌰으쌰', slug: 'cheer', parentId: 4, icon: '🔥', sortOrder: 1, postAccess: 'campus' },
+  { id: 41, name: '스터디/팀원', slug: 'study', parentId: 4, icon: '📖', sortOrder: 2, postAccess: 'campus' },
+  { id: 42, name: '동아리/모임', slug: 'club', parentId: 4, icon: '🎯', sortOrder: 3, postAccess: 'campus' },
+  { id: 43, name: '카풀/동행', slug: 'carpool', parentId: 4, icon: '🚗', sortOrder: 4, postAccess: 'campus' },
+  { id: 44, name: '분실물', slug: 'lost-found', parentId: 4, icon: '🔍', sortOrder: 5, postAccess: 'campus' },
+  { id: 45, name: '학술/세미나', slug: 'seminar', parentId: 4, icon: '🎓', sortOrder: 6, postAccess: 'campus' },
+  { id: 46, name: '자유게시판', slug: 'free-board', parentId: 4, icon: '💬', sortOrder: 7, postAccess: 'campus' },
+  { id: 47, name: '봉사활동', slug: 'volunteer', parentId: 4, icon: '🤝', sortOrder: 8, postAccess: 'campus' },
 
   // 서비스 소분류 (전부 open)
   { id: 51, name: '이사/운송', slug: 'moving', parentId: 5, icon: '🚛', sortOrder: 1, postAccess: 'open' },

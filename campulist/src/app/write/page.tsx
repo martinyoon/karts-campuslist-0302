@@ -110,6 +110,7 @@ function WritePageContent() {
   const [showOtherPosts, setShowOtherPosts] = useState(false);
   const [otherPosts, setOtherPosts] = useState<PostListItem[]>([]);
   const [loadingOthers, setLoadingOthers] = useState(false);
+  const [isMajorFallback, setIsMajorFallback] = useState(false);
   // 확장 예시 세트
   const exSet = minorId ? categoryExampleSets[minorId] : null;
   const exExamples = exSet?.examples ?? (minorId && categoryExamples[minorId] ? [categoryExamples[minorId]] : []);
@@ -521,20 +522,33 @@ function WritePageContent() {
     }, 80);
   };
 
-  // 다른 사람들 글 가져오기: 같은 소분류 게시글 조회
+  // 다른 사람들 글 가져오기: 같은 소분류 → 없으면 대분류 폴백
   const fetchOtherPosts = async () => {
     if (!minorId || !user) return;
     setLoadingOthers(true);
     const minor = categories.find(c => c.id === minorId);
     if (!minor) { setLoadingOthers(false); return; }
 
-    const posts = await getPosts({
+    let posts = await getPosts({
       categoryMinorSlug: minor.slug,
       sortBy: 'popular',
       limit: 20,
     });
+    let fallback = false;
+    if (posts.length === 0 && minor.parentId) {
+      const major = categories.find(c => c.id === minor.parentId);
+      if (major) {
+        posts = await getPosts({
+          categoryMajorSlug: major.slug,
+          sortBy: 'popular',
+          limit: 20,
+        });
+        fallback = true;
+      }
+    }
     const filtered = posts.filter(p => p.author.id !== user.id).slice(0, 10);
     setOtherPosts(filtered);
+    setIsMajorFallback(fallback);
     setLoadingOthers(false);
     setShowOtherPosts(true);
   };
@@ -1146,7 +1160,7 @@ function WritePageContent() {
             <Sheet open={showOtherPosts} onOpenChange={setShowOtherPosts}>
               <SheetContent side="bottom" className="max-h-[60vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
                 <SheetHeader className="pb-1">
-                  <SheetTitle className="text-sm font-normal text-muted-foreground">같은 카테고리의 다른 글</SheetTitle>
+                  <SheetTitle className="text-sm font-normal text-muted-foreground">{isMajorFallback ? '같은 대분류의 다른 글' : '같은 카테고리의 다른 글'}</SheetTitle>
                 </SheetHeader>
                 <div className="space-y-1.5 px-4 pb-3">
                   {otherPosts.length === 0 ? (
