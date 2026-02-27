@@ -1117,13 +1117,22 @@ function WritePageContent() {
                   <span className="font-medium text-foreground">캠퍼스톡</span>
                   <span className="text-xs text-muted-foreground">(기본)</span>
                 </div>
-                {(contactPhone.trim() || contactKakao.trim() || contactEmail.trim()) && (
+                {(contactPhone.trim() || contactKakao.trim() || contactEmail.trim()) ? (
                   <div className="mt-1 flex flex-wrap gap-1">
                     {contactPhone.trim() && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-950 dark:text-blue-300">📱 {contactPhone.trim()}</span>}
                     {contactKakao.trim() && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-950 dark:text-blue-300">💬 카카오톡</span>}
                     {contactEmail.trim() && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-950 dark:text-blue-300">📧 {contactEmail.trim()}</span>}
                   </div>
-                )}
+                ) : user?.contactInfo && (user.contactInfo.phone || user.contactInfo.kakaoLink || user.contactInfo.email) ? (
+                  <div className="mt-1">
+                    <div className="flex flex-wrap gap-1">
+                      {user.contactInfo.phone && <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">📱 {user.contactInfo.phone}</span>}
+                      {user.contactInfo.kakaoLink && <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">💬 카카오톡</span>}
+                      {user.contactInfo.email && <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">📧 {user.contactInfo.email}</span>}
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">프로필에서 자동 입력됩니다</p>
+                  </div>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => setShowContactSheet(true)}
