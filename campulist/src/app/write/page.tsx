@@ -1108,110 +1108,29 @@ function WritePageContent() {
               />
             </div>
 
-            {/* 연락 방법 */}
+            {/* 연락 방법 — 요약 표시 + Sheet 열기 버튼 */}
             <div>
-              {/* 간격 압축: mb-2 → mb-1 */}
               <label className="mb-1 block text-sm font-medium">연락 방법</label>
-              {/* 간격 압축: space-y-3 → space-y-1.5, p-4 → p-2 */}
-              <div className="space-y-1.5 rounded-xl border border-border p-2">
-                {/* 캠퍼스톡 (항상 활성) */}
-                {/* 간격 압축: gap-2.5 → gap-1.5 */}
+              <div className="rounded-xl border border-border p-2">
                 <div className="flex items-center gap-1.5 text-sm">
-                  <span className="flex h-4 w-4 items-center justify-center rounded border-2 border-orange-500 bg-orange-500 text-white">
-                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </span>
+                  <span className="text-base">💬</span>
                   <span className="font-medium text-foreground">캠퍼스톡</span>
                   <span className="text-xs text-muted-foreground">(기본)</span>
                 </div>
-
-                {/* 전화번호 */}
-                <div>
-                  {/* 간격 압축: gap-2.5 → gap-1.5 */}
-                  <label className="flex items-center gap-1.5 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={!!contactPhone}
-                      onChange={e => { if (!e.target.checked) { setContactPhone(''); setContactPhoneCall(true); setContactPhoneSms(true); } else { setContactPhone(' '); } }}
-                      className="rounded"
-                    />
-                    <span className="text-foreground">전화번호 공개</span>
-                  </label>
-                  {/* 간격 압축: mt-2 → mt-1, space-y-2 → space-y-1 */}
-                  {!!contactPhone && (
-                    <div className="mt-1 ml-7 space-y-1">
-                      <Input
-                        type="tel"
-                        placeholder="010-0000-0000"
-                        value={contactPhone.trim()}
-                        onChange={e => setContactPhone(e.target.value)}
-                        className="max-w-xs"
-                      />
-                      {/* 간격 압축: gap-4 → gap-2 */}
-                      <div className="flex gap-2">
-                        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <input type="checkbox" checked={contactPhoneCall} onChange={e => setContactPhoneCall(e.target.checked)} className="rounded" />
-                          전화 OK
-                        </label>
-                        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <input type="checkbox" checked={contactPhoneSms} onChange={e => setContactPhoneSms(e.target.checked)} className="rounded" />
-                          문자 OK
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 카카오 오픈채팅 */}
-                <div>
-                  {/* 간격 압축: gap-2.5 → gap-1.5 */}
-                  <label className="flex items-center gap-1.5 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={!!contactKakao}
-                      onChange={e => { if (!e.target.checked) setContactKakao(''); else setContactKakao(' '); }}
-                      className="rounded"
-                    />
-                    <span className="text-foreground">카카오 오픈채팅</span>
-                  </label>
-                  {/* 간격 압축: mt-2 → mt-1 */}
-                  {!!contactKakao && (
-                    <div className="mt-1 ml-7">
-                      <Input
-                        type="url"
-                        placeholder="https://open.kakao.com/o/..."
-                        value={contactKakao.trim()}
-                        onChange={e => setContactKakao(e.target.value)}
-                        className="max-w-sm"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* 이메일 */}
-                <div>
-                  {/* 간격 압축: gap-2.5 → gap-1.5 */}
-                  <label className="flex items-center gap-1.5 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={!!contactEmail}
-                      onChange={e => { if (!e.target.checked) setContactEmail(''); else setContactEmail(user?.email || ' '); }}
-                      className="rounded"
-                    />
-                    <span className="text-foreground">이메일 공개</span>
-                  </label>
-                  {/* 간격 압축: mt-2 → mt-1 */}
-                  {!!contactEmail && (
-                    <div className="mt-1 ml-7">
-                      <Input
-                        type="email"
-                        placeholder="example@university.ac.kr"
-                        value={contactEmail.trim()}
-                        onChange={e => setContactEmail(e.target.value)}
-                        className="max-w-sm"
-                      />
-                    </div>
-                  )}
-                </div>
+                {(contactPhone.trim() || contactKakao.trim() || contactEmail.trim()) && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {contactPhone.trim() && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-950 dark:text-blue-300">📱 {contactPhone.trim()}</span>}
+                    {contactKakao.trim() && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-950 dark:text-blue-300">💬 카카오톡</span>}
+                    {contactEmail.trim() && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-950 dark:text-blue-300">📧 {contactEmail.trim()}</span>}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowContactSheet(true)}
+                  className="mt-1.5 w-full rounded-lg border border-orange-500 bg-orange-50 py-2 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300"
+                >
+                  📱 연락방법 {(contactPhone.trim() || contactKakao.trim() || contactEmail.trim()) ? '수정' : '추가'}
+                </button>
               </div>
             </div>
 
@@ -1247,48 +1166,35 @@ function WritePageContent() {
               </SheetContent>
             </Sheet>
 
-            {/* 연락 방법 확인 Sheet */}
+            {/* 연락 방법 Sheet — 캠퍼스톡과 동일한 스타일 */}
             <Sheet open={showContactSheet} onOpenChange={setShowContactSheet}>
-              <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
-                <SheetHeader className="pb-1">
-                  <SheetTitle className="text-lg">구매자가 어떻게 연락하면 좋을까요?</SheetTitle>
+              <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl" showCloseButton={false}>
+                <SheetHeader className="pb-2">
+                  <SheetTitle className="text-lg">연락 방법</SheetTitle>
                 </SheetHeader>
-                <div className="space-y-3 px-4 pb-4">
-                  {/* 캠퍼스톡 기본 */}
-                  <div className="flex items-center gap-3 rounded-xl border-2 border-orange-500 bg-orange-500/10 px-4 py-4">
-                    <span className="text-2xl">💬</span>
+                <div className="space-y-2 px-4 pb-3">
+                  {/* 캠퍼스톡 (기본) */}
+                  <div className="flex items-center gap-2.5 rounded-lg border border-orange-500 bg-orange-50 px-3 py-2.5 dark:bg-orange-950">
+                    <span className="text-base">💬</span>
                     <div className="flex-1">
-                      <p className="text-lg font-bold text-orange-600 dark:text-orange-400">캠퍼스톡</p>
-                      <p className="text-sm font-medium text-orange-500/80 dark:text-orange-400/70">기본 — 항상 사용 가능</p>
+                      <span className="text-sm font-medium text-orange-700 dark:text-orange-300">캠퍼스톡</span>
+                      <span className="ml-1.5 text-xs text-muted-foreground">기본 — 항상 사용 가능</span>
                     </div>
-                    <span className="text-sm font-bold text-orange-500">✅ 기본</span>
+                    <span className="text-xs font-bold text-orange-500">✅ 기본</span>
                   </div>
 
-                  <p className="text-sm font-medium text-muted-foreground">추가 연락 방법을 선택해 주세요 (선택)</p>
+                  <p className="text-xs text-muted-foreground">추가 연락 방법을 선택해 주세요 (선택)</p>
 
-                  {/* 전화번호 카드 */}
-                  <div
-                    className={`rounded-xl border-2 transition-colors ${contactPhone.trim() ? 'border-blue-500 bg-blue-500/5' : 'border-border'}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => { if (contactPhone.trim()) { setContactPhone(''); setContactPhoneCall(true); setContactPhoneSms(true); } else { setContactPhone(' '); } }}
-                      className="flex w-full items-center gap-2 px-4 py-3"
-                    >
-                      <span className="text-lg">📱</span>
-                      <span className="flex-1 text-left text-sm font-medium">전화번호</span>
-                      <span className={`text-xs ${contactPhone.trim() ? 'font-bold text-blue-500' : 'text-muted-foreground'}`}>
-                        {contactPhone.trim() ? 'ON' : 'OFF'}
-                      </span>
+                  {/* 전화번호 */}
+                  <div className="rounded-lg border border-border px-3 py-2.5">
+                    <button type="button" onClick={() => { if (contactPhone.trim()) { setContactPhone(''); setContactPhoneCall(true); setContactPhoneSms(true); } else { setContactPhone(' '); } }} className="flex w-full items-center gap-2.5 text-left">
+                      <span className="text-base">📱</span>
+                      <span className="flex-1 text-sm font-medium">전화번호</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${contactPhone.trim() ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>{contactPhone.trim() ? 'ON' : 'OFF'}</span>
                     </button>
                     {!!contactPhone && (
-                      <div className="space-y-2 border-t border-border/50 px-4 py-3">
-                        <Input
-                          type="tel"
-                          placeholder="010-0000-0000"
-                          value={contactPhone.trim()}
-                          onChange={e => setContactPhone(e.target.value)}
-                        />
+                      <div className="mt-2 space-y-1.5">
+                        <input type="tel" value={contactPhone.trim()} onChange={e => setContactPhone(e.target.value)} placeholder="010-0000-0000" className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]" />
                         <div className="flex gap-3">
                           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <input type="checkbox" checked={contactPhoneCall} onChange={e => setContactPhoneCall(e.target.checked)} className="rounded" />
@@ -1303,79 +1209,43 @@ function WritePageContent() {
                     )}
                   </div>
 
-                  {/* 카카오 오픈채팅 카드 */}
-                  <div
-                    className={`rounded-xl border-2 transition-colors ${contactKakao.trim() ? 'border-blue-500 bg-blue-500/5' : 'border-border'}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => { if (contactKakao.trim()) setContactKakao(''); else setContactKakao(' '); }}
-                      className="flex w-full items-center gap-2 px-4 py-3"
-                    >
-                      <span className="text-lg">💬</span>
-                      <span className="flex-1 text-left text-sm font-medium">카카오 오픈채팅</span>
-                      <span className={`text-xs ${contactKakao.trim() ? 'font-bold text-blue-500' : 'text-muted-foreground'}`}>
-                        {contactKakao.trim() ? 'ON' : 'OFF'}
-                      </span>
+                  {/* 카카오 오픈채팅 */}
+                  <div className="rounded-lg border border-border px-3 py-2.5">
+                    <button type="button" onClick={() => { if (contactKakao.trim()) setContactKakao(''); else setContactKakao(' '); }} className="flex w-full items-center gap-2.5 text-left">
+                      <span className="text-base">💬</span>
+                      <span className="flex-1 text-sm font-medium">카카오 오픈채팅</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${contactKakao.trim() ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>{contactKakao.trim() ? 'ON' : 'OFF'}</span>
                     </button>
                     {!!contactKakao && (
-                      <div className="border-t border-border/50 px-4 py-3">
-                        <Input
-                          type="url"
-                          placeholder="https://open.kakao.com/o/..."
-                          value={contactKakao.trim()}
-                          onChange={e => setContactKakao(e.target.value)}
-                        />
+                      <div className="mt-2">
+                        <input type="url" value={contactKakao.trim()} onChange={e => setContactKakao(e.target.value)} placeholder="https://open.kakao.com/o/..." className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]" />
                       </div>
                     )}
                   </div>
 
-                  {/* 이메일 카드 */}
-                  <div
-                    className={`rounded-xl border-2 transition-colors ${contactEmail.trim() ? 'border-blue-500 bg-blue-500/5' : 'border-border'}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => { if (contactEmail.trim()) setContactEmail(''); else setContactEmail(user?.email || ' '); }}
-                      className="flex w-full items-center gap-2 px-4 py-3"
-                    >
-                      <span className="text-lg">📧</span>
-                      <span className="flex-1 text-left text-sm font-medium">이메일</span>
-                      <span className={`text-xs ${contactEmail.trim() ? 'font-bold text-blue-500' : 'text-muted-foreground'}`}>
-                        {contactEmail.trim() ? 'ON' : 'OFF'}
-                      </span>
+                  {/* 이메일 */}
+                  <div className="rounded-lg border border-border px-3 py-2.5">
+                    <button type="button" onClick={() => { if (contactEmail.trim()) setContactEmail(''); else setContactEmail(user?.email || ' '); }} className="flex w-full items-center gap-2.5 text-left">
+                      <span className="text-base">📧</span>
+                      <span className="flex-1 text-sm font-medium">이메일</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${contactEmail.trim() ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300' : 'bg-muted text-muted-foreground'}`}>{contactEmail.trim() ? 'ON' : 'OFF'}</span>
                     </button>
                     {!!contactEmail && (
-                      <div className="border-t border-border/50 px-4 py-3">
-                        <Input
-                          type="email"
-                          placeholder="example@university.ac.kr"
-                          value={contactEmail.trim()}
-                          onChange={e => setContactEmail(e.target.value)}
-                        />
+                      <div className="mt-2">
+                        <input type="email" value={contactEmail.trim()} onChange={e => setContactEmail(e.target.value)} placeholder="example@university.ac.kr" className="border-input placeholder:text-muted-foreground h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]" />
                       </div>
                     )}
                   </div>
 
-                  {/* 연락처 공개 경고 — 추가 연락 방법이 하나라도 ON일 때 표시 */}
-                  {(contactPhone.trim() || contactKakao.trim() || contactEmail.trim()) ? (
-                    <div className="rounded-lg bg-amber-50 p-2.5 dark:bg-amber-950/30">
-                      <p className="text-sm font-bold text-amber-700 dark:text-amber-400">⚠️ 연락처는 게시글에 공개됩니다</p>
-                      <p className="mt-0.5 text-xs text-amber-600/80 dark:text-amber-400/70">모든 사용자가 볼 수 있으니, 필요한 정보만 입력해 주세요</p>
-                    </div>
-                  ) : (
-                    <p className="text-center text-sm text-muted-foreground">
-                      💡 연락 방법을 추가하면 거래 성사율이 3배 높아져요!
-                    </p>
-                  )}
+                  <p className="text-xs text-muted-foreground">⚠️ 연락처는 게시글에 공개됩니다</p>
 
-                  <button
+                  <Button
                     type="button"
-                    onClick={() => { setShowContactSheet(false); setShowPreview(true); }}
-                    className="w-full rounded-lg bg-blue-600 py-3 text-base font-bold text-white transition-colors hover:bg-blue-700"
+                    onClick={() => setShowContactSheet(false)}
+                    className="w-full bg-orange-500 hover:bg-orange-600"
                   >
-                    미리보기로 이동
-                  </button>
+                    확인
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>
