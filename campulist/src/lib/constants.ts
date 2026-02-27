@@ -21,6 +21,7 @@ export const STORAGE_KEYS = {
   CAMTALK_ROOMS: 'ct_rooms',
   CAMTALK_MESSAGES: 'ct_msgs',
   CAMNOTIF: 'cn_notifs',
+  CONTACT_PREFS: 'campulist_contact_prefs',
 } as const;
 
 export const LIMITS = {

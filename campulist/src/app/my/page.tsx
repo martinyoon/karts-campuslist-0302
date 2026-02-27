@@ -13,7 +13,7 @@ import VerifiedBadge from '@/components/ui/VerifiedBadge';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { getMyPosts, getPostsByIds, getRecentViewedPosts, getLikedPostIds } from '@/lib/api';
 import { formatPrice, formatRelativeTime } from '@/lib/format';
-import type { PostListItem, MemberType } from '@/lib/types';
+import type { PostListItem, MemberType, UserContactInfo } from '@/lib/types';
 import { MEMBER_TYPE_LABELS } from '@/lib/constants';
 import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -41,6 +41,12 @@ function MyPageContent() {
   const [editCampus, setEditCampus] = useState<string | null>(null);
   const [editAvatarUrl, setEditAvatarUrl] = useState<string | null>(null);
   const [editError, setEditError] = useState('');
+  const [editContactPhone, setEditContactPhone] = useState('');
+  const [editContactPhoneCall, setEditContactPhoneCall] = useState(true);
+  const [editContactPhoneSms, setEditContactPhoneSms] = useState(true);
+  const [editContactKakao, setEditContactKakao] = useState('');
+  const [editContactEmail, setEditContactEmail] = useState('');
+
 
   useEffect(() => {
     document.title = '마이페이지 | 캠퍼스리스트';
@@ -115,6 +121,11 @@ function MyPageContent() {
                 setEditMemberType(user.memberType);
                 setEditCampus(user.campus);
                 setEditAvatarUrl(user.avatarUrl);
+                setEditContactPhone(user.contactInfo?.phone ?? '');
+                setEditContactPhoneCall(user.contactInfo?.phoneCall ?? true);
+                setEditContactPhoneSms(user.contactInfo?.phoneSms ?? true);
+                setEditContactKakao(user.contactInfo?.kakaoLink ?? '');
+                setEditContactEmail(user.contactInfo?.email ?? '');
                 setEditError('');
                 setEditOpen(true);
               }}
@@ -438,17 +449,77 @@ function MyPageContent() {
                 ))}
               </div>
             </div>
+            {/* 연락 방법 기본값 */}
+            <div>
+              <label className="mb-1 block text-sm font-medium">연락 방법 기본값</label>
+              <p className="mb-1.5 text-xs text-muted-foreground">글쓰기 시 자동으로 채워집니다</p>
+              <div className="space-y-1.5 rounded-xl border border-border p-2">
+                {/* 전화번호 */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-sm">
+                    <input type="checkbox" checked={!!editContactPhone} onChange={e => { if (!e.target.checked) { setEditContactPhone(''); setEditContactPhoneCall(true); setEditContactPhoneSms(true); } else { setEditContactPhone(' '); } }} className="rounded" />
+                    <span>전화번호</span>
+                  </label>
+                  {!!editContactPhone && (
+                    <div className="mt-1 ml-7 space-y-1">
+                      <Input type="tel" placeholder="010-0000-0000" value={editContactPhone.trim()} onChange={e => setEditContactPhone(e.target.value)} className="max-w-xs" />
+                      <div className="flex gap-2">
+                        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <input type="checkbox" checked={editContactPhoneCall} onChange={e => setEditContactPhoneCall(e.target.checked)} className="rounded" /> 전화 OK
+                        </label>
+                        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <input type="checkbox" checked={editContactPhoneSms} onChange={e => setEditContactPhoneSms(e.target.checked)} className="rounded" /> 문자 OK
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* 카카오 오픈채팅 */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-sm">
+                    <input type="checkbox" checked={!!editContactKakao} onChange={e => { if (!e.target.checked) setEditContactKakao(''); else setEditContactKakao(' '); }} className="rounded" />
+                    <span>카카오 오픈채팅</span>
+                  </label>
+                  {!!editContactKakao && (
+                    <div className="mt-1 ml-7">
+                      <Input type="url" placeholder="https://open.kakao.com/o/..." value={editContactKakao.trim()} onChange={e => setEditContactKakao(e.target.value)} className="max-w-sm" />
+                    </div>
+                  )}
+                </div>
+                {/* 이메일 */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-sm">
+                    <input type="checkbox" checked={!!editContactEmail} onChange={e => { if (!e.target.checked) setEditContactEmail(''); else setEditContactEmail(user?.email || ' '); }} className="rounded" />
+                    <span>이메일</span>
+                  </label>
+                  {!!editContactEmail && (
+                    <div className="mt-1 ml-7">
+                      <Input type="email" placeholder="example@university.ac.kr" value={editContactEmail.trim()} onChange={e => setEditContactEmail(e.target.value)} className="max-w-sm" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
             {editError && (
               <p className="text-sm text-destructive">{editError}</p>
             )}
             <Button
               onClick={() => {
+                const contactInfo: UserContactInfo = {};
+                if (editContactPhone.trim()) {
+                  contactInfo.phone = editContactPhone.trim();
+                  contactInfo.phoneCall = editContactPhoneCall;
+                  contactInfo.phoneSms = editContactPhoneSms;
+                }
+                if (editContactKakao.trim()) contactInfo.kakaoLink = editContactKakao.trim();
+                if (editContactEmail.trim()) contactInfo.email = editContactEmail.trim();
                 const result = updateProfile({
                   nickname: editNickname.trim(),
                   department: editDepartment.trim() || null,
                   memberType: editMemberType,
                   campus: editCampus,
                   avatarUrl: editAvatarUrl,
+                  contactInfo: Object.keys(contactInfo).length > 0 ? contactInfo : undefined,
                 });
                 if (result.success) {
                   toast('프로필이 수정되었습니다');

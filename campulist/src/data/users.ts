@@ -1,4 +1,4 @@
-import type { User, UserSummary, MemberType } from '@/lib/types';
+import type { User, UserSummary, MemberType, UserContactInfo } from '@/lib/types';
 import { STORAGE_KEYS } from '@/lib/constants';
 
 interface ProfileOverride {
@@ -7,6 +7,7 @@ interface ProfileOverride {
   memberType?: MemberType;
   campus?: string | null;
   avatarUrl?: string | null;
+  contactInfo?: UserContactInfo;
 }
 
 /** mockUsers의 프로필 수정 사항을 localStorage에서 가져옴 */

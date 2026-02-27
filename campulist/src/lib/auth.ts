@@ -6,7 +6,7 @@
 import { STORAGE_KEYS } from '@/lib/constants';
 import { mockUsers, getProfileOverrides } from '@/data/users';
 import { universities } from '@/data/universities';
-import type { User, MemberType } from '@/lib/types';
+import type { User, MemberType, UserContactInfo } from '@/lib/types';
 
 // Mock 유저 기본 비밀번호
 const MOCK_PASSWORD = '1234';
@@ -21,6 +21,7 @@ interface RegisteredUser {
   campus: string | null;
   department: string | null;
   avatarUrl?: string | null;
+  contactInfo?: UserContactInfo;
   createdAt: string;
 }
 
@@ -85,6 +86,7 @@ export function getFullUser(userId: string): User | null {
       mannerTemp: 36.5,
       tradeCount: 0,
       createdAt: registered.createdAt,
+      contactInfo: registered.contactInfo,
     };
   }
 
@@ -194,6 +196,7 @@ export interface ProfileUpdateData {
   memberType?: MemberType;
   campus?: string | null;
   avatarUrl?: string | null;
+  contactInfo?: UserContactInfo;
 }
 
 export function mockUpdateProfile(userId: string, data: ProfileUpdateData): AuthResult {
@@ -234,6 +237,7 @@ export function mockUpdateProfile(userId: string, data: ProfileUpdateData): Auth
     if (data.memberType !== undefined) current.memberType = data.memberType;
     if (data.campus !== undefined) current.campus = data.campus;
     if (data.avatarUrl !== undefined) current.avatarUrl = data.avatarUrl;
+    if (data.contactInfo !== undefined) current.contactInfo = data.contactInfo;
     allOverrides[userId] = current;
     localStorage.setItem(STORAGE_KEYS.PROFILE_OVERRIDES, JSON.stringify(allOverrides));
     return { success: true, userId };
@@ -249,6 +253,7 @@ export function mockUpdateProfile(userId: string, data: ProfileUpdateData): Auth
   if (data.memberType !== undefined) registeredUsers[idx].memberType = data.memberType;
   if (data.campus !== undefined) registeredUsers[idx].campus = data.campus;
   if (data.avatarUrl !== undefined) registeredUsers[idx].avatarUrl = data.avatarUrl;
+  if (data.contactInfo !== undefined) registeredUsers[idx].contactInfo = data.contactInfo;
 
   saveRegisteredUsers(registeredUsers);
   return { success: true, userId };

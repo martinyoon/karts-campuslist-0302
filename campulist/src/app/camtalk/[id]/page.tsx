@@ -65,7 +65,7 @@ export default function CamTalkDetailPage() {
 function CamTalkDetailContent() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const myId = user?.id ?? '';
   const roomId = params.id as string;
 
@@ -269,12 +269,17 @@ function CamTalkDetailContent() {
     setCanSendBank(false);
   };
 
-  // 연락방법: Sheet 열 때 localStorage에서 불러오기
+  // 연락방법: 프로필 우선, 없으면 ct_contact_info 폴백
   const savedContact = useMemo(() => {
+    if (!user) return null;
+    const ci = user.contactInfo;
+    if (ci && (ci.phone || ci.kakaoLink || ci.email)) {
+      return { phone: ci.phone ?? '', phoneCall: ci.phoneCall ?? true, phoneSms: ci.phoneSms ?? true, kakao: ci.kakaoLink ?? '', email: ci.email ?? '' };
+    }
     if (!myId) return null;
     try { return JSON.parse(localStorage.getItem(`ct_contact_info_${myId}`) || 'null'); }
     catch { return null; }
-  }, [contactOpen, myId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [contactOpen, user, myId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (contactOpen && savedContact) {
@@ -296,6 +301,16 @@ function CamTalkDetailContent() {
     if (ctEmail.trim()) parts.push(`📧 이메일: ${ctEmail.trim()}`);
     if (myId) {
       try { localStorage.setItem(`ct_contact_info_${myId}`, JSON.stringify({ phone: ctPhone.trim(), phoneCall: ctPhoneCall, phoneSms: ctPhoneSms, kakao: ctKakao.trim(), email: ctEmail.trim() })); } catch {}
+    }
+    // 프로필에도 동기화
+    if (user) {
+      const ci: Record<string, unknown> = {};
+      if (ctPhone.trim()) { ci.phone = ctPhone.trim(); ci.phoneCall = ctPhoneCall; ci.phoneSms = ctPhoneSms; }
+      if (ctKakao.trim()) ci.kakaoLink = ctKakao.trim();
+      if (ctEmail.trim()) ci.email = ctEmail.trim();
+      if (Object.keys(ci).length > 0 && JSON.stringify(user.contactInfo ?? {}) !== JSON.stringify(ci)) {
+        updateProfile({ contactInfo: ci as import('@/lib/types').UserContactInfo });
+      }
     }
     const newMsg = sendMessage(roomId, myId, parts.join('\n'));
     setMessages(prev => [...prev, newMsg]);

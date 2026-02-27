@@ -48,6 +48,7 @@ export interface User {
   mannerTemp: number;
   tradeCount: number;
   createdAt: string;
+  contactInfo?: UserContactInfo;
 }
 
 export interface UserSummary {
@@ -81,6 +82,15 @@ export interface ContactMethods {
   phoneSms?: boolean;    // 문자 허용
   kakaoLink?: string;    // 카카오 오픈채팅 링크 (선택)
   email?: string;        // 이메일 (선택)
+}
+
+/** 사용자 프로필 수준의 연락 방법 기본값 (게시글 전용 chat 필드 제외) */
+export interface UserContactInfo {
+  phone?: string;
+  phoneCall?: boolean;
+  phoneSms?: boolean;
+  kakaoLink?: string;
+  email?: string;
 }
 
 export interface Post {

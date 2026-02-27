@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { createPost, getPostForEdit, updatePost, deletePost, getPosts, getPostDetail } from '@/lib/api';
 import { getPostImages } from '@/data/posts';
-import type { PostListItem, PostStatus, MemberType, User } from '@/lib/types';
+import type { PostListItem, PostStatus, MemberType, User, UserContactInfo } from '@/lib/types';
 import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
 import UniversityTabs from '@/components/post/UniversityTabs';
 import CategoryGrid from '@/components/post/CategoryGrid';
@@ -73,7 +73,7 @@ function fillTemplate(template: string, user: User, targetUniversityId: number):
 function WritePageContent() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const [step, setStep] = useState<WriteStep>('major');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -299,6 +299,61 @@ function WritePageContent() {
     } catch { /* ignore parse errors */ }
   }, [user]);
 
+  // 연락 방법 복원: 사용자 프로필에서 읽기 (편집 모드 제외)
+  useEffect(() => {
+    if (isEditRef.current || !user) return;
+    const ci = user.contactInfo;
+    if (!ci) return;
+    if (ci.phone) {
+      setContactPhone(ci.phone);
+      setContactPhoneCall(ci.phoneCall ?? true);
+      setContactPhoneSms(ci.phoneSms ?? true);
+    }
+    if (ci.kakaoLink) setContactKakao(ci.kakaoLink);
+    if (ci.email) setContactEmail(ci.email);
+  }, [user]);
+
+  // 연락 방법 변경 시 사용자 프로필에 동기화 (1초 디바운스)
+  useEffect(() => {
+    if (isEditMode || !user) return;
+    if (!contactPhone && !contactKakao && !contactEmail) return;
+    const newCI: UserContactInfo = {};
+    if (contactPhone.trim()) {
+      newCI.phone = contactPhone.trim();
+      newCI.phoneCall = contactPhoneCall;
+      newCI.phoneSms = contactPhoneSms;
+    }
+    if (contactKakao.trim()) newCI.kakaoLink = contactKakao.trim();
+    if (contactEmail.trim()) newCI.email = contactEmail.trim();
+    const timer = setTimeout(() => {
+      if (JSON.stringify(user.contactInfo ?? {}) !== JSON.stringify(newCI)) {
+        updateProfile({ contactInfo: newCI });
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [isEditMode, user, contactPhone, contactPhoneCall, contactPhoneSms, contactKakao, contactEmail, updateProfile]);
+
+  // 기존 CONTACT_PREFS 데이터 → 프로필로 1회성 마이그레이션
+  useEffect(() => {
+    if (!user || user.contactInfo) return;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CONTACT_PREFS);
+      if (saved) {
+        const c = JSON.parse(saved);
+        const ci: UserContactInfo = {};
+        if (c.contactPhone?.trim()) {
+          ci.phone = c.contactPhone.trim();
+          ci.phoneCall = c.contactPhoneCall ?? true;
+          ci.phoneSms = c.contactPhoneSms ?? true;
+        }
+        if (c.contactKakao?.trim()) ci.kakaoLink = c.contactKakao.trim();
+        if (c.contactEmail?.trim()) ci.email = c.contactEmail.trim();
+        if (Object.keys(ci).length > 0) updateProfile({ contactInfo: ci });
+        localStorage.removeItem(STORAGE_KEYS.CONTACT_PREFS);
+      }
+    } catch {}
+  }, [user, updateProfile]);
+
   // 사용자 대학교를 기본값으로 설정 + 제목 접두어 자동 삽입
   useEffect(() => {
     if (user && !isEditMode && !draftLoaded && !isEditRef.current) {
@@ -480,6 +535,7 @@ function WritePageContent() {
     toast('샘플로 채워졌어요!', 'default', 1000, 'lg', true);
     setHighlightedFields(['제목', '가격', '내용', '태그', '장소']);
     setTimeout(() => setHighlightedFields([]), 1500);
+    setTimeout(() => document.getElementById('write-submit-area')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
   };
 
   // 랜덤 예시 뽑기 (슬롯머신 애니메이션)
@@ -580,6 +636,7 @@ function WritePageContent() {
     toast('가져온 글을 자유롭게 수정하세요!');
     setHighlightedFields(['제목', '가격', '내용', '태그', '장소']);
     setTimeout(() => setHighlightedFields([]), 1500);
+    setTimeout(() => document.getElementById('write-submit-area')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
   };
 
   const validate = (): Record<string, string> => {
@@ -1059,11 +1116,13 @@ function WritePageContent() {
               <div className="space-y-1.5 rounded-xl border border-border p-2">
                 {/* 캠퍼스톡 (항상 활성) */}
                 {/* 간격 압축: gap-2.5 → gap-1.5 */}
-                <label className="flex items-center gap-1.5 text-sm">
-                  <input type="checkbox" checked disabled className="rounded" />
+                <div className="flex items-center gap-1.5 text-sm">
+                  <span className="flex h-4 w-4 items-center justify-center rounded border-2 border-orange-500 bg-orange-500 text-white">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
                   <span className="font-medium text-foreground">캠퍼스톡</span>
                   <span className="text-xs text-muted-foreground">(기본)</span>
-                </label>
+                </div>
 
                 {/* 전화번호 */}
                 <div>
