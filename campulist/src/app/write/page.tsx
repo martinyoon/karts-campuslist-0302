@@ -1003,9 +1003,20 @@ function WritePageContent() {
                 maxLength={5000}
                 className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
               />
-              {/* 간격 압축: mt-1 → mt-0.5 */}
-              <p className="mt-0.5 text-right text-xs text-muted-foreground">{body.length}/5,000</p>
-              {/* 간격 압축: mt-1 → mt-0.5 */}
+              <div className="mt-0.5 flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                  {user?.contactInfo?.phone && (
+                    <button type="button" onClick={() => setBody(prev => prev ? prev + '\n' + user.contactInfo!.phone! : user.contactInfo!.phone!)} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📱 {user.contactInfo.phone} 삽입</button>
+                  )}
+                  {user?.contactInfo?.kakaoLink && (
+                    <button type="button" onClick={() => setBody(prev => prev ? prev + '\n' + user.contactInfo!.kakaoLink! : user.contactInfo!.kakaoLink!)} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">💬 카카오톡 삽입</button>
+                  )}
+                  {user?.contactInfo?.email && (
+                    <button type="button" onClick={() => setBody(prev => prev ? prev + '\n' + user.contactInfo!.email! : user.contactInfo!.email!)} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📧 {user.contactInfo.email} 삽입</button>
+                  )}
+                </div>
+                <p className="shrink-0 text-xs text-muted-foreground">{body.length}/5,000</p>
+              </div>
               {errors.body && <p className="mt-0.5 text-xs text-red-500">{errors.body}</p>}
             </div>
 
