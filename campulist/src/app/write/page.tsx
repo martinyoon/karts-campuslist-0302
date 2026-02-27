@@ -1144,13 +1144,6 @@ function WritePageContent() {
                     <p className="mt-0.5 text-xs text-muted-foreground">프로필에서 자동 입력됩니다</p>
                   </div>
                 ) : null}
-                <button
-                  type="button"
-                  onClick={() => setShowContactSheet(true)}
-                  className="mt-1.5 w-full rounded-lg border border-orange-500 bg-orange-50 py-2 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300"
-                >
-                  📱 연락방법 {(contactPhone.trim() || contactKakao.trim() || contactEmail.trim()) ? '수정' : '추가'}
-                </button>
               </div>
             </div>
 
