@@ -100,6 +100,7 @@ function WritePageContent() {
   const initialized = useRef(false);
   const uniFromUrl = useRef(false);
   const isEditRef = useRef(false);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   // ── 예시 채우기 기능 상태 ──
   const [isSpinning, setIsSpinning] = useState(false);
@@ -996,6 +997,7 @@ function WritePageContent() {
                 )}
               </div>
               <textarea
+                ref={bodyRef}
                 placeholder="내용을 입력하세요"
                 value={body}
                 onChange={e => setBody(e.target.value)}
@@ -1006,13 +1008,13 @@ function WritePageContent() {
               <div className="mt-0.5 flex items-center justify-between">
                 <div className="flex flex-wrap gap-1">
                   {user?.contactInfo?.phone && (
-                    <button type="button" onClick={() => setBody(prev => prev ? prev + '\n' + user.contactInfo!.phone! : user.contactInfo!.phone!)} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📱 {user.contactInfo.phone} 삽입</button>
+                    <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.phone! : user.contactInfo!.phone!); bodyRef.current?.focus(); }} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📱 {user.contactInfo.phone} 삽입</button>
                   )}
                   {user?.contactInfo?.kakaoLink && (
-                    <button type="button" onClick={() => setBody(prev => prev ? prev + '\n' + user.contactInfo!.kakaoLink! : user.contactInfo!.kakaoLink!)} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">💬 카카오톡 삽입</button>
+                    <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.kakaoLink! : user.contactInfo!.kakaoLink!); bodyRef.current?.focus(); }} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">💬 카카오톡 삽입</button>
                   )}
                   {user?.contactInfo?.email && (
-                    <button type="button" onClick={() => setBody(prev => prev ? prev + '\n' + user.contactInfo!.email! : user.contactInfo!.email!)} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📧 {user.contactInfo.email} 삽입</button>
+                    <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.email! : user.contactInfo!.email!); bodyRef.current?.focus(); }} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📧 {user.contactInfo.email} 삽입</button>
                   )}
                 </div>
                 <p className="shrink-0 text-xs text-muted-foreground">{body.length}/5,000</p>
