@@ -14,7 +14,7 @@ import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { createPost, getPostForEdit, updatePost, deletePost, getPosts, getPostDetail } from '@/lib/api';
-import { getPostImages } from '@/data/posts';
+import { preloadPostImages } from '@/data/posts';
 import type { PostListItem, PostStatus, MemberType, User, UserContactInfo } from '@/lib/types';
 import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
 import UniversityTabs from '@/components/post/UniversityTabs';
@@ -138,16 +138,16 @@ function WritePageContent() {
     return s;
   }, [title, price, body, images, tags, location, contactPhone, contactKakao, contactEmail]);
 
-  const scoreLabel = completionScore >= 90 ? '🔥 완벽한 글' : completionScore >= 70 ? '✨ 매력적인 글' : completionScore >= 40 ? '📝 기본 완성' : '✏️ 작성 중';
+  const scoreLabel = completionScore >= 90 ? '🤩 우와~ 완벽해요!' : completionScore >= 70 ? '🥰 거의 다 왔어요!' : completionScore >= 40 ? '😊 좋아요, 조금만 더!' : '🍼 천천히 시작해봐요~';
 
   const nextHint = useMemo(() => {
-    if (!title.trim() || title.trim().length < 10) return '제목을 10자 이상 입력해보세요';
-    if (!body.trim() || body.trim().length < 100) return '내용을 100자 이상 작성하면 신뢰도가 올라가요';
-    if (images.length === 0) return '📸 사진을 추가하면 조회수가 3배 높아져요!';
-    if (tags.length === 0) return '🏷️ 태그를 추가하면 검색에 잘 노출돼요';
-    if (!location.trim()) return '📍 거래 장소를 적으면 빠른 거래가 가능해요';
-    if (images.length < 3) return '📸 사진 3장 이상이면 더 많은 관심을 받아요';
-    return '🎉 훌륭한 글이에요! 등록해보세요';
+    if (!title.trim() || title.trim().length < 10) return '제목을 조금만 더 써주면 딱 좋겠어요~';
+    if (!body.trim() || body.trim().length < 100) return '내용을 조금만 더 채워주면 훨씬 멋져요!';
+    if (images.length === 0) return '📸 사진 넣어주면 눈이 번쩍! 할 거예요';
+    if (tags.length === 0) return '🏷️ 태그 하나만 달아줄래요? 금방이에요~';
+    if (!location.trim()) return '📍 장소도 알려주면 더 빨리 만날 수 있어요!';
+    if (images.length < 3) return '📸 사진 조금만 더! 관심이 쏟아질 거예요~';
+    return '🎉 대단해요! 이제 등록만 하면 돼요!';
   }, [title, body, images, tags, location]);
 
   // 인기 태그 추천
@@ -169,6 +169,11 @@ function WritePageContent() {
     }
     e.target.value = '';
   };
+
+  // localStorage → IndexedDB 이미지 마이그레이션 (1회)
+  useEffect(() => {
+    import('@/lib/imageStore').then(m => m.migrateFromLocalStorage());
+  }, []);
 
   // 수정 모드 또는 임시저장 불러오기
   useEffect(() => {
@@ -210,7 +215,7 @@ function WritePageContent() {
         setTags(post.tags);
         setLocation(post.locationDetail || '');
         setPostStatus(post.status);
-        setImages(getPostImages(editParam));
+        preloadPostImages(editParam).then(imgs => setImages(imgs));
         if (post.contactMethods) {
           if (post.contactMethods.phone) {
             setContactPhone(post.contactMethods.phone);
@@ -670,7 +675,7 @@ function WritePageContent() {
     setShowPreview(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (submitting) return;
 
     // postAccess 기반 권한 검증: campus 소분류는 대학 소속 회원만
@@ -715,13 +720,13 @@ function WritePageContent() {
     };
 
     if (isEditMode && editId) {
-      updatePost(editId, { ...postData, tags, images, status: postStatus });
-      toast('게시글이 수정되었습니다!');
+      const result = await updatePost(editId, { ...postData, tags, images, status: postStatus });
+      toast(result.imageSaveFailed && images.length > 0 ? '게시글이 수정되었지만 사진 저장에 실패했어요. 저장 공간이 부족할 수 있습니다.' : '게시글이 수정되었습니다!');
       router.push(`/post/${editId}`);
     } else {
-      const post = createPost({ ...postData, authorId: user.id, tags, images });
+      const post = await createPost({ ...postData, authorId: user.id, tags, images });
       clearDraft();
-      toast('게시글이 등록되었습니다!');
+      toast(post.imageSaveFailed && images.length > 0 ? '게시글이 등록되었지만 사진 저장에 실패했어요. 저장 공간이 부족할 수 있습니다.' : '게시글이 등록되었습니다!');
       // 카테고리 목록으로 이동 (내 글이 최상단에 보이는지 확인 가능)
       const uni = universities.find(u => u.id === universityId);
       const major = categories.find(c => c.id === majorId);
@@ -833,20 +838,6 @@ function WritePageContent() {
       {step === 'form' && (
         <div className="px-4 py-2">
           <div className="space-y-2.5">
-            {/* 완성도 점수 — 1줄 압축 */}
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2 py-1.5">
-              <span className="shrink-0 text-sm font-bold">{scoreLabel} {completionScore}점</span>
-              <div className="h-2 w-20 shrink-0 overflow-hidden rounded-full bg-muted">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    completionScore >= 90 ? 'bg-green-500' : completionScore >= 70 ? 'bg-blue-500' : completionScore >= 40 ? 'bg-yellow-500' : 'bg-gray-400'
-                  }`}
-                  style={{ width: `${completionScore}%` }}
-                />
-              </div>
-              <span className="truncate text-sm text-muted-foreground">{nextHint}</span>
-            </div>
-
             {/* 예시 채우기 영역: 간격 압축: space-y-2.5 → space-y-1.5, p-3 → p-1.5 */}
             {hasExample && (
               <div className="space-y-1.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-1.5">
@@ -1005,19 +996,20 @@ function WritePageContent() {
                 maxLength={5000}
                 className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
               />
-              <div className="mt-0.5 flex items-center justify-between">
-                <div className="flex flex-wrap gap-1">
-                  {user?.contactInfo?.phone && (
-                    <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.phone! : user.contactInfo!.phone!); bodyRef.current?.focus(); }} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📱 {user.contactInfo.phone} 삽입</button>
-                  )}
-                  {user?.contactInfo?.kakaoLink && (
-                    <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.kakaoLink! : user.contactInfo!.kakaoLink!); bodyRef.current?.focus(); }} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">💬 카카오톡 삽입</button>
-                  )}
-                  {user?.contactInfo?.email && (
-                    <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.email! : user.contactInfo!.email!); bodyRef.current?.focus(); }} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-blue-100 hover:text-blue-600">📧 {user.contactInfo.email} 삽입</button>
-                  )}
-                </div>
-                <p className="shrink-0 text-xs text-muted-foreground">{body.length}/5,000</p>
+              <p className="mt-0.5 text-right text-xs text-muted-foreground">{body.length}/5,000</p>
+              <div className="flex gap-2 overflow-x-auto pt-1 scrollbar-hide">
+                {user?.contactInfo?.phone && (
+                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.phone! : user.contactInfo!.phone!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">📱 {user.contactInfo.phone}</button>
+                )}
+                {user?.contactInfo?.kakaoLink && (
+                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.kakaoLink! : user.contactInfo!.kakaoLink!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">💬 카카오톡</button>
+                )}
+                {user?.contactInfo?.email && (
+                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.email! : user.contactInfo!.email!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">📧 {user.contactInfo.email}</button>
+                )}
+                {(!user?.contactInfo?.phone || !user?.contactInfo?.kakaoLink || !user?.contactInfo?.email) && (
+                  <button type="button" onClick={() => router.push('/my')} className="shrink-0 rounded-full border border-orange-400/40 px-3 py-1 text-sm text-orange-600 transition-colors hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-950">📱 마이페이지에서 연락처 등록 →</button>
+                )}
               </div>
               {errors.body && <p className="mt-0.5 text-xs text-red-500">{errors.body}</p>}
             </div>
@@ -1375,6 +1367,15 @@ function WritePageContent() {
                 </div>
               </SheetContent>
             </Sheet>
+
+            {/* 감정 온도 — 등록 버튼 바로 위 */}
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-orange-50/60 px-2.5 py-1.5 dark:bg-orange-950/20">
+              <span className="shrink-0 text-sm font-bold">{scoreLabel}</span>
+              <div className="h-2.5 w-20 shrink-0 overflow-hidden rounded-full bg-orange-100 dark:bg-orange-900/30">
+                <div className={`h-full rounded-full transition-all duration-700 ease-out ${completionScore >= 90 ? 'bg-rose-400' : completionScore >= 70 ? 'bg-orange-400' : completionScore >= 40 ? 'bg-amber-300' : 'bg-orange-200'}`} style={{ width: `${completionScore}%` }} />
+              </div>
+              <span className="truncate text-sm text-muted-foreground">{nextHint}</span>
+            </div>
 
             {/* 등록 버튼 (누르면 미리보기 → 최종 등록) */}
             <div id="write-submit-area">

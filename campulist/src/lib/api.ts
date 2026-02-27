@@ -4,7 +4,7 @@
 // ============================================================
 
 import type { Post, PostListItem, PostDetail, PostFilters, PostStatus, User } from './types';
-import { mockPosts, toPostListItem, getPostImages, getPostTags } from '@/data/posts';
+import { mockPosts, toPostListItem, getPostImages, getPostTags, preloadPostImages, updateImageCache } from '@/data/posts';
 import { universities } from '@/data/universities';
 import { categories } from '@/data/categories';
 import { getUserSummary, mockUsers } from '@/data/users';
@@ -121,7 +121,7 @@ export async function getPostDetail(postId: string): Promise<PostDetail | null> 
     university: { id: uni.id, name: uni.name, slug: uni.slug },
     categoryMajor: { id: major.id, name: major.name, slug: major.slug, icon: major.icon },
     categoryMinor: { id: minor.id, name: minor.name, slug: minor.slug },
-    images: getPostImages(post.id),
+    images: await preloadPostImages(post.id),
     tags: getPostTags(post.id),
     isLiked: getLikedPostIds().includes(postId),
   };
@@ -197,7 +197,7 @@ export function getPostForEdit(postId: string): (Post & { tags: string[] }) | nu
 }
 
 // 게시글 수정
-export function updatePost(postId: string, input: {
+export async function updatePost(postId: string, input: {
   title: string;
   body: string;
   universityId: number;
@@ -210,7 +210,7 @@ export function updatePost(postId: string, input: {
   tags?: string[];
   images?: string[];
   status?: PostStatus;
-}): void {
+}): Promise<{ imageSaveFailed?: boolean }> {
   if (!input.title.trim()) throw new Error('제목을 입력해주세요.');
   if (input.title.length > LIMITS.TITLE_MAX_LENGTH) throw new Error(`제목은 ${LIMITS.TITLE_MAX_LENGTH}자 이내로 입력해주세요.`);
   if (!input.body.trim()) throw new Error('내용을 입력해주세요.');
@@ -243,15 +243,16 @@ export function updatePost(postId: string, input: {
     } catch { /* storage full */ }
   }
 
-  // 이미지 저장
+  // 이미지 저장 (IndexedDB)
+  let imageSaveFailed = false;
   if (input.images) {
     try {
-      const savedImages = localStorage.getItem(STORAGE_KEYS.POST_IMAGES);
-      const allImages: Record<string, string[]> = savedImages ? JSON.parse(savedImages) : {};
-      allImages[postId] = input.images;
-      localStorage.setItem(STORAGE_KEYS.POST_IMAGES, JSON.stringify(allImages));
-    } catch { /* storage full */ }
+      const { savePostImages } = await import('@/lib/imageStore');
+      await savePostImages(postId, input.images);
+      updateImageCache(postId, input.images);
+    } catch { imageSaveFailed = true; }
   }
+  return { imageSaveFailed };
 }
 
 // 게시글 삭제
@@ -271,7 +272,7 @@ export function deletePost(postId: string): void {
 // TODO: Supabase 연동 시 RLS로 postAccess 기반 권한 검증
 // - campus 소분류: CAMPUS_MEMBER_TYPES만 작성 가능
 // - open 소분류: 모든 회원 작성 가능
-export function createPost(input: {
+export async function createPost(input: {
   title: string;
   body: string;
   authorId: string;
@@ -284,7 +285,7 @@ export function createPost(input: {
   contactMethods?: import('./types').ContactMethods;
   tags: string[];
   images?: string[];
-}): Post {
+}): Promise<Post & { imageSaveFailed?: boolean }> {
   if (!input.title.trim()) throw new Error('제목을 입력해주세요.');
   if (input.title.length > LIMITS.TITLE_MAX_LENGTH) throw new Error(`제목은 ${LIMITS.TITLE_MAX_LENGTH}자 이내로 입력해주세요.`);
   if (!input.body.trim()) throw new Error('내용을 입력해주세요.');
@@ -327,17 +328,17 @@ export function createPost(input: {
     } catch { /* storage full */ }
   }
 
-  // 이미지 저장
+  // 이미지 저장 (IndexedDB)
+  let imageSaveFailed = false;
   if (input.images && input.images.length > 0) {
     try {
-      const savedImages = localStorage.getItem(STORAGE_KEYS.POST_IMAGES);
-      const allImages: Record<string, string[]> = savedImages ? JSON.parse(savedImages) : {};
-      allImages[post.id] = input.images;
-      localStorage.setItem(STORAGE_KEYS.POST_IMAGES, JSON.stringify(allImages));
-    } catch { /* storage full */ }
+      const { savePostImages } = await import('@/lib/imageStore');
+      await savePostImages(post.id, input.images);
+      updateImageCache(post.id, input.images);
+    } catch { imageSaveFailed = true; }
   }
 
-  return post;
+  return { ...post, imageSaveFailed };
 }
 
 // A1: 게시글 상태 변경 (localStorage 오버라이드)

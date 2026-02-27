@@ -142,14 +142,46 @@ const postTags: Record<string, string[]> = {
   p47: ['원룸', '부동산', '관악'],
 };
 
+// IndexedDB 이미지 메모리 캐시 (동기 접근용)
+const imageCache: Record<string, string[]> = {};
+
+/** 동기 함수: mock 이미지 또는 캐시에서 반환 */
 export function getPostImages(postId: string): string[] {
   if (postImages[postId]) return postImages[postId];
+  if (imageCache[postId]) return imageCache[postId];
   if (typeof window === 'undefined') return [];
+  // localStorage 폴백 (마이그레이션 전 데이터)
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.POST_IMAGES);
     const allImages: Record<string, string[]> = saved ? JSON.parse(saved) : {};
-    return allImages[postId] || [];
-  } catch { return []; }
+    if (allImages[postId]) {
+      imageCache[postId] = allImages[postId];
+      return allImages[postId];
+    }
+  } catch { /* ignore */ }
+  return [];
+}
+
+/** 비동기 함수: IndexedDB에서 로드 → 캐시에 저장 */
+export async function preloadPostImages(postId: string): Promise<string[]> {
+  if (postImages[postId]) return postImages[postId];
+  if (imageCache[postId]) return imageCache[postId];
+  if (typeof window === 'undefined') return [];
+  try {
+    const { loadPostImages } = await import('@/lib/imageStore');
+    const imgs = await loadPostImages(postId);
+    if (imgs.length > 0) {
+      imageCache[postId] = imgs;
+      return imgs;
+    }
+  } catch { /* IndexedDB 불가 */ }
+  // localStorage 폴백
+  return getPostImages(postId);
+}
+
+/** 캐시 업데이트 (저장 후 즉시 동기 접근 가능하게) */
+export function updateImageCache(postId: string, images: string[]): void {
+  imageCache[postId] = images;
 }
 
 export function getPostTags(postId: string): string[] {

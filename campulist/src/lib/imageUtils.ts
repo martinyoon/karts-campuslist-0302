@@ -15,8 +15,8 @@ function validateImageFile(file: File): void {
   }
 }
 
-/** 게시글 이미지 압축 (최대 800px, JPEG 0.7 품질) */
-export async function compressImage(file: File, maxDim = 800, quality = 0.7): Promise<string> {
+/** 게시글 이미지 압축 (최대 600px, JPEG 0.5 품질 — localStorage 용량 절약) */
+export async function compressImage(file: File, maxDim = 600, quality = 0.5): Promise<string> {
   validateImageFile(file);
   return new Promise((resolve, reject) => {
     const img = new window.Image();
