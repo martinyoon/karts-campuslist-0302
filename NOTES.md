@@ -2251,3 +2251,105 @@ campulist/src/app/search/page.tsx
 3. 글이 없으면 → 같은 대분류 전체에서 검색 + "같은 대분류의 다른 글" 안내
 
 ### TypeScript 빌드: 0 에러
+
+---
+
+## 작업 일자: 2026-02-27
+
+---
+
+### 1. 완성도 점수 → 감정 온도 변경
+
+**목적**: 숫자 점수 대신, 따뜻하게 응원하는 감정 온도로 표현
+
+| 구간 | 이전 | 변경 후 |
+|------|------|---------|
+| 0~39 | ✏️ 작성 중 20점 | 🍼 천천히 시작해봐요~ |
+| 40~69 | 📝 기본 완성 45점 | 😊 좋아요, 조금만 더! |
+| 70~89 | ✨ 매력적인 글 75점 | 🥰 거의 다 왔어요! |
+| 90~100 | 🔥 완벽한 글 95점 | 🤩 우와~ 완벽해요! |
+
+- 숫자 점수 제거, 응원 톤 힌트 메시지
+- 온도 바 색상: 오렌지/앰버/로즈 따뜻한 계열
+- 표시 위치: 폼 상단 → 미리보기 후 등록 버튼 바로 위로 이동
+
+| 파일 | 변경 |
+|------|------|
+| `app/write/page.tsx` | scoreLabel, nextHint 메시지 변경, 표시 위치 이동, 감정 온도 스타일 |
+
+### 2. 이미지 저장 IndexedDB 전환
+
+**목적**: localStorage 5MB 한도 → IndexedDB 수백 MB로 사진 저장 용량 문제 해결
+
+- `lib/imageStore.ts` 신규: IndexedDB 래퍼 (save/load/delete/migrate)
+- `data/posts.ts`: `preloadPostImages` (async/IndexedDB), `updateImageCache` 추가, 동기 `getPostImages`는 메모리 캐시 활용
+- `lib/api.ts`: `createPost`/`updatePost` async 전환, 이미지 저장 실패 시 `imageSaveFailed` 반환
+- `app/write/page.tsx`: `handleSubmit` async화, 이미지 저장 실패 시 toast 알림, 마이그레이션 useEffect 추가
+- `lib/imageUtils.ts`: 압축률 강화 (800px→600px, 품질 0.7→0.5)
+- 기존 localStorage 데이터 자동 마이그레이션 지원
+
+| 파일 | 변경 |
+|------|------|
+| `lib/imageStore.ts` | 신규 — IndexedDB 래퍼 |
+| `data/posts.ts` | preloadPostImages, updateImageCache, imageCache 추가 |
+| `lib/api.ts` | createPost/updatePost async + IndexedDB 저장 |
+| `app/write/page.tsx` | async 대응, 마이그레이션, toast 에러 표시 |
+| `lib/imageUtils.ts` | 압축률 강화 (600px, 0.5) |
+
+### 3. 글쓰기 폼 레이아웃 재배치
+
+**예시 채우기 영역 이동**:
+- 이전: 폼 최상단
+- 변경: 가격 입력창 아래
+
+**사진 업로드 영역 이동**:
+- 이전: 내용 입력 아래 (태그 위)
+- 변경: 내용 입력 바로 위
+
+**변경 후 순서**: 거래 상태(수정 시) → 제목 → 가격 → 예시 채우기 → 사진 → 내용 → 태그 → 장소 → 연락 방법 → 감정 온도 → 등록 버튼
+
+| 파일 | 변경 |
+|------|------|
+| `app/write/page.tsx` | 예시 채우기, 사진 업로드 블록 위치 이동 |
+
+### 4. 제목/내용 글자수 라벨 옆 표시
+
+- 제목: `제목 * 28/100` (라벨 바로 옆)
+- 내용: `내용 * 158/5,000` (라벨 바로 옆)
+- 기존 입력창 하단 글자수 표시 제거
+
+| 파일 | 변경 |
+|------|------|
+| `app/write/page.tsx` | 제목/내용 라벨에 글자수 인라인 표시 |
+
+### 5. 가격 한국어 읽기형 표시
+
+**목적**: 가격 입력 시 사용자가 읽기 쉽게 한국어로 변환 표시
+
+- `15000` → `가격 1만5,000원`
+- `1450000` → `가격 145만원`
+- `999999999999` 초과 → 빨간색 `가격이 너무 큽니다` 경고
+- 제출 시에도 validate에서 차단
+
+| 파일 | 변경 |
+|------|------|
+| `lib/format.ts` | `formatPriceKorean` 함수 추가 (억/만 단위 + 콤마) |
+| `app/write/page.tsx` | 가격 라벨 옆 한국어 읽기형 + 상한 초과 경고 |
+
+### 6. 가격 협의 가능 체크박스 삭제
+
+| 파일 | 변경 |
+|------|------|
+| `app/write/page.tsx` | priceNegotiable 체크박스 UI 제거 |
+
+### 7. 거래 장소 예시 버튼 5개 추가
+
+- 선택한 대학교명에 맞춰 동적 생성
+- 예: `한예종 정문 앞` `한예종 도서관 앞` `한예종 학생회관` `한예종 카페거리` `택배 거래`
+- 클릭 시 장소 입력창에 바로 채워짐
+
+| 파일 | 변경 |
+|------|------|
+| `app/write/page.tsx` | 장소 입력 아래 5개 예시 버튼 추가 |
+
+### TypeScript 빌드: 0 에러

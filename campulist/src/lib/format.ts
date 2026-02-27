@@ -4,6 +4,19 @@ export function formatPrice(price: number | null): string {
   return price.toLocaleString('ko-KR') + '원';
 }
 
+export function formatPriceKorean(price: number | null): string {
+  if (price === null || price === 0) return '';
+  const comma = (n: number) => n.toLocaleString('ko-KR');
+  const eok = Math.floor(price / 100000000);
+  const man = Math.floor((price % 100000000) / 10000);
+  const rest = price % 10000;
+  let result = '';
+  if (eok > 0) result += `${comma(eok)}억`;
+  if (man > 0) result += `${comma(man)}만`;
+  if (rest > 0) result += comma(rest);
+  return result + '원';
+}
+
 export function formatRelativeTime(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);

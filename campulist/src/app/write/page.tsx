@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { createPost, getPostForEdit, updatePost, deletePost, getPosts, getPostDetail } from '@/lib/api';
 import { preloadPostImages } from '@/data/posts';
+import { formatPriceKorean } from '@/lib/format';
 import type { PostListItem, PostStatus, MemberType, User, UserContactInfo } from '@/lib/types';
 import { CAMPUS_MEMBER_TYPES } from '@/lib/types';
 import UniversityTabs from '@/components/post/UniversityTabs';
@@ -651,6 +652,7 @@ function WritePageContent() {
     if (!body.trim()) errs.body = '내용을 입력해주세요';
     if (!minorId) errs.category = '카테고리를 선택해주세요';
     if (price && Number(price) < 0) errs.price = '올바른 가격을 입력해주세요';
+    if (price && Number(price) > 999999999999) errs.price = '가격이 너무 큽니다. 다시 확인해주세요';
     return errs;
   };
 
@@ -838,44 +840,6 @@ function WritePageContent() {
       {step === 'form' && (
         <div className="px-4 py-2">
           <div className="space-y-2.5">
-            {/* 예시 채우기 영역: 간격 압축: space-y-2.5 → space-y-1.5, p-3 → p-1.5 */}
-            {hasExample && (
-              <div className="space-y-1.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-1.5">
-                {/* 글쓰기 위치 브레드크럼 + 안내 */}
-                <p className="text-lg font-bold text-foreground">
-                  📍 {selectedUni?.name || '대학'} › {selectedMajor && <><span className="cat-icon">{selectedMajor.icon}</span> {selectedMajor.name}</>}{selectedMinor && <> › {selectedMinor.name}</>} <span className="text-muted-foreground">— 글 제목·내용을 어떻게 채울지 막막하다면?</span>
-                </p>
-
-
-                {/* 예시 채우기 + 다른 글 가져오기 — 1줄 가로 배치 */}
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={fillRandomExample}
-                    disabled={isSpinning}
-                    className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
-                  >
-                    {isSpinning ? (
-                      <>
-                        <span className="animate-spin">✨</span>
-                        <span ref={spinnerRef} className="truncate max-w-[200px]">샘플 고르는 중...</span>
-                      </>
-                    ) : (
-                      '샘플로 게시글 채우기'
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={fetchOtherPosts}
-                    disabled={loadingOthers}
-                    className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
-                  >
-                    {loadingOthers ? '불러오는 중...' : '다른 게시글 가져와서 고치기'}
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* 거래 상태 (수정 모드만) */}
             {isEditMode && (
               <div>
@@ -924,7 +888,7 @@ function WritePageContent() {
             <div id="field-title">
               {/* 간격 압축: mb-1.5 → mb-1 */}
               <div className="mb-1 flex items-center justify-between">
-                <label className="text-sm font-medium">제목 <span className="text-red-500">*</span></label>
+                <label className="text-sm font-medium">제목 <span className="text-red-500">*</span> <span className="ml-1 font-normal text-muted-foreground">{title.length}/100</span></label>
                 {hasExample && (
                   <button type="button" onClick={fillTitleExample} className="text-xs text-blue-500 hover:underline">💡 예시</button>
                 )}
@@ -936,18 +900,14 @@ function WritePageContent() {
                 maxLength={100}
                 className={highlightedFields.includes('제목') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}
               />
-              {/* 간격 압축: mt-1 → mt-0.5 */}
-              <div className="mt-0.5 flex items-center justify-between">
-                {errors.title ? <p className="text-xs text-red-500">{errors.title}</p> : <span />}
-                <p className="text-xs text-muted-foreground">{title.length}/100</p>
-              </div>
+              {errors.title && <p className="mt-0.5 text-xs text-red-500">{errors.title}</p>}
             </div>
 
             {/* 가격 */}
             <div id="field-price">
               {/* 간격 압축: mb-1.5 → mb-1 */}
               <div className="mb-1 flex items-center justify-between">
-                <label className="text-sm font-medium">가격</label>
+                <label className="text-sm font-medium">가격{price && Number(price) > 999999999999 ? <span className="ml-1 font-normal text-red-500">가격이 너무 큽니다</span> : price && Number(price) > 0 ? <span className="ml-1 font-normal text-muted-foreground">{formatPriceKorean(Number(price))}</span> : null}</label>
                 {hasExample && (
                   <button type="button" onClick={fillPriceExample} className="text-xs text-blue-500 hover:underline">💡 예시</button>
                 )}
@@ -964,61 +924,48 @@ function WritePageContent() {
                 />
                 <span className="text-sm text-muted-foreground">원</span>
               </div>
-              {/* 간격 압축: mt-2 → mt-1, gap-2 → gap-1.5 */}
-              <label className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={priceNegotiable}
-                  onChange={e => setPriceNegotiable(e.target.checked)}
-                  className="rounded"
-                />
-                가격 협의 가능
-              </label>
               {/* 간격 압축: mt-1 → mt-0.5 */}
               {errors.price && <p className="mt-0.5 text-xs text-red-500">{errors.price}</p>}
             </div>
 
-            {/* 본문 */}
-            <div id="field-body">
-              {/* 간격 압축: mb-1.5 → mb-1 */}
-              <div className="mb-1 flex items-center justify-between">
-                <label className="text-sm font-medium">내용 <span className="text-red-500">*</span></label>
-                {hasExample && (
-                  <button type="button" onClick={fillBodyExample} className="text-xs text-blue-500 hover:underline">💡 예시</button>
-                )}
+            {/* 예시 채우기 영역 */}
+            {hasExample && (
+              <div className="space-y-1.5 rounded-lg border border-blue-500/20 bg-blue-500/5 p-1.5">
+                <p className="text-lg font-bold text-foreground">
+                  📍 {selectedUni?.name || '대학'} › {selectedMajor && <><span className="cat-icon">{selectedMajor.icon}</span> {selectedMajor.name}</>}{selectedMinor && <> › {selectedMinor.name}</>} <span className="text-muted-foreground">— 글 제목·내용을 어떻게 채울지 막막하다면?</span>
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={fillRandomExample}
+                    disabled={isSpinning}
+                    className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
+                  >
+                    {isSpinning ? (
+                      <>
+                        <span className="animate-spin">✨</span>
+                        <span ref={spinnerRef} className="truncate max-w-[200px]">샘플 고르는 중...</span>
+                      </>
+                    ) : (
+                      '샘플로 게시글 채우기'
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={fetchOtherPosts}
+                    disabled={loadingOthers}
+                    className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border-2 border-orange-500 bg-transparent px-3 py-1 text-[clamp(0.65rem,2.8vw,1rem)] font-bold text-orange-600 dark:text-orange-300 transition-colors hover:bg-orange-50 dark:hover:bg-orange-950 disabled:opacity-60"
+                  >
+                    {loadingOthers ? '불러오는 중...' : '다른 게시글 가져와서 고치기'}
+                  </button>
+                </div>
               </div>
-              <textarea
-                ref={bodyRef}
-                placeholder="내용을 입력하세요"
-                value={body}
-                onChange={e => setBody(e.target.value)}
-                rows={8}
-                maxLength={5000}
-                className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
-              />
-              <p className="mt-0.5 text-right text-xs text-muted-foreground">{body.length}/5,000</p>
-              <div className="flex gap-2 overflow-x-auto pt-1 scrollbar-hide">
-                {user?.contactInfo?.phone && (
-                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.phone! : user.contactInfo!.phone!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">📱 {user.contactInfo.phone}</button>
-                )}
-                {user?.contactInfo?.kakaoLink && (
-                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.kakaoLink! : user.contactInfo!.kakaoLink!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">💬 카카오톡</button>
-                )}
-                {user?.contactInfo?.email && (
-                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.email! : user.contactInfo!.email!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">📧 {user.contactInfo.email}</button>
-                )}
-                {(!user?.contactInfo?.phone || !user?.contactInfo?.kakaoLink || !user?.contactInfo?.email) && (
-                  <button type="button" onClick={() => router.push('/my')} className="shrink-0 rounded-full border border-orange-400/40 px-3 py-1 text-sm text-orange-600 transition-colors hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-950">📱 마이페이지에서 연락처 등록 →</button>
-                )}
-              </div>
-              {errors.body && <p className="mt-0.5 text-xs text-red-500">{errors.body}</p>}
-            </div>
+            )}
 
+            {/* 본문 */}
             {/* 이미지 */}
             <div>
-              {/* 간격 압축: mb-1.5 → mb-1 */}
               <label className="mb-1 block text-sm font-medium">사진 (최대 {LIMITS.MAX_IMAGES}장)</label>
-              {/* 간격 압축: gap-2 → gap-1.5, pb-2 → pb-1 */}
               <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                 {images.map((src, i) => (
                   <div key={i} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-border">
@@ -1049,10 +996,43 @@ function WritePageContent() {
                   </label>
                 )}
               </div>
-              {/* 간격 압축: mt-1 → mt-0.5 */}
               {images.length === 0 && (
                 <p className="mt-0.5 text-xs text-muted-foreground">사진을 추가하면 관심을 더 많이 받을 수 있어요.</p>
               )}
+            </div>
+
+            <div id="field-body">
+              {/* 간격 압축: mb-1.5 → mb-1 */}
+              <div className="mb-1 flex items-center justify-between">
+                <label className="text-sm font-medium">내용 <span className="text-red-500">*</span> <span className="ml-1 font-normal text-muted-foreground">{body.length}/5,000</span></label>
+                {hasExample && (
+                  <button type="button" onClick={fillBodyExample} className="text-xs text-blue-500 hover:underline">💡 예시</button>
+                )}
+              </div>
+              <textarea
+                ref={bodyRef}
+                placeholder="내용을 입력하세요"
+                value={body}
+                onChange={e => setBody(e.target.value)}
+                rows={8}
+                maxLength={5000}
+                className={`w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${highlightedFields.includes('내용') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}`}
+              />
+              <div className="mt-0.5 flex gap-2 overflow-x-auto scrollbar-hide">
+                {user?.contactInfo?.phone && (
+                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.phone! : user.contactInfo!.phone!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">📱 {user.contactInfo.phone}</button>
+                )}
+                {user?.contactInfo?.kakaoLink && (
+                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.kakaoLink! : user.contactInfo!.kakaoLink!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">💬 카카오톡</button>
+                )}
+                {user?.contactInfo?.email && (
+                  <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => { setBody(prev => prev ? prev + '\n' + user.contactInfo!.email! : user.contactInfo!.email!); bodyRef.current?.focus(); }} className="shrink-0 rounded-full border border-blue-400/40 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950">📧 {user.contactInfo.email}</button>
+                )}
+                {(!user?.contactInfo?.phone || !user?.contactInfo?.kakaoLink || !user?.contactInfo?.email) && (
+                  <button type="button" onClick={() => router.push('/my')} className="shrink-0 rounded-full border border-orange-400/40 px-3 py-1 text-sm text-orange-600 transition-colors hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-950">📱 마이페이지에서 연락처 등록 →</button>
+                )}
+              </div>
+              {errors.body && <p className="mt-0.5 text-xs text-red-500">{errors.body}</p>}
             </div>
 
             {/* 태그 */}
@@ -1106,11 +1086,29 @@ function WritePageContent() {
               {/* 간격 압축: mb-1.5 → mb-1 */}
               <label className="mb-1 block text-sm font-medium">거래 희망 장소 (선택)</label>
               <Input
-                placeholder="예: 서울대 정문 GS25 앞"
+                placeholder="예: 정문 GS25 앞"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
                 className={highlightedFields.includes('장소') ? 'ring-2 ring-blue-400 transition-all' : 'transition-all'}
               />
+              <div className="mt-1 flex flex-wrap gap-1">
+                {[
+                  `${selectedUni?.name || '학교'} 정문 앞`,
+                  `${selectedUni?.name || '학교'} 도서관 앞`,
+                  `${selectedUni?.name || '학교'} 학생회관`,
+                  `${selectedUni?.name || '학교'} 카페거리`,
+                  '택배 거래',
+                ].map(place => (
+                  <button
+                    key={place}
+                    type="button"
+                    onClick={() => setLocation(place)}
+                    className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:border-blue-400 hover:text-blue-600"
+                  >
+                    {place}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* 연락 방법 — 요약 표시 + Sheet 열기 버튼 */}
