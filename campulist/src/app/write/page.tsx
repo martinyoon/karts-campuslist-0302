@@ -666,7 +666,7 @@ function WritePageContent() {
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
-    setShowContactSheet(true);
+    setShowPreview(true);
   };
 
   const handleSubmit = () => {
