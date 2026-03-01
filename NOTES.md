@@ -2353,3 +2353,23 @@ campulist/src/app/search/page.tsx
 | `app/write/page.tsx` | 장소 입력 아래 5개 예시 버튼 추가 |
 
 ### TypeScript 빌드: 0 에러
+
+---
+
+## 작업 일자: 2026-03-01
+
+---
+
+### 1. 글쓰기 소분류 배지 선택/미선택 구분 개선
+
+- **문제**: 선택/미선택 배지 모두 오렌지 테두리여서 구분 어려움
+- **해결**: 미선택 배지를 회색 테두리+텍스트로 변경, hover 시 오렌지로 전환
+  - 미선택: `border-gray-400 text-muted-foreground` (회색)
+  - hover: `hover:border-orange-400 hover:text-orange-600` (오렌지)
+  - 선택됨: 기존 유지 (`border-2 border-orange-500 font-bold`)
+
+| 파일 | 변경 |
+|------|------|
+| `app/write/page.tsx` | 소분류 배지 미선택 스타일 회색으로 변경 |
+
+### TypeScript 빌드: 0 에러

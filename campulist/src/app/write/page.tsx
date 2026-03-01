@@ -798,7 +798,7 @@ function WritePageContent() {
                       ? 'border-2 border-orange-500 text-orange-600 font-bold dark:text-orange-300'
                       : isLocked
                         ? 'border-border text-muted-foreground/50 cursor-not-allowed'
-                        : 'border-orange-400 text-orange-600 dark:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950'
+                        : 'border-gray-400 text-muted-foreground hover:border-orange-400 hover:text-orange-600 dark:border-gray-500 dark:hover:text-orange-300'
                   }`}
                 >
                   {isLocked && '🔒 '}<span className="cat-icon">{m.icon} </span>{m.name}
