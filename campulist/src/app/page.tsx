@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getPosts } from '@/lib/api';
 import UniversityTabs from '@/components/post/UniversityTabs';
 import CategoryGrid from '@/components/post/CategoryGrid';
@@ -15,6 +16,14 @@ export default async function HomePage() {
 
   return (
     <div>
+      {/* 한예종 - 으쌰으쌰 바로가기 */}
+      <Link
+        href="/karts-eussa"
+        className="flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 px-4 py-3 text-lg font-bold text-white transition-opacity hover:opacity-90"
+      >
+        🔥 한예종으쌰으쌰 🔥
+      </Link>
+
       <UniversityTabs />
 
       <UniversityBanner name="모든 대학" subtitle="전체 캠퍼스 통합 · All Universities" />

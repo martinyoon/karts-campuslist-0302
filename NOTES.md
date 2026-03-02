@@ -99,6 +99,57 @@ interface User {
 | `264f1a7` | fix+refactor: 글쓰기 UI 개선 4건 — 문체 prefix 버그 수정 + 완성도/버튼 1줄 압축 |
 | `(이전)` | fix+refactor: 글쓰기 버그 수정 + UI 압축 3건 — prefix 대학 버그 + 완성도 글자 + 브레드크럼 |
 | (현재) | feat: 회원가입 3-Step 분리 — 캠퍼스 이메일 인증 + 외부 회원 플로우 분리 |
+| `a83ceec` | feat: 로고를 '한예종 캠퍼스리스트v.3.2'로 변경 |
+| (현재) | feat: 한예종으쌰으쌰 전용 페이지 추가 (풀 패키지) |
+
+---
+
+## 작업 일자: 2026-03-02 — 한예종으쌰으쌰 전용 페이지
+
+### 1. 로고 변경
+
+**파일**: `campulist/src/components/layout/Header.tsx`
+
+- 헤더 로고를 **한예종 캠퍼스리스트v.3.2**로 변경
+- 영문 서브텍스트(`Campu(s)+LIST+.COM=...`) 제거
+- 버전 번호 `v.3.2`는 `text-sm font-normal`로 작게 표시
+
+### 2. 한예종으쌰으쌰 전용 페이지 (`/karts-eussa`)
+
+**새 파일**:
+- `campulist/src/app/karts-eussa/page.tsx` — 메인 페이지 (Server Component)
+- `campulist/src/app/karts-eussa/EussaClientBits.tsx` — 랜덤 문구/검색창 (Client Component)
+
+**수정 파일**:
+- `campulist/src/app/page.tsx` — 홈 최상단에 "🔥 한예종으쌰으쌰 🔥" 바로가기 버튼 추가
+
+#### 페이지 구성 (위→아래)
+
+| 영역 | 설명 |
+|------|------|
+| 브레드크럼 | `한예종 › 👥 게시판 › 으쌰으쌰 ›` |
+| 테마 헤더 | 남색→파랑 그라데이션 + "🔥 한예종으쌰으쌰 🔥" + 응원 카운터 |
+| 랜덤 응원 문구 | 14개 중 랜덤 표시 ("시험 화이팅! 💪" 등) |
+| 중앙 검색창 | placeholder 6종 랜덤, GET 폼으로 `/karts-eussa?q=...` |
+| 인기 태그 뱃지 | #시험기간 #졸업작품 #공연준비 #전시 #합평 등 10개 |
+| 정렬 옵션 | 최신순/가격순/인기순 |
+| 게시글 목록 | 한예종 + 게시판 + 으쌰으쌰 카테고리만 필터링 |
+
+#### 데이터 필터링
+```ts
+getPosts({
+  universitySlug: 'karts',        // 한예종만
+  categoryMajorSlug: 'community', // 게시판
+  categoryMinorSlug: 'cheer',     // 으쌰으쌰
+})
+```
+
+#### 글쓰기 연동
+- EmptyState의 글쓰기 링크: `/write?uni=karts&major=community&minor=cheer`
+- 으쌰으쌰 컨텍스트가 자동 전달되어 **바로 글쓰기 폼** 진입
+
+#### Supabase 연동 영향
+- **없음** — 프론트엔드 경로만 추가, slug 기반 필터링이므로 DB 전환 시 `getPosts()` 함수만 교체하면 됨
 
 ---
 
