@@ -127,8 +127,7 @@ export default function Header() {
               }}
               className="flex shrink-0 flex-col leading-tight"
             >
-              <span className={`text-xl font-bold ${isHome ? 'text-orange-400' : 'text-muted-foreground'}`}>캠퍼스리스트</span>
-              <span className="hidden text-xs text-muted-foreground md:block">Campu(s)+LIST+.COM=CAMPuLIST.COM</span>
+              <span className={`text-xl font-bold ${isHome ? 'text-orange-400' : 'text-muted-foreground'}`}>한예종 캠퍼스리스트<span className="text-sm font-normal">v.3.2</span></span>
             </button>
 
             {/* 우측 버튼 */}
