@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-26T09:48:25.313Z",
+  "lastUpdated": "2026-03-02T10:26:41.803Z",
   "activeFeatures": [
     "02-design",
     "data",
@@ -27,7 +27,9 @@
     "camtalk",
     "camnotif",
     "ad",
-    "suggest"
+    "suggest",
+    "eussa",
+    "karts-eussa"
   ],
   "primaryFeature": "campulist",
   "features": {
@@ -52,9 +54,9 @@
       "archivedAt": "2026-02-20T10:42:00.000Z",
       "archivedTo": "docs/archive/2026-02/campulist/",
       "phaseNumber": 3,
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/lib/api.ts",
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/lib/writeUrl.ts",
       "timestamps": {
-        "lastUpdated": "2026-02-26T07:16:05.962Z"
+        "lastUpdated": "2026-03-02T10:26:31.634Z"
       }
     },
     "data": {
@@ -66,9 +68,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:08:12.371Z",
-        "lastUpdated": "2026-02-26T09:48:25.313Z"
+        "lastUpdated": "2026-03-02T10:13:06.473Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/data/categoryExamples.ts"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/data/categories.ts"
     },
     "layout": {
       "phase": "do",
@@ -79,9 +81,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:11:45.301Z",
-        "lastUpdated": "2026-02-26T07:15:29.279Z"
+        "lastUpdated": "2026-03-02T06:04:44.220Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/components/layout/BottomNav.tsx"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/components/layout/Header.tsx"
     },
     "post": {
       "phase": "do",
@@ -144,9 +146,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:14:48.946Z",
-        "lastUpdated": "2026-02-26T02:44:38.819Z"
+        "lastUpdated": "2026-03-02T10:26:41.803Z"
       },
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/write/page.tsx"
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/app/write/page.tsx"
     },
     "search": {
       "phase": "do",
@@ -368,6 +370,32 @@
         "lastUpdated": "2026-02-26T01:08:25.287Z"
       },
       "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/수파=캠푸리스트=2월20일=테스트001/campulist/src/app/suggest/page.tsx"
+    },
+    "eussa": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T09:17:28.407Z",
+        "lastUpdated": "2026-03-02T09:27:58.014Z"
+      },
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/app/eussa/EussaClientBits.tsx"
+    },
+    "karts-eussa": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T09:57:43.145Z",
+        "lastUpdated": "2026-03-02T09:58:06.350Z"
+      },
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/app/karts-eussa/EussaClientBits.tsx"
     }
   },
   "pipeline": {
@@ -378,7 +406,7 @@
   "session": {
     "startedAt": "2026-02-20T06:05:02.769Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-26T09:48:25.313Z"
+    "lastActivity": "2026-03-02T10:26:41.803Z"
   },
   "history": [
     {
@@ -11689,6 +11717,108 @@
     {
       "timestamp": "2026-02-26T09:48:25.313Z",
       "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T06:04:44.220Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:16:44.496Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:16:52.104Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:17:28.407Z",
+      "feature": "eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:27:33.264Z",
+      "feature": "eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:27:58.014Z",
+      "feature": "eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:57:43.145Z",
+      "feature": "karts-eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:57:44.652Z",
+      "feature": "karts-eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:57:45.963Z",
+      "feature": "karts-eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:57:47.467Z",
+      "feature": "karts-eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:57:49.631Z",
+      "feature": "karts-eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:58:06.350Z",
+      "feature": "karts-eussa",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T09:58:19.800Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T10:13:06.473Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T10:15:48.675Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T10:26:31.634Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T10:26:41.803Z",
+      "feature": "write",
       "phase": "do",
       "action": "updated"
     }

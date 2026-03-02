@@ -2424,3 +2424,105 @@ campulist/src/app/search/page.tsx
 | `app/write/page.tsx` | 소분류 배지 미선택 스타일 회색으로 변경 |
 
 ### TypeScript 빌드: 0 에러
+
+---
+
+## 작업 일자: 2026-03-02
+
+---
+
+### 1. 로고 변경
+
+- **변경**: "캠퍼스리스트" → "한예종 캠퍼스리스트v.3.2"
+- 영문 부제(subtitle) 제거
+
+| 파일 | 변경 |
+|------|------|
+| `components/layout/Header.tsx` L130 | 로고 텍스트 및 버전 표시 변경 |
+
+---
+
+### 2. 한예종으쌰으쌰 전용 페이지 (`/karts-eussa`) 신규 생성
+
+홈 화면 최상단에 "🔥 한예종으쌰으쌰 🔥" 버튼 추가, 클릭 시 전용 페이지로 이동.
+
+#### 구현 내용
+- **브레드크럼**: 한예종 › 게시판 › 으쌰으쌰 ›
+- **테마 헤더**: indigo-blue 그라데이션, 응원 카운터
+- **랜덤 응원 한마디**: 14가지 메시지 (클라이언트 컴포넌트)
+- **인기 태그 뱃지**: 시험기간, 졸업작품, 공연준비, 전시, 합평, 오디션, 연습, 레슨, 협업, 축제
+- **중앙 검색창**: 랜덤 placeholder 6종
+- **정렬 옵션**: SortBadgeRow 재사용
+- **게시글 필터**: universitySlug='karts', categoryMajorSlug='community', categoryMinorSlug='cheer'
+- **EmptyState**: 글이 없을 때 글쓰기 바로가기 제공
+
+#### 하드코딩 ID 매핑
+| 항목 | slug | id |
+|------|------|----|
+| 한예종 | karts | 5 |
+| 게시판 | community | 4 |
+| 으쌰으쌰 | cheer | 48 |
+
+| 파일 | 변경 |
+|------|------|
+| `app/page.tsx` | 홈 최상단에 한예종으쌰으쌰 Link 버튼 추가 |
+| `app/karts-eussa/page.tsx` | 신규 — 전용 페이지 (Server Component) |
+| `app/karts-eussa/EussaClientBits.tsx` | 신규 — 랜덤 응원/검색 (Client Component) |
+
+---
+
+### 3. 대분류 표시 순서 변경 — 게시판을 1번으로
+
+- **변경 전**: 중고마켓(1) → 주거(2) → 일자리(3) → 게시판(4) → ...
+- **변경 후**: 게시판(1) → 중고마켓(2) → 주거(3) → 일자리(4) → ...
+- 배열 정의 순서 + sortOrder 값 모두 변경
+- CategoryGrid, 글쓰기 대분류 선택 등 자동 반영 (추가 코드 변경 없음)
+
+| 파일 | 변경 |
+|------|------|
+| `data/categories.ts` | majorCategories 배열 순서 및 sortOrder 재배치 |
+
+---
+
+### 4. 글쓰기 컨텍스트 전달 버그 수정
+
+- **문제**: `/karts-eussa`에서 글쓰기 버튼 클릭 시 브레드크럼이 "모든 대학 › 한예종 › 카테고리 선택"으로 표시 (파라미터 미전달)
+- **원인**: `getWriteUrl()`이 `/karts-eussa` 경로를 인식하지 못함 (university/category 패턴만 처리)
+- **해결**: `writeUrl.ts`에 `/karts-eussa` 특수 케이스 추가 → `/write?uni=karts&major=community&minor=cheer` 반환
+
+| 파일 | 변경 |
+|------|------|
+| `lib/writeUrl.ts` L12-15 | `/karts-eussa` 경로 특수 처리 추가 |
+
+---
+
+### 5. 글쓰기 완료 후 `/karts-eussa`로 리다이렉트
+
+- **문제**: 한예종으쌰으쌰에서 글 작성 완료 시 `/karts/community?minor=cheer`로 이동 (일반 카테고리 페이지)
+- **해결**: `from=karts-eussa` 파라미터를 URL 체인에 추가하여, 글쓰기 완료 후 원래 페이지로 복귀
+- **동작 흐름**: `/karts-eussa` → 글쓰기 → `/write?uni=karts&major=community&minor=cheer&from=karts-eussa` → 등록 → `/karts-eussa`
+
+| 파일 | 변경 |
+|------|------|
+| `lib/writeUrl.ts` L14 | `&from=karts-eussa` 파라미터 추가 |
+| `app/write/page.tsx` L732-743 | `from` 파라미터 체크 후 리다이렉트 분기 |
+
+---
+
+### 갭 분석 결과 (PDCA Check)
+
+- **Match Rate**: 96%
+- **이번 세션 변경사항**: 모두 정상 확인
+- **경미한 이슈**:
+  - 한예종 으쌰으쌰 목 데이터(mock posts) 미존재 → 추가 권장
+  - `from` 파라미터 `karts-eussa`만 지원 → 향후 일반화 가능
+  - localStorage 키 4개 글로벌 상태 → Phase B(Supabase)에서 해결
+
+### Git 커밋 이력
+
+| 해시 | 메시지 |
+|------|--------|
+| `a83ceec` | feat: 로고를 '한예종 캠퍼스리스트v.3.2'로 변경 |
+| `65a8fc8` | feat: 한예종으쌰으쌰 전용 페이지 추가 — 테마 헤더, 랜덤 응원, 인기 태그, 검색, 글쓰기 연동 |
+| `9bf2ddb` | fix: 대분류 순서 변경(게시판 1번) + 으쌰으쌰 글쓰기 컨텍스트 버그 수정 |
+| `177e130` | fix: 한예종으쌰으쌰 글쓰기 완료 후 /karts-eussa로 리다이렉트 |

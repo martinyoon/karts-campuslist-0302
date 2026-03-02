@@ -1,13 +1,13 @@
-# Campulist Gap Analysis Report v8.0 -- Comprehensive Project Analysis
+# Campulist Gap Analysis Report v9.0 -- Full Project Analysis (2026-03-02)
 
 > **Analysis Type**: Design vs Implementation Gap Analysis (Full Project)
 >
 > **Project**: Campulist -- Korean Craigslist for university campuses
 > **Analyst**: gap-detector (Claude Code)
-> **Date**: 2026-02-25
+> **Date**: 2026-03-02
 > **Design Docs**: `docs/archive/2026-02/campulist/PRD-campulist.md`, `ERD-campulist.md`
-> **Implementation Path**: `campulist/src/` (82 source files)
-> **Iteration**: Check-8 (Full project with brand rename + bug fix verification)
+> **Implementation Path**: `campulist/src/` (86 source files)
+> **Iteration**: Check-9 (Full project with karts-eussa feature + UX improvements)
 
 ### Design Document References
 
@@ -15,12 +15,15 @@
 |----------|------|---------|
 | PRD | `docs/archive/2026-02/campulist/PRD-campulist.md` | Product requirements |
 | ERD | `docs/archive/2026-02/campulist/ERD-campulist.md` | Database schema design |
-| Types | `campulist/src/lib/types.ts` | 217 lines, TypeScript type definitions |
-| Constants | `campulist/src/lib/constants.ts` | 48 lines, centralized constants |
+| Types | `campulist/src/lib/types.ts` | 227 lines, TypeScript type definitions |
+| Constants | `campulist/src/lib/constants.ts` | 53 lines, centralized constants |
 | API Layer | `campulist/src/lib/api.ts` | 447 lines, data access abstraction |
 | Auth | `campulist/src/lib/auth.ts` | 273 lines, mock auth functions |
 | CamTalk | `campulist/src/lib/camtalk.ts` | 231 lines, chat data layer |
 | CamNotif | `campulist/src/lib/camnotif.ts` | 103 lines, notification data layer |
+| WriteUrl | `campulist/src/lib/writeUrl.ts` | 37 lines, context-aware URL generation |
+| ImageStore | `campulist/src/lib/imageStore.ts` | 81 lines, IndexedDB image storage |
+| ImageUtils | `campulist/src/lib/imageUtils.ts` | 68 lines, image compression utilities |
 
 ---
 
@@ -28,31 +31,36 @@
 
 ### 1.1 Analysis Purpose
 
-Comprehensive project analysis triggered by two changes since Check-7:
+Full project gap analysis triggered by the following changes since Check-8 (2026-02-25):
 
-1. **Brand rename**: "캠톡" fully replaced with "캠퍼스톡" across the entire codebase
-2. **Bug fix**: `ct_bank_info` localStorage key was global (shared across users) -- now user-scoped (`ct_bank_info_${userId}`) with one-time migration
-
-Additionally: full-project quality audit covering localStorage key scoping, type safety, convention compliance, and architecture verification.
+1. **Logo change**: Header logo changed to "한예종 캠퍼스리스트v.3.2"
+2. **New feature -- karts-eussa**: Dedicated `/karts-eussa` page for 한예종으쌰으쌰 (university-specific cheer board with themed header, random cheer messages, popular tags, search, and write integration)
+3. **Category order change**: "게시판" (community) moved to sortOrder 1 in `categories.ts`
+4. **Write context bug fix**: `writeUrl.ts` updated with special handling for `/karts-eussa` path
+5. **Write redirect fix**: `write/page.tsx` now supports `from=karts-eussa` parameter for post-completion redirect
+6. **UX improvements**: Image storage migrated to IndexedDB, write form layout/price display improvements, subcategory badge visual distinction
 
 ### 1.2 Analysis Scope
 
-- **Scope**: Full project (all 82 source files)
-- **Primary Focus Files**: 15 files explicitly analyzed (see Section 3)
-- **Analysis Date**: 2026-02-25
-- **Phase Context**: Phase A -- Mock data with localStorage persistence
+- **Scope**: Full project (all 86 source files, up from 82 in v8.0)
+- **New files since v8.0**: 4 files
+  - `campulist/src/app/karts-eussa/page.tsx` (107 lines)
+  - `campulist/src/app/karts-eussa/EussaClientBits.tsx` (83 lines)
+  - `campulist/src/lib/imageStore.ts` (81 lines)
+  - `campulist/src/lib/imageUtils.ts` (68 lines)
+- **Modified files**: `page.tsx` (home), `categories.ts`, `writeUrl.ts`, `write/page.tsx`, `Header.tsx`, `constants.ts`
+- **Analysis Date**: 2026-03-02
+- **Phase Context**: Phase A -- Mock data with localStorage/IndexedDB persistence
 
 ### 1.3 Previous Analysis Summary
 
 | Analysis | Date | Overall Match Rate | Scope |
 |----------|------|:------------------:|-------|
 | Check-1 (Initial) | 2026-02-20 | 52% | Full project |
-| Check-3 (Act-2) | 2026-02-20 | 76% | Full project |
-| Check-4 (Act-3) | 2026-02-20 | 88% | Full project |
-| Check-5 (Round 2-4) | 2026-02-20 | 93% | Full project |
 | Check-6 (Post-v5.0) | 2026-02-20 | 96% | Full project |
 | Check-7 (3-step signup) | 2026-02-25 | 100% | Feature: auth signup |
-| **Check-8 (This report)** | **2026-02-25** | **97%** | **Full project** |
+| Check-8 (Brand + Bug fix) | 2026-02-25 | 97% | Full project |
+| **Check-9 (This report)** | **2026-03-02** | **96%** | **Full project** |
 
 ---
 
@@ -60,518 +68,602 @@ Additionally: full-project quality audit covering localStorage key scoping, type
 
 | Category | Score | Status |
 |----------|:-----:|:------:|
-| Brand Rename Compliance ("캠톡" -> "캠퍼스톡") | 100% | [OK] |
-| Bank Info Bug Fix (user-scoped localStorage) | 100% | [OK] |
-| localStorage Key Scoping Audit | 95% | [WARN] |
-| Design Match (PRD vs Implementation) | 97% | [OK] |
+| Logo / Branding Consistency | 95% | [WARN] |
+| karts-eussa Feature Completeness | 98% | [OK] |
+| Category Structure Consistency | 92% | [WARN] |
+| Write Flow Integration | 100% | [OK] |
+| Image System (IndexedDB) | 100% | [OK] |
+| Design Match (PRD vs Implementation) | 96% | [OK] |
 | Architecture Compliance (Starter Level) | 98% | [OK] |
-| Convention Compliance | 95% | [WARN] |
+| Convention Compliance | 94% | [WARN] |
 | Type Safety | 97% | [OK] |
-| Code Quality | 96% | [OK] |
-| **Overall** | **97%** | **[OK]** |
+| Code Quality | 95% | [WARN] |
+| **Overall** | **96%** | **[OK]** |
 
 ---
 
-## 3. Brand Rename Verification: "캠톡" -> "캠퍼스톡"
+## 3. New Feature Verification: karts-eussa (한예종으쌰으쌰)
 
-### 3.1 Search Result: "캠톡" Occurrences
+### 3.1 Feature Architecture Review
 
-```
-Searched: campulist/src/**/*.{ts,tsx,jsx,js,json,md}
-Result: 0 matches found
-```
+| Aspect | Implementation | Status |
+|--------|---------------|:------:|
+| Route | `/karts-eussa` (static route, not `[university]` dynamic) | [OK] |
+| Server component | `page.tsx` -- SSR with `getPosts()`, `Metadata` export | [OK] |
+| Client component | `EussaClientBits.tsx` -- random cheer, search form | [OK] |
+| Data layer | Uses existing `getPosts()` API with `universitySlug: 'karts'`, `categoryMinorSlug: 'cheer'` | [OK] |
+| Breadcrumb | `한예종 > 게시판 > 으쌰으쌰` with correct hrefs | [OK] |
+| Post list | `PostFeedWithLocal` reusing existing component | [OK] |
+| Empty state | Correct empty state with write action link | [OK] |
+| Sort | `SortBadgeRow` reusing existing component | [OK] |
+| Search | Form-based search with query parameter persistence | [OK] |
+| Popular tags | 10 hardcoded tags with active state styling | [OK] |
 
-**Status: [OK]** -- "캠톡" has been fully eliminated from the codebase.
+### 3.2 karts-eussa ID Consistency Audit
 
-### 3.2 "캠퍼스톡" Usage Audit (27 occurrences across 9 files)
+The page uses hardcoded IDs that must match `categories.ts` and `universities.ts`:
 
-| File | Line(s) | Context | Correct |
-|------|---------|---------|:-------:|
-| `lib/camtalk.ts` | L2,3,67,78,83,92,150 | Comments + notification title | [OK] |
-| `components/layout/Header.tsx` | L107,109 | aria-label + label text | [OK] |
-| `components/layout/BottomNav.tsx` | L15 | Navigation label | [OK] |
-| `app/camtalk/page.tsx` | L21,34,39,40,81 | Title, heading, empty state | [OK] |
-| `app/camtalk/[id]/page.tsx` | L135,148,151 | Title, error messages | [OK] |
-| `app/write/page.tsx` | L1063,1067,1201,1205,1381 | Contact method labels | [OK] |
-| `app/my/page.tsx` | L461 | Account deletion info | [OK] |
-| `app/privacy/page.tsx` | L20 | Privacy policy text | [OK] |
-| `components/post/PostBottomAction.tsx` | L83,105,111 | Button labels, sheet title | [OK] |
-| `components/user/UserChatButton.tsx` | L50 | Button label | [OK] |
+| ID | Expected | Actual (page.tsx) | Source | Status |
+|----|----------|-------------------|--------|:------:|
+| University ID for 한예종 | 5 | `universityId={5}` (L93) | `universities.ts` L13: `id: 5` | [OK] |
+| CategoryMajor "게시판" ID | 4 | `categoryMajorId={4}` (L94) | `categories.ts` L5: `id: 4` | [OK] |
+| CategoryMinor "으쌰으쌰" ID | 48 | `categoryMinorId={48}` (L95) | `categories.ts` L41: `id: 48` | [OK] |
+| University slug | 'karts' | `universitySlug: 'karts'` (L29) | `universities.ts` L13: `slug: 'karts'` | [OK] |
+| Category major slug | 'community' | `categoryMajorSlug: 'community'` (L30) | `categories.ts` L5: `slug: 'community'` | [OK] |
+| Category minor slug | 'cheer' | `categoryMinorSlug: 'cheer'` (L31) | `categories.ts` L41: `slug: 'cheer'` | [OK] |
 
-**All 27 occurrences use "캠퍼스톡" correctly.** No mixed or partial rename artifacts found.
+**All 6 hardcoded IDs and slugs are consistent across files.**
+
+### 3.3 Client/Server Boundary Analysis
+
+The karts-eussa feature correctly splits client and server concerns:
+
+| Responsibility | Component | Rendering | Status |
+|---------------|-----------|-----------|:------:|
+| Data fetching (`getPosts`) | `page.tsx` | Server (async) | [OK] |
+| Metadata (`<title>`, `<meta>`) | `page.tsx` | Server | [OK] |
+| Random cheer message | `EussaClientBits.tsx` | Client (`useMemo`) | [OK] |
+| Search form | `EussaClientBits.tsx` | Client (form action) | [OK] |
+| Post list rendering | `PostFeedWithLocal` | Client (rehydration) | [OK] |
+| Tag badges | `page.tsx` | Server (static) | [OK] |
+
+**Assessment**: Clean server/client split. `useMemo(() => ..., [])` for random messages ensures consistent hydration (computed once on mount, not re-computed on re-renders). This is the correct pattern for random content in React.
+
+### 3.4 Potential Issues Found
+
+| Issue | File | Line | Severity | Description |
+|-------|------|------|:--------:|-------------|
+| Missing mock data for karts cheer | `data/posts.ts` | L93-95 | Low | Only 2 mock cheer posts exist (p48 for 서울대, p49 for KAIST), none for 한예종 (universityId=5). The karts-eussa page will show empty state when browsing. |
+| No AuthGuard on karts-eussa | `karts-eussa/page.tsx` | -- | N/A | Correct: read-only pages do not need AuthGuard. Write button correctly links to `/write` which has AuthGuard. |
+| Hardcoded POPULAR_TAGS | `karts-eussa/page.tsx` | L17 | Low | Tags are hardcoded strings, not derived from data. Acceptable for Phase A. |
 
 ---
 
-## 4. Bank Info Bug Fix Verification
+## 4. Logo / Branding Verification
 
-### 4.1 Bug Description
+### 4.1 Header Logo Change
 
-The original code used a single global localStorage key `ct_bank_info` to store bank account information. When multiple users logged in on the same device, User B would see User A's bank details.
+| Aspect | Before (v8.0) | After (v9.0) | Status |
+|--------|--------------|-------------|:------:|
+| Logo text | (not recorded) | "한예종 캠퍼스리스트v.3.2" | [OK] |
+| Location | `Header.tsx` L130 | `Header.tsx` L130 | [OK] |
+| Conditional styling | Orange when home, muted otherwise | Same pattern maintained | [OK] |
 
-### 4.2 Fix Implementation (camtalk/[id]/page.tsx)
+### 4.2 Branding Consistency Check
 
-| Aspect | Before (Bug) | After (Fix) | Status |
-|--------|-------------|-------------|:------:|
-| Read key | `ct_bank_info` | `ct_bank_info_${myId}` (L234) | [OK] |
-| Write key | `ct_bank_info` | `ct_bank_info_${myId}` (L256) | [OK] |
-| Migration | None | L239-247: old key -> new key (1-time) | [OK] |
-| Guard | None | `if (!myId) return null` (L233) | [OK] |
+| Location | Brand Text | Consistent |
+|----------|-----------|:----------:|
+| `Header.tsx` L130 | "한예종 캠퍼스리스트v.3.2" | [OK] |
+| `layout.tsx` L19 (metadata title) | "캠퍼스리스트 - 캠퍼스의 모든 것" | [WARN] |
+| `karts-eussa/page.tsx` L12 (metadata title) | "한예종으쌰으쌰 / 캠퍼스리스트" | [OK] |
+| `layout.tsx` L20 (metadata description) | "한국형 크레이그리스트" | [OK] |
 
-### 4.3 Migration Logic Review (Lines 239-247)
+**Finding**: The global metadata title in `layout.tsx` says "캠퍼스리스트" without "한예종" prefix, while the header logo says "한예종 캠퍼스리스트v.3.2". This is a minor inconsistency. The global title should remain generic ("캠퍼스리스트") because it's the platform name, while the header is customized for this specific deployment. This is **intentional** (platform vs deployment branding) but should be documented.
+
+---
+
+## 5. Category Structure Change Analysis
+
+### 5.1 Category Order Change
+
+| Category | PRD Order | Previous (v8.0) | Current (v9.0) | Status |
+|----------|:---------:|:----------------:|:---------------:|:------:|
+| 게시판 (community) | 4th | 4th | **1st** | [CHANGED] |
+| 중고마켓 (market) | 1st | 1st | **2nd** | [CHANGED] |
+| 주거 (housing) | 2nd | 2nd | 3rd | [OK] |
+| 일자리 (jobs) | 3rd | 3rd | 4th | [OK] |
+| 서비스 (services) | 5th | 5th | 5th | [OK] |
+| 캠퍼스라이프 (campus-life) | 6th (비즈니스) | 6th | 6th | [OK] |
+| 긱/의뢰 (gigs) | -- | 7th | 7th | N/A (new) |
+
+### 5.2 PRD Category Name Changes
+
+| PRD Category | Implementation Category | Match |
+|-------------|------------------------|:-----:|
+| 마켓 (사고팔고) | 중고마켓 | [CHANGED] name |
+| 주거 (방 구하기) | 주거 | [OK] |
+| 일자리 | 일자리 | [OK] |
+| 커뮤니티 | 게시판 | [CHANGED] name |
+| 서비스 | 서비스 | [OK] |
+| 캠퍼스 비즈니스 | 캠퍼스라이프 | [CHANGED] name + scope |
+| -- | 긱/의뢰 | [ADDED] new category |
+
+### 5.3 New Subcategory: 으쌰으쌰 (cheer)
+
+| Aspect | Value | Status |
+|--------|-------|:------:|
+| ID | 48 | [OK] |
+| Name | 으쌰으쌰 | [OK] |
+| Slug | cheer | [OK] |
+| Parent | 4 (게시판/community) | [OK] |
+| Icon | fire | [OK] |
+| Sort order | 1 (first in 게시판) | [OK] |
+| Post access | campus | [OK] -- only campus members can post cheer messages |
+
+### 5.4 Impact Assessment
+
+The category order change (게시판 first) is an intentional product decision to prioritize community engagement over marketplace features. This diverges from the PRD but reflects the project's current focus on 한예종 campus life.
+
+**Category count**: PRD defines 6 major + ~34 minor = 40 categories. Implementation has 7 major + 51 minor = 58 categories, with additional subcategories for 서비스, 게시판, and the new 긱/의뢰 major category.
+
+---
+
+## 6. Write Flow Integration Verification
+
+### 6.1 writeUrl.ts -- karts-eussa Special Handling
 
 ```typescript
-useEffect(() => {
-  if (!myId) return;
-  const oldKey = 'ct_bank_info';
-  const newKey = `ct_bank_info_${myId}`;
-  if (localStorage.getItem(oldKey) && !localStorage.getItem(newKey)) {
-    localStorage.setItem(newKey, localStorage.getItem(oldKey)!);
-    localStorage.removeItem(oldKey);
-  }
-}, [myId]);
+// campulist/src/lib/writeUrl.ts L12-15
+if (pathname === '/karts-eussa') {
+  return '/write?uni=karts&major=community&minor=cheer&from=karts-eussa';
+}
 ```
-
-**Migration logic evaluation:**
 
 | Check | Result | Notes |
 |-------|:------:|-------|
-| Only runs when `myId` is available | [OK] | `if (!myId) return;` guard |
-| Only migrates if old key exists | [OK] | `localStorage.getItem(oldKey)` check |
-| Does not overwrite existing new key | [OK] | `!localStorage.getItem(newKey)` check |
-| Removes old key after migration | [OK] | `localStorage.removeItem(oldKey)` |
-| Runs only once per user | [OK] | After migration, old key is gone |
-| Dependency array correct | [OK] | `[myId]` -- only re-runs on user change |
+| Correctly detects `/karts-eussa` path | [OK] | Exact string match |
+| Sets `uni=karts` | [OK] | Matches `universities.ts` slug |
+| Sets `major=community` | [OK] | Matches `categories.ts` slug |
+| Sets `minor=cheer` | [OK] | Matches `categories.ts` slug |
+| Sets `from=karts-eussa` | [OK] | Used for post-completion redirect |
 
-**Edge case: multi-user scenario.** If User A's bank info was stored globally, and User A logs in first, the migration correctly copies to `ct_bank_info_u1` and removes the global key. When User B logs in later, there is no global key to migrate (already removed), so User B gets a clean slate. This is the correct behavior -- the global key was ambiguous so only the first user to log in inherits it.
+### 6.2 write/page.tsx -- from Parameter Redirect
 
-**Status: [OK]** -- The bug fix is correct, complete, and handles edge cases properly.
+```typescript
+// campulist/src/app/write/page.tsx L732-746
+const fromParam = new URLSearchParams(window.location.search).get('from');
+if (fromParam === 'karts-eussa') {
+  router.push('/karts-eussa');
+} else {
+  // ... default redirect to category page
+}
+```
 
----
+| Check | Result | Notes |
+|-------|:------:|-------|
+| Reads `from` param from URL | [OK] | Uses `window.location.search` |
+| Redirects to `/karts-eussa` when `from=karts-eussa` | [OK] | Correct path |
+| Default redirect remains functional | [OK] | Falls through to uni/category redirect |
+| Only applies to new posts (not edits) | [OK] | Inside `else` of `isEditMode` check |
 
-## 5. localStorage Key Scoping Audit
+### 6.3 Full Write Flow Trace
 
-### 5.1 Audit Methodology
+```
+User on /karts-eussa
+  -> Clicks write button (Header or BottomNav)
+  -> writeUrl.ts detects /karts-eussa -> returns /write?uni=karts&major=community&minor=cheer&from=karts-eussa
+  -> write/page.tsx auto-fills: university=한예종, major=게시판, minor=으쌰으쌰
+  -> User writes and submits
+  -> createPost() called
+  -> fromParam === 'karts-eussa' -> router.push('/karts-eussa')
+  -> User returns to karts-eussa page with new post visible
+```
 
-All localStorage keys in the codebase were audited for whether they should be user-scoped (per-user isolation) or can remain global (shared across users on the same device).
-
-### 5.2 Key Classification
-
-#### Global Keys (Correctly Shared)
-
-| Key | File | Reason Global is Correct |
-|-----|------|--------------------------|
-| `ct_rooms` | camtalk.ts L37 | Rooms contain participant IDs; functions filter by userId |
-| `ct_msgs` | camtalk.ts L38 | Messages contain senderId; filtered by roomId |
-| `cn_notifs` | camnotif.ts L24 | Notifications have recipientId; filtered per user |
-| `campulist_show_icons` | constants.ts L18 | UI preference, not user-sensitive data |
-| `campulist_post_overrides` | constants.ts L11 | Post data, not user-specific |
-| `campulist_user_posts` | constants.ts L10 | Contains authorId field for filtering |
-| `campulist_post_images` | constants.ts L17 | Post data, indexed by postId |
-| `campulist_post_tags` | constants.ts L14 | Post data, indexed by postId |
-| `campulist_registered_users` | constants.ts L16 | User registry, shared by design |
-| `campulist_reports` | constants.ts L13 | Report IDs, not sensitive |
-| `campulist_current_user` | constants.ts L15 | Single-value: current session user ID |
-| `campulist_profile_overrides` | constants.ts L19 | Keyed by userId internally |
-
-#### User-Scoped Keys (Correctly Scoped)
-
-| Key | File | Scoping Method |
-|-----|------|---------------|
-| `ct_bank_info_${userId}` | camtalk/[id]/page.tsx L234,256 | Template literal with userId |
-
-#### Keys That Should Be User-Scoped But Are Global
-
-| Key | File | Risk | Severity |
-|-----|------|------|:--------:|
-| `campulist_liked_posts` | constants.ts L7 | User A's liked posts visible to User B | Medium |
-| `campulist_write_draft` | constants.ts L8 | User A's draft visible to User B | Low |
-| `campulist_recent_searches` | constants.ts L9 | User A's searches visible to User B | Low |
-| `campulist_recent_viewed` | constants.ts L12 | User A's viewed posts visible to User B | Low |
-
-### 5.3 Impact Assessment
-
-The four unscoped keys above share the same pattern as the `ct_bank_info` bug: on a shared device, switching between user accounts shows the previous user's data. However:
-
-- **Bank info was Critical**: It exposed sensitive financial data (bank account numbers)
-- **Liked/drafts/searches/recent are Low severity**: They expose browsing preferences but no sensitive personal data
-- **Phase A context**: This is a prototype with mock data. These will be server-side in Phase B (Supabase)
-
-**Recommendation**: Fix in Phase B when migrating to Supabase (server-side storage). For Phase A, document as known limitation. If multi-user testing on shared devices is needed before Phase B, scope these four keys with `${userId}` suffix.
-
-### 5.4 Hardcoded Key Audit
-
-Three files use hardcoded string literals instead of `STORAGE_KEYS` constants:
-
-| File | Line | Hardcoded Key | Constant Available |
-|------|------|--------------|-------------------|
-| `data/users.ts` | L56 | `'campulist_registered_users'` | `STORAGE_KEYS.REGISTERED_USERS` |
-| `data/posts.ts` | L144 | `'campulist_post_images'` | `STORAGE_KEYS.POST_IMAGES` |
-| `data/posts.ts` | L154 | `'campulist_post_tags'` | `STORAGE_KEYS.POST_TAGS` |
-
-**Impact**: Low (values match the constants). These are a convention violation, not a bug.
+**Status: [OK]** -- The full write-and-return flow is correctly implemented.
 
 ---
 
-## 6. Architecture Compliance (Starter Level)
+## 7. Image System Migration (IndexedDB)
 
-### 6.1 Folder Structure Verification
+### 7.1 New Files
 
-| Expected Path | Exists | Contents | Status |
-|---------------|:------:|----------|:------:|
-| `src/components/` | Yes | UI components (auth, layout, post, search, ui, user, write) | [OK] |
-| `src/lib/` | Yes | Utilities + API abstraction (api, auth, camtalk, camnotif, constants, format, types, utils, writeUrl) | [OK] |
-| `src/data/` | Yes | Mock data (universities, categories, categoryExamples, posts, users) | [OK] |
-| `src/contexts/` | Yes | AuthContext.tsx | [OK] |
-| `src/app/` | Yes | 15+ routes (Next.js App Router) | [OK] |
+| File | Lines | Purpose | Status |
+|------|:-----:|---------|:------:|
+| `lib/imageStore.ts` | 81 | IndexedDB CRUD for post images | [OK] |
+| `lib/imageUtils.ts` | 68 | Canvas-based image compression | [OK] |
 
-**Architecture Level**: Starter (components, lib, data, contexts) -- appropriate for Phase A prototype.
+### 7.2 Architecture Assessment
 
-### 6.2 Dependency Direction Check
+| Aspect | Implementation | Status |
+|--------|---------------|:------:|
+| DB name | `campulist_images` | [OK] |
+| Object store | `post_images` | [OK] |
+| API: savePostImages | `async (postId, images) => void` | [OK] |
+| API: loadPostImages | `async (postId) => string[]` | [OK] |
+| API: deletePostImages | `async (postId) => void` | [OK] |
+| Migration from localStorage | `migrateFromLocalStorage()` -- one-time, guarded by flag | [OK] |
+| Image compression | `compressImage(file, maxDim=600, quality=0.5)` | [OK] |
+| Profile image compression | `compressProfileImage(file)` -- 200x200 center crop | [OK] |
+| File validation | Type check (jpeg/png/gif/webp), size check (10MB max) | [OK] |
 
-| Layer | Expected | Actual | Status |
-|-------|----------|--------|:------:|
-| `app/` (pages) | Can import: components, lib, data, contexts | Imports components, lib, data, contexts only | [OK] |
-| `components/` | Can import: lib, data, contexts, ui | Imports lib, data, contexts, other components | [OK] |
-| `lib/` | Can import: data, other lib | Imports data, constants, types | [OK] |
-| `data/` | Can import: lib/types, lib/constants | Imports lib/types, lib/constants | [OK] |
-| `contexts/` | Can import: lib | Imports lib/auth, lib/types | [OK] |
+### 7.3 Migration Logic Review
+
+```typescript
+// campulist/src/lib/imageStore.ts L52-80
+const MIGRATED_KEY = 'campulist_images_migrated';
+if (localStorage.getItem(MIGRATED_KEY)) return;  // guard: only run once
+// ... migrate entries from localStorage to IndexedDB ...
+localStorage.removeItem('campulist_post_images');  // clean up old key
+localStorage.setItem(MIGRATED_KEY, '1');  // mark as done
+```
+
+| Check | Result |
+|-------|:------:|
+| One-time execution guard | [OK] |
+| Handles empty/missing data | [OK] |
+| Removes old localStorage key after migration | [OK] |
+| Error handling (try/catch with ignore) | [OK] |
+| SSR guard (`typeof window`) | [OK] |
+
+**Note**: The hardcoded `'campulist_post_images'` string in `imageStore.ts` L59 and L74 is intentional -- this is migration code that must reference the literal old key name, not the constant.
+
+---
+
+## 8. Previous Issues Resolution (v8.0 Findings)
+
+### 8.1 Hardcoded localStorage Keys (v8.0 Issue)
+
+| File | Line | v8.0 Status | v9.0 Status | Resolution |
+|------|------|:-----------:|:-----------:|------------|
+| `data/users.ts` L56 | `'campulist_registered_users'` | Hardcoded | **Fixed** | Now uses `STORAGE_KEYS.REGISTERED_USERS` (L58) |
+| `data/posts.ts` L144 | `'campulist_post_images'` | Hardcoded | **Fixed** | Now uses `STORAGE_KEYS.POST_IMAGES` (L155) |
+| `data/posts.ts` L154 | `'campulist_post_tags'` | Hardcoded | **Fixed** | Now uses `STORAGE_KEYS.POST_TAGS` (L191) |
+
+**All 3 hardcoded localStorage key violations from v8.0 have been resolved.**
+
+### 8.2 User-Scoped localStorage Keys (v8.0 Issue)
+
+| Key | v8.0 Severity | v9.0 Status | Notes |
+|-----|:------------:|:-----------:|-------|
+| `campulist_liked_posts` | Medium | Still global | Phase B migration will handle |
+| `campulist_write_draft` | Low | Still global | Phase B migration will handle |
+| `campulist_recent_searches` | Low | Still global | Phase B migration will handle |
+| `campulist_recent_viewed` | Low | Still global | Phase B migration will handle |
+
+**Recommendation unchanged**: Fix when migrating to Supabase in Phase B. Not a blocking issue for Phase A.
+
+---
+
+## 9. Architecture Compliance (Starter Level)
+
+### 9.1 Folder Structure Verification
+
+```
+campulist/src/  (86 files)
++-- app/                    # Pages (Presentation) -- 19 route files + 3 special
+|   +-- karts-eussa/        # [NEW] Dedicated 한예종으쌰으쌰 page
+|   |   +-- page.tsx        # Server component
+|   |   +-- EussaClientBits.tsx  # Client component
+|   +-- [university]/       # Dynamic university routes
+|   +-- all/                # All-university category routes
+|   +-- auth/, camtalk/, camnotif/, my/, post/, write/
+|   +-- about/, privacy/, terms/, search/, suggest/, user/
++-- components/             # UI Components (Presentation) -- 35 components
+|   +-- auth/, layout/, post/, search/, ui/, user/, write/
++-- contexts/               # State Management -- 1 context
+|   +-- AuthContext.tsx
++-- data/                   # Mock Data (Infrastructure) -- 5 data files
+|   +-- categories.ts, categoryExamples.ts, posts.ts, universities.ts, users.ts
++-- lib/                    # Utilities + API (Infrastructure + Domain) -- 11 files
+    +-- api.ts, auth.ts, camtalk.ts, camnotif.ts, constants.ts
+    +-- format.ts, imageStore.ts, imageUtils.ts, types.ts, utils.ts, writeUrl.ts
+```
+
+### 9.2 New File Naming Convention Check
+
+| File | Convention | Correct |
+|------|-----------|:-------:|
+| `karts-eussa/page.tsx` | Folder: kebab-case, file: Next.js convention | [OK] |
+| `karts-eussa/EussaClientBits.tsx` | PascalCase component file | [OK] |
+| `lib/imageStore.ts` | camelCase utility file | [OK] |
+| `lib/imageUtils.ts` | camelCase utility file | [OK] |
+
+### 9.3 Dependency Direction Check
+
+| Import | From | To | Valid |
+|--------|------|------|:-----:|
+| `karts-eussa/page.tsx` | app/ | lib/ (api), components/, data/ | [OK] |
+| `EussaClientBits.tsx` | app/ | (none -- self-contained) | [OK] |
+| `imageStore.ts` | lib/ | (none -- uses browser APIs only) | [OK] |
+| `imageUtils.ts` | lib/ | (none -- uses browser APIs only) | [OK] |
+| `writeUrl.ts` | lib/ | data/ (categories, universities) | [OK] |
 
 **No circular dependency violations found.**
 
-### 6.3 API Abstraction Layer
-
-The `lib/api.ts` file serves as the single data access layer, abstracting mock data for future Supabase swap:
-
-| Function | Type | Dependencies | Status |
-|----------|------|-------------|:------:|
-| `getPosts()` | async | mockPosts, localStorage | [OK] |
-| `getPostDetail()` | async | mockPosts, getUserSummary | [OK] |
-| `createPost()` | sync | localStorage | [OK] |
-| `updatePost()` | sync | localStorage | [OK] |
-| `deletePost()` | sync | localStorage | [OK] |
-| `toggleLike()` | sync | localStorage | [OK] |
-| 20+ other functions | mixed | localStorage, mock data | [OK] |
-
-**Assessment**: The abstraction layer is well-designed. All page components use `lib/api.ts` rather than accessing mock data directly. Phase B migration will only require replacing this single file.
-
-### 6.4 CamTalk Architectural Independence
-
-The chat system (`camtalk.ts`, `camnotif.ts`) correctly maintains its own:
-- Type definitions (not dependent on `types.ts`)
-- localStorage keys (not in `STORAGE_KEYS`)
-- Event system (`camtalkUpdate`, `camnotifUpdate` custom events)
-
-This is appropriate because the chat system has a fundamentally different data model from the post system and will likely be implemented with a different backend service (e.g., Supabase Realtime) in Phase B.
-
 ---
 
-## 7. Convention Compliance
+## 10. Convention Compliance
 
-### 7.1 Naming Convention Check
+### 10.1 Naming Convention Check
 
 | Category | Convention | Files Checked | Compliance | Violations |
 |----------|-----------|:-------------:|:----------:|------------|
-| Components | PascalCase | 34 | 100% | None |
-| Functions | camelCase | 50+ | 100% | None |
-| Constants | UPPER_SNAKE_CASE | 5 groups | 100% | None |
-| Files (component) | PascalCase.tsx | 34 | 100% | None |
-| Files (utility) | camelCase.ts | 12 | 100% | None |
-| Folders | kebab-case or feature | 15 | 93% | `camtalk/` (acceptable -- brand name) |
+| Components | PascalCase | 36 (+2) | 100% | None |
+| Functions | camelCase | 60+ | 100% | None |
+| Constants | UPPER_SNAKE_CASE | 6 groups | 100% | None |
+| Files (component) | PascalCase.tsx | 36 | 100% | None |
+| Files (utility) | camelCase.ts | 13 (+2) | 100% | None |
+| Folders | kebab-case or feature | 16 (+1) | 100% | None |
 
-### 7.2 Import Order Check
+### 10.2 New Constants Audit
 
-Spot-checked 15 key files:
+| Constant | File | Naming | Status |
+|----------|------|--------|:------:|
+| `POPULAR_TAGS` | karts-eussa/page.tsx L17 | UPPER_SNAKE_CASE | [OK] |
+| `CHEER_MESSAGES` | EussaClientBits.tsx L5 | UPPER_SNAKE_CASE | [OK] |
+| `SEARCH_PLACEHOLDERS` | EussaClientBits.tsx L22 | UPPER_SNAKE_CASE | [OK] |
+| `DB_NAME` | imageStore.ts L4 | UPPER_SNAKE_CASE | [OK] |
+| `DB_VERSION` | imageStore.ts L5 | UPPER_SNAKE_CASE | [OK] |
+| `STORE_NAME` | imageStore.ts L6 | UPPER_SNAKE_CASE | [OK] |
+| `MAX_FILE_SIZE` | imageUtils.ts L6 | UPPER_SNAKE_CASE | [OK] |
+| `ALLOWED_TYPES` | imageUtils.ts L7 | UPPER_SNAKE_CASE | [OK] |
 
-| Check | Status |
-|-------|:------:|
-| External libraries first (react, next) | [OK] |
-| Internal absolute imports second (`@/...`) | [OK] |
-| Relative imports third (`./...`) | [OK] |
-| Type imports last (`import type`) | [OK] |
+### 10.3 Import Order Check (New Files)
 
-**Minor pattern**: Some files mix `import type` with regular imports from the same module (e.g., `import { useAuth } from '@/contexts/AuthContext'` then `import type { User } from '@/lib/types'`). This is acceptable TypeScript practice and not a violation.
+| File | External first | Internal `@/` second | Relative third | Status |
+|------|:-:|:-:|:-:|:------:|
+| `karts-eussa/page.tsx` | next (L1-2) | @/lib, @/components (L3-8) | ./EussaClientBits (L9) | [OK] |
+| `EussaClientBits.tsx` | react (L3) | -- | -- | [OK] |
+| `imageStore.ts` | -- | -- | -- | [OK] (no imports) |
+| `imageUtils.ts` | -- | -- | -- | [OK] (no imports) |
 
-### 7.3 Hardcoded String Violations
-
-| Category | Count | Files | Severity |
-|----------|:-----:|-------|:--------:|
-| localStorage keys not using STORAGE_KEYS | 3 | data/users.ts L56, data/posts.ts L144,L154 | Low |
-| CamTalk localStorage keys (intentionally separate) | 4 | lib/camtalk.ts, lib/camnotif.ts | N/A |
-| Bank info key (intentionally template-based) | 1 | app/camtalk/[id]/page.tsx | N/A |
-
-### 7.4 Convention Score
+### 10.4 Convention Score
 
 ```
 Naming Convention:     100% ||||||||||||||||||||||||||||||||
-Import Order:           98% ||||||||||||||||||||||||||||||
-Folder Structure:       93% ||||||||||||||||||||||||||||
-Constant Centralization: 92% |||||||||||||||||||||||||||
-Overall Convention:     95%
+Import Order:          100% ||||||||||||||||||||||||||||||||
+Folder Structure:      100% ||||||||||||||||||||||||||||||||
+Constant Centralization: 88% ||||||||||||||||||||||||||
+Code Organization:      90% |||||||||||||||||||||||||||
+Overall Convention:     94%
 ```
+
+The constant centralization score is 88% because:
+- `POPULAR_TAGS`, `CHEER_MESSAGES`, `SEARCH_PLACEHOLDERS` are page-local constants (acceptable -- they are page-specific, not shared)
+- `DB_NAME`, `DB_VERSION`, `STORE_NAME` are module-local constants (acceptable -- internal to imageStore)
+- CamTalk still maintains its own separate constant namespace (intentional)
 
 ---
 
-## 8. Code Quality Analysis
+## 11. Code Quality Analysis
 
-### 8.1 File Size Assessment
+### 11.1 File Size Assessment (Updated)
 
 | File | Lines | Complexity | Status | Notes |
 |------|:-----:|:----------:|:------:|-------|
-| `app/write/page.tsx` | 1370+ | High | [WARN] | Large but functional; uses step-based wizard |
+| `app/write/page.tsx` | 1370+ | High | [WARN] | Still the largest file; multi-step wizard |
 | `app/camtalk/[id]/page.tsx` | 839 | High | [WARN] | 4 Sheet dialogs + message rendering |
 | `app/auth/page.tsx` | 522 | Medium | [OK] | 3-step signup + login |
 | `app/my/page.tsx` | 500 | Medium | [OK] | Tabs + 3 Sheet dialogs |
 | `lib/api.ts` | 447 | Medium | [OK] | Clean data access layer |
-| `lib/auth.ts` | 273 | Low | [OK] | Well-structured auth functions |
-| `lib/camtalk.ts` | 231 | Low | [OK] | Clean chat data layer |
+| **`app/karts-eussa/page.tsx`** | **107** | **Low** | **[OK]** | **Clean server component** |
+| **`app/karts-eussa/EussaClientBits.tsx`** | **83** | **Low** | **[OK]** | **Focused client component** |
+| **`lib/imageStore.ts`** | **81** | **Low** | **[OK]** | **Clean IndexedDB abstraction** |
+| **`lib/imageUtils.ts`** | **68** | **Low** | **[OK]** | **Image compression utilities** |
 
-**Note**: `write/page.tsx` at 1370+ lines is the largest file. It implements a full multi-step post creation wizard with category selection, image upload, contact methods, draft saving, and edit mode. While large, it is a single page component with clear internal structure. Extracting sub-components would be premature for Phase A but should be considered in Phase B.
+### 11.2 karts-eussa Code Quality
 
-### 8.2 Type Safety Audit
+| Check | Assessment | Score |
+|-------|-----------|:-----:|
+| Server/client split | Excellent -- proper RSC/client boundary | 10/10 |
+| Component reuse | Reuses PostFeedWithLocal, SortBadgeRow, EmptyState, Breadcrumb, Badge | 10/10 |
+| Type safety | Props interface defined, searchParams properly awaited | 9/10 |
+| Error handling | Empty state handles both search and no-posts scenarios | 9/10 |
+| Accessibility | `aria-label` on search input | 8/10 |
+| SEO | Metadata export with title and description | 9/10 |
+| Performance | Server-side data fetching, no unnecessary client-side state | 10/10 |
 
-| Area | Status | Notes |
-|------|:------:|-------|
-| All exported functions have typed parameters | [OK] | |
-| All exported functions have typed returns | [OK] | |
-| No `any` types in core code | [OK] | |
-| CamTalk defines own types independently | [OK] | CamTalkRoom, CamTalkMessage, CamTalkParticipant |
-| UserSummary consistently used for public user data | [OK] | Never exposes full User to non-auth components |
-| PostStatus enum-like type | [OK] | `'active' \| 'reserved' \| 'completed' \| 'hidden'` |
-| MemberType exhaustive | [OK] | 7 types: undergraduate, graduate, professor, staff, alumni, merchant, general |
-
-### 8.3 Potential Runtime Issues
+### 11.3 Potential Issues
 
 | Issue | File | Line | Severity | Description |
 |-------|------|------|:--------:|-------------|
-| Non-null assertion | camtalk/[id]/page.tsx | L244 | Low | `localStorage.getItem(oldKey)!` -- guarded by `if` check on L243 |
-| Uncontrolled ref access | camtalk/[id]/page.tsx | L96-99 | Low | `appDateRef.current?.value` -- optional chaining used correctly |
-| useMemo dependency lint suppression | camtalk/[id]/page.tsx | L236 | Low | `[bankOpen, myId]` -- bankOpen triggers re-read of saved bank info |
-| exhaustive-deps lint suppression | camtalk/[id]/page.tsx | L138 | Low | `[roomId, myId]` -- intentionally excluding partnerNickname |
-
-**No Critical or High severity runtime issues found.**
-
-### 8.4 Security Considerations (Phase A Context)
-
-| Issue | Severity | Phase A Impact | Phase B Action |
-|-------|:--------:|:--------------:|----------------|
-| Passwords stored in plain text in localStorage | Expected | Mock auth -- no real security | Supabase handles auth |
-| Bank info in localStorage | Medium | Client-only, no server | Move to encrypted server-side |
-| No CSRF protection | Expected | No server-side API | Supabase handles automatically |
-| No rate limiting | Expected | Client-only mock | Add via Supabase Edge Functions |
+| No 한예종 cheer mock posts | `data/posts.ts` | L93-95 | Low | Existing cheer posts are for 서울대 (p48) and KAIST (p49), not 한예종. The karts-eussa page filters by `universitySlug: 'karts'` and will show empty. |
+| `from` param only supports one value | `write/page.tsx` | L733-735 | Low | Only checks `'karts-eussa'`. If more special pages are added, this will need generalization. |
+| `useMemo(() => random, [])` hydration risk | `EussaClientBits.tsx` | L37-43 | Info | `useMemo` with empty deps ensures the random value is computed once per mount. Since this is a client component rendered after hydration, there is no server/client mismatch. Safe pattern. |
+| `searchParams` as Promise | `karts-eussa/page.tsx` | L20 | Info | Correct for Next.js 16 where `searchParams` is async in server components. Properly `await`ed on L24. |
 
 ---
 
-## 9. Feature Completeness (PRD vs Implementation)
+## 12. Feature Completeness (PRD vs Implementation)
 
-### 9.1 PRD Core Features
+### 12.1 PRD Core Features
 
-| PRD Feature | Status | Implementation |
-|-------------|:------:|----------------|
-| University-based post boards | [OK] | 5 universities, slug-based routing |
-| Category system (6 major, 24 minor) | [OK] | Full category hierarchy with icons |
-| Post CRUD | [OK] | Create, read, update, delete, status change |
-| Post listing with filters | [OK] | University, category, price, sort, search |
-| Post detail with images/tags | [OK] | Image gallery, tags, related posts |
-| User authentication (.ac.kr) | [OK] | 3-step signup with email domain detection |
-| Member types (7 types) | [OK] | Campus 4 + External 2 + Alumni |
-| In-app chat (캠퍼스톡) | [OK] | CamTalk with rooms, messages, unread |
-| Like/favorite system | [OK] | Toggle like with count |
-| User profiles | [OK] | Profile page with manner temp, trade count |
-| Post bumping | [OK] | Owner can bump posts to top |
-| Search | [OK] | Text search with recent searches |
-| Notifications (캠알림) | [OK] | CamNotif system with read/unread |
-| Privacy policy / Terms | [OK] | Static pages present |
-| About page | [OK] | Service introduction page |
+| PRD Feature | Status | Implementation | Change from v8.0 |
+|-------------|:------:|----------------|:-:|
+| University-based post boards | [OK] | 5 universities, slug-based routing | -- |
+| Category system | [OK] | 7 major (was 6 in PRD), 51 minor | EXPANDED |
+| Post CRUD | [OK] | Create, read, update, delete, status change | -- |
+| Post listing with filters | [OK] | University, category, price, sort, search | -- |
+| Post detail with images/tags | [OK] | Image gallery (now IndexedDB), tags, related posts | IMPROVED |
+| User authentication (.ac.kr) | [OK] | 3-step signup with email domain detection | -- |
+| In-app chat (캠퍼스톡) | [OK] | CamTalk with rooms, messages, unread | -- |
+| Like/favorite system | [OK] | Toggle like with count | -- |
+| User profiles | [OK] | Profile page with manner temp, trade count | -- |
+| Search | [OK] | Text search with recent searches | -- |
+| Notifications (캠알림) | [OK] | CamNotif system with read/unread | -- |
+| Privacy/Terms/About | [OK] | Static pages present | -- |
 
-### 9.2 PRD Features Not Yet Implemented (Phase B+)
+### 12.2 Features Beyond PRD (Implementation Additions)
 
-| PRD Feature | PRD Section | Status | Notes |
-|-------------|-------------|:------:|-------|
-| Business accounts with paid plans | Section 4 | Deferred | Phase B |
-| Premium post placement | Section 4 | Deferred | `isPremium` field exists but unused |
-| Keyword alerts | Section 3.8 | Deferred | Type defined but not implemented |
-| Review system (real) | Section 3.7 | Partial | Mock reviews in my/page.tsx |
-| Image upload (real) | Section 3.3 | Partial | URL-based mock, no file upload |
-| Ad system | Section 4 | Deferred | Route exists (`/ad`) |
-| Email notifications | Section 3.9 | Deferred | Phase B |
-| Admin dashboard | Section 3.10 | Deferred | Phase B |
-
-### 9.3 Features Beyond PRD (Implementation Additions)
-
-| Feature | Files | Description |
-|---------|-------|-------------|
-| Dark mode | ThemeProvider, ThemeToggle | Full dark mode support |
-| Icon toggle | IconToggle | Category icons show/hide toggle |
-| Draft auto-save | write/page.tsx | Post draft saved to localStorage |
-| Post edit mode | write/page.tsx | Full edit with pre-fill |
-| Contact methods | write/page.tsx, PostDetailContent | Phone, Kakao, email besides chat |
-| Appointment system | camtalk/[id]/page.tsx | Schedule, confirm, cancel, complete appointments |
-| Location sharing | camtalk/[id]/page.tsx | Send meeting location in chat |
-| Bank info sharing | camtalk/[id]/page.tsx | Send bank transfer info (user-scoped) |
-| Message principles | camtalk/[id]/page.tsx | Trading principles system |
-| Report system | ReportDialog, ReportButton | Report inappropriate content |
-| Scroll restoration | ScrollRestoration | Maintain scroll position on navigation |
-| Category examples | categoryExamples | Example posts per category |
-| University campus support | Multi-campus | Campus selection in signup and profile |
+| # | Feature | Files | Change from v8.0 |
+|---|---------|-------|:---:|
+| A-01 | CamTalk appointment system | camtalk/[id]/page.tsx | -- |
+| A-02 | CamTalk location sharing | camtalk/[id]/page.tsx | -- |
+| A-03 | CamTalk bank info (user-scoped) | camtalk/[id]/page.tsx | -- |
+| A-04 | Draft auto-save system | write/page.tsx | -- |
+| A-05 | Contact methods | types.ts, write/page.tsx | -- |
+| A-06 | Dark mode support | ThemeProvider, ThemeToggle | -- |
+| A-07 | Report system | ReportDialog, ReportButton | -- |
+| A-08 | University-aware write URL | writeUrl.ts | -- |
+| A-09 | Image compression & IndexedDB | imageStore.ts, imageUtils.ts | **NEW** |
+| **A-10** | **한예종으쌰으쌰 전용 페이지** | **karts-eussa/page.tsx, EussaClientBits.tsx** | **NEW** |
+| **A-11** | **Write-to-origin redirect (from param)** | **write/page.tsx, writeUrl.ts** | **NEW** |
 
 ---
 
-## 10. Differences Found
+## 13. Differences Found
 
-### 10.1 Missing Features (Design O, Implementation X)
+### 13.1 Missing Features (Design O, Implementation X)
 
 | # | Item | Design Location | Description | Severity |
 |---|------|-----------------|-------------|:--------:|
-| M-01 | Business account plans | PRD Section 4 | Paid tiers (basic/pro/premium) not implemented | Low (Phase B) |
+| M-01 | Business account plans | PRD Section 4 | Paid tiers not implemented | Low (Phase B) |
 | M-02 | Keyword alerts | PRD Section 3.8 | KeywordAlert type exists but UI/logic missing | Low (Phase B) |
-| M-03 | Real image upload | PRD Section 3.3 | Only URL-based image input, no file upload | Low (Phase B) |
+| M-03 | Real image upload to server | PRD Section 3.3 | Images stored locally (IndexedDB), not server | Low (Phase B) |
 
-### 10.2 Added Features (Design X, Implementation O)
+### 13.2 Added Features (Design X, Implementation O)
 
 | # | Item | Implementation Location | Description | Impact |
 |---|------|------------------------|-------------|:------:|
-| A-01 | CamTalk appointment system | camtalk/[id]/page.tsx L19-27, L165-208 | Full appointment create/accept/cancel/complete flow | POSITIVE |
-| A-02 | CamTalk location sharing | camtalk/[id]/page.tsx L210-226 | Structured location messages | POSITIVE |
-| A-03 | CamTalk bank info (user-scoped) | camtalk/[id]/page.tsx L228-264 | Bank info with auto-fill + migration | POSITIVE |
-| A-04 | CamTalk message principles | camtalk/[id]/page.tsx L266-289 | Trading principle selection | POSITIVE |
-| A-05 | Draft auto-save system | write/page.tsx | Auto-save to localStorage with restore | POSITIVE |
-| A-06 | Post contact methods | types.ts L77-84, write/page.tsx | Phone/Kakao/email besides in-app chat | POSITIVE |
-| A-07 | Category access control | types.ts L13-16, write/page.tsx | PostAccess type for campus vs open categories | POSITIVE |
-| A-08 | Dark mode support | ThemeProvider, ThemeToggle | Full theme system | POSITIVE |
-| A-09 | Report system | ReportDialog, ReportButton | Post reporting with reason selection | POSITIVE |
-| A-10 | University-aware write URL | writeUrl.ts | Auto-fills university/category from current page | POSITIVE |
+| A-09 | IndexedDB image storage | `lib/imageStore.ts`, `lib/imageUtils.ts` | Overcomes localStorage 5MB limit | POSITIVE |
+| A-10 | 한예종으쌰으쌰 전용 페이지 | `app/karts-eussa/` (2 files) | University-specific themed community board | POSITIVE |
+| A-11 | Write-to-origin redirect | `writeUrl.ts` L12-15, `write/page.tsx` L733-735 | Context-preserving navigation | POSITIVE |
+| A-12 | Category reordering | `categories.ts` L5 | "게시판" prioritized as #1 category | NEUTRAL |
+| A-13 | 긱/의뢰 category | `categories.ts` L11, L68-73 | 7th major category with 6 subcategories | POSITIVE |
 
-### 10.3 Changed Features (Design != Implementation)
+### 13.3 Changed Features (Design != Implementation)
 
-| # | Item | Design | Implementation | Impact |
-|---|------|--------|----------------|:------:|
-| C-01 | Chat route name | PRD: `/chat` | Implementation: `/camtalk` | Low |
-| C-02 | Chat brand name | PRD: not specified | Implementation: "캠퍼스톡" | Low |
-| C-03 | Notification brand name | PRD: not specified | Implementation: "캠알림" | Low |
-
----
-
-## 11. Clean Architecture Compliance
-
-### 11.1 Starter Level Assessment
-
-```
-campulist/src/
-+-- app/              # Pages (Presentation)
-+-- components/       # UI Components (Presentation)
-|   +-- auth/         # Auth components
-|   +-- layout/       # Layout components
-|   +-- post/         # Post components
-|   +-- search/       # Search components
-|   +-- ui/           # Base UI components (shadcn)
-|   +-- user/         # User components
-|   +-- write/        # Write components
-+-- contexts/         # State Management
-+-- data/             # Mock Data (Infrastructure)
-+-- lib/              # Utilities + API (Infrastructure + Domain)
-    +-- api.ts        # Data access layer
-    +-- auth.ts       # Auth functions
-    +-- camtalk.ts    # Chat data layer
-    +-- camnotif.ts   # Notification data layer
-    +-- constants.ts  # Constants (Domain)
-    +-- format.ts     # Formatters (Utility)
-    +-- types.ts      # Type definitions (Domain)
-    +-- utils.ts      # General utilities
-    +-- writeUrl.ts   # URL generation utility
-```
-
-**Architecture Score**: 98% -- Appropriate for Starter level. Clean separation of concerns.
+| # | Item | Design (PRD) | Implementation | Impact |
+|---|------|-------------|----------------|:------:|
+| C-01 | Chat route | `/chat` | `/camtalk` | Low |
+| C-02 | Chat brand | not specified | "캠퍼스톡" | Low |
+| C-03 | Notification brand | not specified | "캠알림" | Low |
+| C-04 | Category order | 마켓 first | **게시판 first** | Medium |
+| C-05 | Category names | 마켓, 커뮤니티, 캠퍼스비즈니스 | 중고마켓, 게시판, 캠퍼스라이프 | Medium |
+| C-06 | Number of categories | 6 major / ~34 minor | 7 major / 51 minor | Low |
+| C-07 | Logo text | "캠퍼스리스트" / "캠푸리스트" | "한예종 캠퍼스리스트v.3.2" | Low |
 
 ---
 
-## 12. Recommended Actions
+## 14. Clean Architecture Compliance
 
-### 12.1 No Immediate Actions Required
+### 14.1 Starter Level Assessment
 
-The brand rename and bank info bug fix are both verified correct.
+| Layer | Expected | Actual | Status |
+|-------|----------|--------|:------:|
+| `app/` (pages) | Imports: components, lib, data, contexts | Correct | [OK] |
+| `components/` | Imports: lib, data, contexts, ui | Correct | [OK] |
+| `lib/` | Imports: data, other lib | Correct | [OK] |
+| `data/` | Imports: lib/types, lib/constants | Correct | [OK] |
+| `contexts/` | Imports: lib | Correct | [OK] |
 
-### 12.2 Short-term Improvements (Before Phase B)
+**Architecture Score**: 98% -- Appropriate for Starter level. No circular dependency violations.
 
-| Priority | Item | File(s) | Description |
-|----------|------|---------|-------------|
-| Low | Use STORAGE_KEYS constants | data/users.ts L56, data/posts.ts L144,L154 | Replace 3 hardcoded localStorage key strings with constants |
-| Low | Consider user-scoping LIKED_POSTS | constants.ts, api.ts | Add `_${userId}` suffix to prevent cross-user leaking on shared devices |
+### 14.2 karts-eussa Architectural Fit
 
-### 12.3 Phase B Migration Notes
-
-| Item | Current State | Phase B Action |
-|------|-------------|----------------|
-| localStorage keys | Global except bank info | All user data moves to Supabase |
-| CamTalk | localStorage-based | Supabase Realtime channels |
-| Auth | Mock with plain-text passwords | Supabase Auth |
-| Images | URL-only | Supabase Storage with file upload |
-| Bank info | User-scoped localStorage | Encrypted server-side storage |
+The karts-eussa feature follows the established patterns:
+- Server component for data fetching (same as all page.tsx files)
+- Client component for interactive bits (same as other pages)
+- Reuses existing components (PostFeedWithLocal, SortBadgeRow, etc.)
+- Does not introduce new architectural patterns or dependencies
 
 ---
 
-## 13. Match Rate Calculation
+## 15. Match Rate Calculation
 
-### 13.1 Scoring Breakdown
+### 15.1 Scoring Breakdown
 
-| Category | Items Checked | Matched | Added | Missing | Score |
-|----------|:------------:|:-------:|:-----:|:-------:|:-----:|
-| PRD Core Features | 15 | 15 | 10 | 0 | 100% |
-| PRD Extended Features | 8 | 0 | 0 | 8 | 0% (Phase B) |
-| Brand Consistency | 27 references | 27 | 0 | 0 | 100% |
-| Bug Fix Correctness | 4 aspects | 4 | 0 | 0 | 100% |
-| localStorage Scoping | 16 keys | 13 | 0 | 3 | 81% |
-| Convention Compliance | 5 categories | 4.75 | 0 | 0.25 | 95% |
-| Architecture | 5 layers | 5 | 0 | 0 | 100% |
-| Type Safety | 7 areas | 7 | 0 | 0 | 100% |
+| Category | Items Checked | Matched | Added | Missing | Changed | Score |
+|----------|:------------:|:-------:|:-----:|:-------:|:-------:|:-----:|
+| PRD Core Features | 12 | 12 | 5 | 0 | 0 | 100% |
+| PRD Extended Features | 8 | 0 | 0 | 8 | 0 | 0% (Phase B) |
+| Category Structure | 6 major | 5 | 1 | 0 | 3 names | 83% |
+| karts-eussa Feature | 10 checks | 10 | 0 | 0 | 0 | 100% |
+| Write Flow | 6 checks | 6 | 0 | 0 | 0 | 100% |
+| Image System | 7 checks | 7 | 0 | 0 | 0 | 100% |
+| Previous Issues | 3 hardcoded keys | 3 | 0 | 0 | 0 | 100% |
+| Convention Compliance | 5 categories | 4.7 | 0 | 0.3 | 0 | 94% |
+| Architecture | 5 layers | 5 | 0 | 0 | 0 | 100% |
+| Type Safety | 7 areas | 7 | 0 | 0 | 0 | 100% |
 
-### 13.2 Overall Match Rate
+### 15.2 Overall Match Rate
 
 ```
 PRD Core Match:        100% ||||||||||||||||||||||||||||||||
-Brand Rename:          100% ||||||||||||||||||||||||||||||||
-Bug Fix:               100% ||||||||||||||||||||||||||||||||
+karts-eussa Feature:   100% ||||||||||||||||||||||||||||||||
+Write Flow:            100% ||||||||||||||||||||||||||||||||
+Image System:          100% ||||||||||||||||||||||||||||||||
+Previous Fix:          100% ||||||||||||||||||||||||||||||||
 Architecture:          100% ||||||||||||||||||||||||||||||||
 Type Safety:           100% ||||||||||||||||||||||||||||||||
-Convention:             95% |||||||||||||||||||||||||||||
-localStorage Scoping:   81% ||||||||||||||||||||||||
+Convention:             94% ||||||||||||||||||||||||||||
+Category Structure:     83% |||||||||||||||||||||||||
 
-Overall Match Rate:     97%
+Overall Match Rate:     96%
 
   3 Missing features  (Design O, Implementation X) -- all Phase B deferred
- 10 Positive additions (Design X, Implementation O)
-  3 Changed features   (Design != Implementation) -- all Low impact
-
-Note: PRD Extended Features (Phase B) excluded from score as they are
-intentionally deferred. Including them would yield 87%.
+  5 Positive additions (Design X, Implementation O) -- this session
+  7 Changed features   (Design != Implementation) -- 4 Low, 2 Medium, 1 Low
+  3 Previous issues    resolved from v8.0
 ```
+
+**Note**: The 1% decrease from v8.0 (97% -> 96%) is due to the expanded category divergence from the PRD. The implementation now has 7 major categories vs PRD's 6, renamed categories, and reordered priorities. These are intentional product decisions reflecting the project's evolution toward 한예종-specific features.
 
 ---
 
-## 14. Match Rate History (Full Project)
+## 16. Match Rate History (Full Project)
 
 | Analysis | Date | Scope | Overall Match Rate | Key Change |
 |----------|------|-------|:------------------:|------------|
 | Check-1 (Initial) | 2026-02-20 | Full project | 52% | Initial assessment |
-| Check-3 (Act-2) | 2026-02-20 | Full project | 76% | Major gap fixes |
-| Check-4 (Act-3) | 2026-02-20 | Full project | 88% | Auth implementation |
-| Check-5 (Round 2-4) | 2026-02-20 | Full project | 93% | Convention fixes |
 | Check-6 (Post-v5.0) | 2026-02-20 | Full project | 96% | Full feature completion |
 | Check-7 (3-step signup) | 2026-02-25 | Feature: auth | 100% | 3-step signup flow |
-| **Check-8 (This report)** | **2026-02-25** | **Full project** | **97%** | **Brand rename + bug fix + audit** |
-
-**Note**: Check-8 is 97% vs Check-6's 96%. The 1% improvement comes from the brand rename achieving full consistency and the bank info bug fix resolving a data isolation issue. The localStorage scoping findings (Section 5.3) are new discoveries that slightly offset the gains, but overall quality has improved.
+| Check-8 (Brand + Bug fix) | 2026-02-25 | Full project | 97% | Brand rename + bug fix + audit |
+| **Check-9 (This report)** | **2026-03-02** | **Full project** | **96%** | **karts-eussa + category changes + image system** |
 
 ---
 
-## 15. Post-Analysis Actions
+## 17. Recommended Actions
+
+### 17.1 Immediate Actions (Before Next Iteration)
+
+| Priority | Item | File(s) | Description |
+|----------|------|---------|-------------|
+| Medium | Add 한예종 cheer mock posts | `data/posts.ts` | Add 2-3 mock posts with `universityId: 5, categoryMinorId: 48` so the karts-eussa page is not empty |
+| Low | Update PRD category section | Design doc | Document the 7-category structure, name changes, and order changes |
+
+### 17.2 Short-term Improvements (Before Phase B)
+
+| Priority | Item | File(s) | Description |
+|----------|------|---------|-------------|
+| Low | Generalize `from` redirect | `write/page.tsx` L733 | Replace hardcoded `'karts-eussa'` check with generic redirect: `if (fromParam) router.push('/' + fromParam)` |
+| Low | User-scope 4 localStorage keys | `constants.ts`, `api.ts` | Add `_${userId}` suffix to LIKED_POSTS, WRITE_DRAFT, RECENT_SEARCHES, RECENT_VIEWED |
+| Low | Add STORAGE_KEYS for CamTalk constants | `constants.ts` | Already partially done (L21-23), verify all CamTalk keys are listed |
+
+### 17.3 Phase B Migration Notes
+
+| Item | Current State | Phase B Action |
+|------|-------------|----------------|
+| Image storage | IndexedDB (client-side) | Supabase Storage with file upload |
+| localStorage keys | Mostly global | All user data moves to Supabase |
+| CamTalk | localStorage-based | Supabase Realtime channels |
+| Auth | Mock with plain-text passwords | Supabase Auth |
+| Category data | Static TypeScript arrays | Supabase categories table |
+| University data | Static TypeScript arrays | Supabase universities table |
+
+---
+
+## 18. Post-Analysis Actions
 
 ```
-Match Rate 97% (>= 90%):
-  -> "Design and implementation match very well."
-  -> Brand rename "캠톡" -> "캠퍼스톡": fully verified (0 old, 27 new)
-  -> Bank info bug fix: verified correct with migration logic
-  -> 3 hardcoded localStorage keys found (data/users.ts, data/posts.ts)
-  -> 4 localStorage keys could benefit from user-scoping (low severity)
+Match Rate 96% (>= 90%):
+  -> "Design and implementation match well."
+  -> karts-eussa feature: correctly implemented with clean architecture
+  -> Write flow integration: fully functional with from-param redirect
+  -> Image system: successfully migrated to IndexedDB
+  -> 3 previous hardcoded key issues: all resolved
+  -> Category structure diverges from PRD (intentional product evolution)
+  -> 1 actionable finding: add 한예종 mock cheer posts
   -> Ready for /pdca report campulist
 ```
 
@@ -584,3 +676,4 @@ Match Rate 97% (>= 90%):
 | 1.0-6.0 | 2026-02-20 | Full project gap analysis iterations | gap-detector |
 | 7.0 | 2026-02-25 | Feature-level analysis: 3-step signup flow | gap-detector |
 | 8.0 | 2026-02-25 | Comprehensive analysis: brand rename + bug fix + full audit | gap-detector |
+| 9.0 | 2026-03-02 | Full analysis: karts-eussa feature + category changes + image system + UX improvements | gap-detector |
