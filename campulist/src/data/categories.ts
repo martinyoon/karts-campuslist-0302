@@ -2,10 +2,10 @@ import type { Category, CategoryGroup } from '@/lib/types';
 
 export const categories: Category[] = [
   // ===== 대분류 (7개) =====
-  { id: 1, name: '중고마켓', slug: 'market', parentId: null, icon: '📦', sortOrder: 1 },
-  { id: 2, name: '주거', slug: 'housing', parentId: null, icon: '🏠', sortOrder: 2 },
-  { id: 3, name: '일자리', slug: 'jobs', parentId: null, icon: '💼', sortOrder: 3 },
-  { id: 4, name: '게시판', slug: 'community', parentId: null, icon: '👥', sortOrder: 4 },
+  { id: 4, name: '게시판', slug: 'community', parentId: null, icon: '👥', sortOrder: 1 },
+  { id: 1, name: '중고마켓', slug: 'market', parentId: null, icon: '📦', sortOrder: 2 },
+  { id: 2, name: '주거', slug: 'housing', parentId: null, icon: '🏠', sortOrder: 3 },
+  { id: 3, name: '일자리', slug: 'jobs', parentId: null, icon: '💼', sortOrder: 4 },
   { id: 5, name: '서비스', slug: 'services', parentId: null, icon: '🛠️', sortOrder: 5 },
   { id: 6, name: '캠퍼스라이프', slug: 'campus-life', parentId: null, icon: '🏪', sortOrder: 6 },
   { id: 7, name: '긱·의뢰', slug: 'gigs', parentId: null, icon: '📣', sortOrder: 7 },

@@ -9,6 +9,11 @@ const universitySlugs = new Set(universities.map(u => u.slug));
  * 대학교/카테고리 페이지에 있으면 ?uni=&major=&minor= 파라미터를 자동 추가.
  */
 export function getWriteUrl(pathname: string, searchParams?: string): string {
+  // 한예종으쌰으쌰 전용 페이지
+  if (pathname === '/karts-eussa') {
+    return '/write?uni=karts&major=community&minor=cheer';
+  }
+
   const segments = pathname.split('/').filter(Boolean);
   const writeParams = new URLSearchParams();
 
