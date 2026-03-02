@@ -11,7 +11,7 @@ const universitySlugs = new Set(universities.map(u => u.slug));
 export function getWriteUrl(pathname: string, searchParams?: string): string {
   // 한예종으쌰으쌰 전용 페이지
   if (pathname === '/karts-eussa') {
-    return '/write?uni=karts&major=community&minor=cheer';
+    return '/write?uni=karts&major=community&minor=cheer&from=karts-eussa';
   }
 
   const segments = pathname.split('/').filter(Boolean);

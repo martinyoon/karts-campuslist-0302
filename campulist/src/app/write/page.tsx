@@ -729,15 +729,20 @@ function WritePageContent() {
       const post = await createPost({ ...postData, authorId: user.id, tags, images });
       clearDraft();
       toast(post.imageSaveFailed && images.length > 0 ? '게시글이 등록되었지만 사진 저장에 실패했어요. 저장 공간이 부족할 수 있습니다.' : '게시글이 등록되었습니다!');
-      // 카테고리 목록으로 이동 (내 글이 최상단에 보이는지 확인 가능)
-      const uni = universities.find(u => u.id === universityId);
-      const major = categories.find(c => c.id === majorId);
-      const minor = categories.find(c => c.id === minorId);
-      if (uni && major) {
-        const minorQuery = minor ? `?minor=${minor.slug}` : '';
-        router.push(`/${uni.slug}/${major.slug}${minorQuery}`);
+      // 진입 페이지(from)가 있으면 해당 페이지로, 아니면 카테고리 목록으로 이동
+      const fromParam = new URLSearchParams(window.location.search).get('from');
+      if (fromParam === 'karts-eussa') {
+        router.push('/karts-eussa');
       } else {
-        router.push(`/post/${post.id}`);
+        const uni = universities.find(u => u.id === universityId);
+        const major = categories.find(c => c.id === majorId);
+        const minor = categories.find(c => c.id === minorId);
+        if (uni && major) {
+          const minorQuery = minor ? `?minor=${minor.slug}` : '';
+          router.push(`/${uni.slug}/${major.slug}${minorQuery}`);
+        } else {
+          router.push(`/post/${post.id}`);
+        }
       }
     }
   };
