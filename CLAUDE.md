@@ -16,19 +16,19 @@
 ```
 campulist/
 ├── src/app/                  — 페이지 라우트 (20+)
-│   ├── [uni]/[major]/          — 동적 라우트 (대학/대분류)
+│   ├── [university]/[category]/  — 동적 라우트 (대학/대분류)
 │   ├── write/                  — 글쓰기 (page.tsx, 가장 복잡한 파일)
 │   ├── karts-eussa/            — 한예종으쌰으쌰 전용 페이지
 │   ├── post/[id]/              — 게시글 상세
 │   ├── camtalk/                — 캠톡 (채팅)
 │   ├── all/                    — 전체 대학 통합 게시판
 │   └── mypage/                 — 마이페이지
-├── src/components/           — UI 컴포넌트 (51개)
+├── src/components/           — UI 컴포넌트 (49개)
 │   ├── layout/                 — Header, Footer, Breadcrumb
 │   ├── ui/                     — shadcn/ui 기반 (Sheet, Toast 등)
 │   └── post/                   — PostCard, PostFeed 등
 ├── src/data/                 — Mock 데이터
-│   ├── categories.ts           — 7 대분류 + 67 소분류
+│   ├── categories.ts           — 7 대분류 + 48 소분류
 │   ├── universities.ts         — 5개 대학교
 │   └── posts.ts                — Mock 게시글
 ├── src/lib/                  — 유틸리티
@@ -64,7 +64,7 @@ campulist/
 | jobs | 3 | 일자리 | 4 |
 | services | 5 | 서비스 | 5 |
 | campus-life | 6 | 캠퍼스라이프 | 6 |
-| gigs | 7 | 긱/의뢰 | 7 |
+| gigs | 7 | 긱·의뢰 | 7 |
 
 ### 주요 소분류
 
@@ -72,7 +72,7 @@ campulist/
 |------|----|------|----------|------------|
 | cheer | 48 | 으쌰으쌰 | 4 (게시판) | campus |
 | free-board | 46 | 자유게시판 | 4 (게시판) | campus |
-| textbooks | 11 | 전공서적 | 1 (마켓) | campus |
+| textbooks | 11 | 전공서적/교양도서 | 1 (마켓) | campus |
 | studio | 21 | 원룸/자취방 | 2 (주거) | open |
 
 **규칙**: slug 기반으로 코딩. 하드코딩 ID는 Server Component 초기값에만 허용.

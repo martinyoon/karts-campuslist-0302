@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-02T10:26:41.803Z",
+  "lastUpdated": "2026-03-03T07:03:00.325Z",
   "activeFeatures": [
     "02-design",
     "data",
@@ -54,9 +54,9 @@
       "archivedAt": "2026-02-20T10:42:00.000Z",
       "archivedTo": "docs/archive/2026-02/campulist/",
       "phaseNumber": 3,
-      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/lib/writeUrl.ts",
+      "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/app/page.tsx",
       "timestamps": {
-        "lastUpdated": "2026-03-02T10:26:31.634Z"
+        "lastUpdated": "2026-03-03T07:02:50.989Z"
       }
     },
     "data": {
@@ -146,7 +146,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-20T07:14:48.946Z",
-        "lastUpdated": "2026-03-02T10:26:41.803Z"
+        "lastUpdated": "2026-03-03T07:03:00.325Z"
       },
       "lastFile": "/Users/yoonsukmin/Documents/VSCL-center/한예종캠퍼스리스트3월2일/campulist/src/app/write/page.tsx"
     },
@@ -406,7 +406,7 @@
   "session": {
     "startedAt": "2026-02-20T06:05:02.769Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-02T10:26:41.803Z"
+    "lastActivity": "2026-03-03T07:03:00.325Z"
   },
   "history": [
     {
@@ -11818,6 +11818,18 @@
     },
     {
       "timestamp": "2026-03-02T10:26:41.803Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-03T07:02:50.989Z",
+      "feature": "campulist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-03T07:03:00.325Z",
       "feature": "write",
       "phase": "do",
       "action": "updated"

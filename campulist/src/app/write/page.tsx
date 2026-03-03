@@ -733,6 +733,8 @@ function WritePageContent() {
       const fromParam = new URLSearchParams(window.location.search).get('from');
       if (fromParam === 'karts-eussa') {
         router.push('/karts-eussa');
+      } else if (fromParam === 'home-lesson') {
+        router.push('/');
       } else {
         const uni = universities.find(u => u.id === universityId);
         const major = categories.find(c => c.id === majorId);
